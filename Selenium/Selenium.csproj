@@ -1,0 +1,238 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B30CE36F-3653-4610-9519-FAA61E8FC12B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Selenium</RootNamespace>
+    <AssemblyName>Selenium</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>2</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>x86</PlatformTarget>
+    <RegisterForComInterop>true</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Release\Selenium.XML</DocumentationFile>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RegisterForComInterop>false</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\..\AppData\Local\SeleniumBasic\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;Test</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RegisterForComInterop>false</RegisterForComInterop>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ComInterfaces\_Actions.cs" />
+    <Compile Include="ComInterfaces\_Assert.cs" />
+    <Compile Include="ComInterfaces\_By.cs" />
+    <Compile Include="ComInterfaces\_Cookie.cs" />
+    <Compile Include="ComInterfaces\_Cookies.cs" />
+    <Compile Include="ComInterfaces\_DictionaryItem.cs" />
+    <Compile Include="ComInterfaces\_Table.cs" />
+    <Compile Include="ComInterfaces\_Dictionary.cs" />
+    <Compile Include="ComInterfaces\_Image.cs" />
+    <None Include="ComInterfaces\_IME.cs" />
+    <Compile Include="ComInterfaces\_Keyboard.cs" />
+    <Compile Include="ComInterfaces\_Keys.cs" />
+    <Compile Include="ComInterfaces\_List.cs" />
+    <Compile Include="ComInterfaces\_Logs.cs" />
+    <Compile Include="ComInterfaces\_Manage.cs" />
+    <Compile Include="ComInterfaces\_Mouse.cs" />
+    <Compile Include="ComInterfaces\_PdfFile.cs" />
+    <Compile Include="ComInterfaces\_TableRow.cs" />
+    <Compile Include="ComInterfaces\_TouchScreen.cs" />
+    <Compile Include="ComInterfaces\_SelectElement.cs" />
+    <Compile Include="ComInterfaces\_Proxy.cs" />
+    <Compile Include="ComInterfaces\_Storage.cs" />
+    <Compile Include="ComInterfaces\_TableElement.cs" />
+    <Compile Include="ComInterfaces\_Timeouts.cs" />
+    <Compile Include="ComInterfaces\_TouchActions.cs" />
+    <Compile Include="ComInterfaces\_Utils.cs" />
+    <Compile Include="ComInterfaces\_Verify.cs" />
+    <Compile Include="ComInterfaces\_Waiter.cs" />
+    <Compile Include="ComInterfaces\_WebElement.cs" />
+    <Compile Include="ComInterfaces\_WebElements.cs" />
+    <Compile Include="ComInterfaces\_Window.cs" />
+    <Compile Include="Common\CacheState.cs" />
+    <Compile Include="Common\MouseButton.cs" />
+    <Compile Include="Common\Strategy.cs" />
+    <Compile Include="Core\DeserializeException.cs" />
+    <Compile Include="Core\JavascriptContext.cs" />
+    <Compile Include="Errors\DictionaryErrors.cs" />
+    <Compile Include="Errors\ImageErrors.cs" />
+    <Compile Include="Errors\KeyboardInterruptError.cs" />
+    <Compile Include="Core\RequestMethod.cs" />
+    <Compile Include="Common\SearchContext.cs" />
+    <Compile Include="Core\WindowContext.cs" />
+    <Compile Include="Errors\ArgumentErrors.cs" />
+    <Compile Include="Errors\InvalidOperationError.cs" />
+    <Compile Include="Errors\NotImplementedError.cs" />
+    <Compile Include="Errors\PdfErrors.cs" />
+    <Compile Include="Excel\ICells.cs" />
+    <Compile Include="Excel\IExcel.cs" />
+    <Compile Include="Excel\IRange.cs" />
+    <Compile Include="Excel\IWorkbook.cs" />
+    <Compile Include="Excel\IWorkbooks.cs" />
+    <Compile Include="Excel\IWorksheet.cs" />
+    <Compile Include="Excel\IWorksheets.cs" />
+    <Compile Include="Internal\AssemblyExt.cs" />
+    <Compile Include="Internal\AssemblyURLAttribute.cs" />
+    <Compile Include="Internal\Crc32.cs" />
+    <Compile Include="Internal\HotKeyGlobal.cs" />
+    <Compile Include="Core\SysWaiter.cs" />
+    <Compile Include="Errors\WebRequestErrors.cs" />
+    <Compile Include="Internal\IniFile.cs" />
+    <Compile Include="Internal\ProcessExt.cs" />
+    <Compile Include="Internal\RunningObject.cs" />
+    <Compile Include="Internal\StringExt.cs" />
+    <Compile Include="Internal\ThreadExt.cs" />
+    <Compile Include="Internal\UnhandledException.cs" />
+    <Compile Include="ComInterfaces\_Selenium.cs" />
+    <Compile Include="Pdf\PdfFonts.cs" />
+    <Compile Include="Pdf\PdfImage.cs" />
+    <Compile Include="Pdf\PdfOutlines.cs" />
+    <Compile Include="Pdf\PdfPages.cs" />
+    <Compile Include="Pdf\PdfXRefs.cs" />
+    <Compile Include="Application.cs" />
+    <Compile Include="RotWrapper.cs" />
+    <Compile Include="Serializer\IJsonObject.cs" />
+    <Compile Include="Serializer\JsonException.cs" />
+    <Compile Include="Serializer\JsonReader.cs" />
+    <Compile Include="Serializer\JsonWriter.cs" />
+    <Compile Include="NamespaceDoc.cs" />
+    <Compile Include="Pdf\PdfFont.cs" />
+    <Compile Include="Pdf\PdfPage.cs" />
+    <Compile Include="Pdf\PdfWriter.cs" />
+    <Compile Include="Core\IDriverService.cs" />
+    <Compile Include="Common\Actions.cs" />
+    <Compile Include="Common\Alert.cs" />
+    <Compile Include="Core\FrameContext.cs" />
+    <None Include="Common\IME.cs" />
+    <Compile Include="Common\Logs.cs" />
+    <Compile Include="Common\Timeouts.cs" />
+    <Compile Include="Common\Keyboard.cs" />
+    <Compile Include="Common\Mouse.cs" />
+    <Compile Include="Common\TouchScreen.cs" />
+    <Compile Include="Common\Capabilities.cs" />
+    <Compile Include="Struct\Dictionary.cs" />
+    <Compile Include="Struct\DictionaryItem.cs" />
+    <Compile Include="Zip\ZipException.cs" />
+    <Compile Include="Zip\ZipFile.cs" />
+    <None Include="Internal\HotKeyGlobalLL.cs" />
+    <Compile Include="Internal\ExceptionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Internal\ExceptionDialog.Designer.cs">
+      <DependentUpon>ExceptionDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Internal\ClipboardExt.cs" />
+    <Compile Include="Internal\COMExt.cs" />
+    <Compile Include="Internal\FolderCache.cs" />
+    <Compile Include="Common\Storage.cs" />
+    <Compile Include="Core\RemoteSession.cs" />
+    <Compile Include="SeleniumError.cs" />
+    <Compile Include="Struct\TableRow.cs" />
+    <Compile Include="Assert.cs" />
+    <Compile Include="Common\By.cs" />
+    <Compile Include="Common\Cookie.cs" />
+    <Compile Include="Common\Cookies.cs" />
+    <Compile Include="Drivers\ChromeDriver.cs" />
+    <Compile Include="Drivers\FirefoxDriver.cs" />
+    <Compile Include="Core\FirefoxService.cs" />
+    <Compile Include="Drivers\IEDriver.cs" />
+    <Compile Include="Drivers\OperaDriver.cs" />
+    <Compile Include="Drivers\PhantomJSDriver.cs" />
+    <Compile Include="Core\DriverService.cs" />
+    <Compile Include="Common\SelectElement.cs" />
+    <Compile Include="Common\TableElement.cs" />
+    <Compile Include="Excel\ExcelApi.cs" />
+    <Compile Include="Core\RemoteServer.cs" />
+    <Compile Include="Internal\IOExt.cs" />
+    <Compile Include="Internal\NetExt.cs" />
+    <Compile Include="Internal\ObjExt.cs" />
+    <Compile Include="ComInterfaces\_Alerts.cs" />
+    <Compile Include="ComInterfaces\_WebDriver.cs" />
+    <Compile Include="Common\Manage.cs" />
+    <Compile Include="Pdf\PdfFile.cs" />
+    <Compile Include="Common\Proxy.cs" />
+    <Compile Include="Struct\Table.cs" />
+    <Compile Include="Common\Image.cs" />
+    <Compile Include="SeleniumException.cs" />
+    <Compile Include="Common\Keys.cs" />
+    <Compile Include="Struct\List.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Struct\Point.cs" />
+    <Compile Include="Struct\Size.cs" />
+    <Compile Include="Common\TouchActions.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="Verify.cs" />
+    <Compile Include="Waiter.cs" />
+    <Compile Include="WebDriver.cs" />
+    <Compile Include="Common\WebElement.cs" />
+    <Compile Include="Common\WebElements.cs" />
+    <Compile Include="Common\Window.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Core\FirefoxPrefs.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="key.snk" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /D /Y "$(ProjectDir)\..\References\firefoxdriver.xpi" .
+xcopy /D /Y "$(ProjectDir)\..\References\chromedriver.exe" .
+xcopy /D /Y "$(ProjectDir)\..\References\operadriver.exe" .
+xcopy /D /Y "$(ProjectDir)\..\References\iedriver.exe" .
+xcopy /D /Y "$(ProjectDir)\..\References\phantomjs.exe" .</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

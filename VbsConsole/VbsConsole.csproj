@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FB9F9DAE-3024-49AF-B017-8AECFDECF844}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>vbsc</RootNamespace>
+    <AssemblyName>vbsc</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CustomMarshalers" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ConsoleArgument.cs" />
+    <Compile Include="ExitException.cs" />
+    <Compile Include="Interop\IMSScriptContol.cs" />
+    <Compile Include="Interop\IMSScriptControl_Events.cs" />
+    <Compile Include="ScriptControl.cs" />
+    <Compile Include="ScriptDebugger.cs" />
+    <Compile Include="IWscript.cs" />
+    <Compile Include="Interop\MSScriptControl_EventSink.cs" />
+    <Compile Include="Interop\MSScriptControl_EventProvider.cs" />
+    <Compile Include="Interop\IMSScriptError.cs" />
+    <Compile Include="Interop\IMSScriptModule.cs" />
+    <Compile Include="Interop\IMSScriptModules.cs" />
+    <Compile Include="Interop\IMSScriptProcedure.cs" />
+    <Compile Include="Interop\IMSScriptProcedures.cs" />
+    <Compile Include="Interop\MSScriptControlConstants.cs" />
+    <Compile Include="Interop\ScriptControlStates.cs" />
+    <Compile Include="ConsoleArguments.cs" />
+    <Compile Include="Script.cs" />
+    <Compile Include="ScriptError.cs" />
+    <Compile Include="ScriptModule.cs" />
+    <Compile Include="ScriptProcedures.cs" />
+    <Compile Include="ScriptResult.cs" />
+    <Compile Include="ScriptRunner.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="RunnerVbNet.cs" />
+    <Compile Include="MultiScriptRunner.cs" />
+    <Compile Include="ScriptProcedure.cs" />
+    <Compile Include="ScriptSuccees.cs" />
+    <Compile Include="WithParams.cs" />
+    <Compile Include="TraceLine.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="WScript.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Selenium\Selenium.csproj">
+      <Project>{b30ce36f-3653-4610-9519-faa61e8fc12b}</Project>
+      <Name>Selenium</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<overlay id="implicit-wait_extension_loader_overlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+         xmlns:html="http://www.w3.org/1999/xhtml">
+    <script type="application/x-javascript" src="chrome://selenium-ide/content/api.js"/>
+	<html:script type="application/x-javascript">
+        var ide_api = new API();
+		ide_api.addPlugin("implicit-wait@florent.breheret");
+		ide_api.addPluginProvidedIdeExtension("chrome://implicit-wait/content/implicit-wait-ide.js");
+		ide_api.addPluginProvidedUserExtension("chrome://implicit-wait/content/implicit-wait-ext.js", "chrome://implicit-wait/content/implicit-wait-ide.xml");
+    </html:script>
+</overlay>

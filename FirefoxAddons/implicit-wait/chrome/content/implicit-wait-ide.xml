@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<apidoc>
+
+<function name="setImplicitWait">
+	<param name="timeout">Timeout in millisecond, set 0 to disable the implicit wait</param>
+	<comment>
+		<p>Specifies the amount of time it should wait when searching for an element if it is not immediately present.</p>
+		<p>Exemple : setImplicitWait | 5000</p>
+	</comment>
+</function>
+
+<function name="setImplicitWaitCondition">
+	<param name="timeout">Timeout in millisecond, set 0 to disable the implicit wait</param>
+	<param name="condition_js">a javascript logical expression that need to be true to execute each command.</param>
+	<comment>
+		<p>Specifies the amount of time it should wait for a condition to be true to continue to the next command.</p>
+		<p>Exemple : setImplicitWaitCondition | 5000  | 1==1  </p>
+		Conditions with known Ajax libraries :
+		<ul>
+		<li><code>!window.Sys || !window.Sys.WebForms.PageRequestManager.getInstance().get_isInAsyncPostBack()</code></li>
+		<li><code>!window.dojo || !window.dojo.io.XMLHTTPTransport.inFlight.length</code></li>
+		<li><code>!window.Ajax || !window.Ajax.activeRequestCount</code></li>
+		<li><code>!window.tapestry || !window.tapestry.isServingRequests()</code></li>
+		<li><code>!window.jQuery || !window.jQuery.active</code></li>
+		</ul>
+		PS : To check if the library is used, run the command getEval with the name of the library. Ex : getEval | alert( "Lib is present : " + ( typeof window.Ajax!='undefined') )
+	</comment>
+</function>
+
+</apidoc>

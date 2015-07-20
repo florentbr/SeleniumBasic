@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{09D6B13B-4B98-43E8-AB8E-8BE14C515E37}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Selenium.Tests</RootNamespace>
+    <AssemblyName>Selenium.Tests</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>2</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Test\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit-console-runner">
+      <HintPath>..\References\nunit\nunit-console-runner.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\nunit\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Internals\COM.cs" />
+    <Compile Include="Internals\BaseExcel.cs" />
+    <Compile Include="Internals\IgnoreFixtureAttribute.cs" />
+    <Compile Include="Internals\BaseBrowsers.cs" />
+    <Compile Include="Internals\TypeExt.cs" />
+    <Compile Include="Internals\WebServer.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TS_Actions.cs" />
+    <Compile Include="TS_Assert.cs" />
+    <Compile Include="TS_By.cs" />
+    <Compile Include="TS_SearchContext.cs" />
+    <Compile Include="TS_Capture.cs" />
+    <Compile Include="TS_Alert.cs" />
+    <Compile Include="TS_Element.cs" />
+    <Compile Include="TS_ExecuteScript.cs" />
+    <Compile Include="TS_Frame.cs" />
+    <Compile Include="TS_Manage.cs" />
+    <Compile Include="TS_Mouse.cs" />
+    <Compile Include="TS_PDF.cs" />
+    <Compile Include="TS_Scraping.cs" />
+    <Compile Include="TS_Select.cs" />
+    <Compile Include="TS_Keyboard.cs" />
+    <Compile Include="TS_Serialiser.cs" />
+    <Compile Include="TS_Excel.cs" />
+    <Compile Include="TS_Verify.cs" />
+    <Compile Include="TS_Window.cs" />
+    <Compile Include="TS_Windows.cs" />
+    <Compile Include="TS_zip.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Pages\element.html" />
+    <Content Include="Pages\findby.html" />
+    <Content Include="Pages\input.html" />
+    <Content Include="Pages\links.html" />
+    <Content Include="Pages\select.html" />
+    <Content Include="Pages\table.html" />
+    <Content Include="Pages\win2.html" />
+    <Content Include="Pages\win3.html" />
+    <Content Include="Pages\frame2.html" />
+    <Content Include="Pages\frame1.html" />
+    <Content Include="Pages\elements.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Pages\frame3.html" />
+    <Content Include="Pages\win1.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Selenium\Selenium.csproj">
+      <Project>{b30ce36f-3653-4610-9519-faa61e8fc12b}</Project>
+      <Name>Selenium</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /D /Y "$(ProjectDir)\..\References\firefoxdriver.xpi" .
+xcopy /D /Y "$(ProjectDir)\..\References\chromedriver.exe" .
+xcopy /D /Y "$(ProjectDir)\..\References\operadriver.exe" .
+xcopy /D /Y "$(ProjectDir)\..\References\iedriver.exe" .
+xcopy /D /Y "$(ProjectDir)\..\References\phantomjs.exe" .</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

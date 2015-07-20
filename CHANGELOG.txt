@@ -1,0 +1,255 @@
+Author : Florent BREHERET
+Website : https://github.com/florentbr/SeleniumBasic
+
+Third party softwares:
+ 
+ Selenium - Software Freedom Conservancy
+ https://github.com/SeleniumHQ/selenium
+ 
+ Chrome driver - New BSD License
+ https://sites.google.com/a/chromium.org/chromedriver
+ 
+ Opera driver - Creative Commons Attribution 3.0 Unported license
+ https://github.com/operasoftware/operachromiumdriver
+ 
+ PhantomJs web stack - BSD license
+ http://phantomjs.org/
+
+
+v2.0.2.0  (2015/07/20)
+===============================================================================
+ * Updated the setup to install without privileges
+ * Removed all the RC commands (deprecated and no longer maintained)
+ * Removed the Safari driver as this browser is no longer maintained on Windows
+ * Added interoperability with Excel to read/write data (DataTable object and ToExcel methods)
+ * Added some registry tweaks in the setup for IE compatibility (Optional)
+ * Added the touch screen commands
+ * Added the Opera driver (version 0.2.0)
+ * Updated Firefox driver to version 2.46
+ * Updated IEDriverServer to version 2.46
+ * Updated Chrome driver to version 2.16
+ * Aligned the API with the W3C specifications
+ * Refactored all the verify and error messages
+ * Defined a unique temporary folder for each driver (%TEMP%\Selenium)
+ * Improved the cleaning process and launching time for Firefox
+ * Refactore the PDF class to remove external dependencies.
+ * Fixed the interrupt mechanism triggered by the Escape key
+
+v1.0.23.0  (2014/11/20)
+===============================================================================
+ * Updated Chrome driver to 2.12
+ * Added the multi-line input for the console runner
+ * Added the switchToParentFrame command
+ * [Issue117] Fixed the Assert/Verify commands having an array as input
+ * [Issue118] Skips the installation of the IDE if Firefox is missing
+
+v1.0.22.0  (2014/10/27)
+===============================================================================
+ * Updated IEDriverServer to version 2.44.0
+ * Updated Selenium libraries to version 2.44.0
+ * Updated PhantomJS to version 1.9.8
+
+v1.0.21.1  (2014/10/14)
+===============================================================================
+ * Updated Selenium IDE to 2.8.0
+ * Updated Chrome driver to 2.11
+ * Added the option "raise" on "open" and "get" to skip the exception in case of timeout
+ * Added the keys option on the click command of a web element
+ * Fixed the exception for "for each" used on methods returning an array of strings
+ * Fixed the open and get command to allow a "javascript:..." url
+ * Fixed the failing calls after a second start on a single instance
+ * Fixed PhantomJs driver failing on start command
+
+v1.0.20.0  (2014/09/18)
+===============================================================================
+ * Updated Selenium libraries to 2.43.1
+ * Updated IEDriverServer to 2.43.0
+ * Updated PhantomJs to 1.9.7
+ * Added the option "raise" on FindElement to skip the exception and to return Nothing
+ * Added "Run VBS" on the context menu of the folder
+ * Added the switch to a frame by WebElement switchToFrame(WebElement)
+ * Added arguments and proxy suport for PhantomJS
+ * Fixed switchToFrame and switchToWindow when called an index (issue 92)
+
+v1.0.19.0  (2014/05/05)
+===============================================================================
+ * Updated Selenium libraries to 2.41.0
+ * Updated IEDriverServer to 2.41.0
+ * Updated Chrome driver to 2.10
+ * Added an enhanced console script runner (vbsc.exe) to replace wscript.exe
+ * Added WaitFor method (waits for a provided procedure to to return true)
+ * Added WaitForSelection, WaitForEnabled and WaitForDisplayed methods
+ * Added WaitNotElement and WaitTitleMatches methods
+ * Added waitForScriptCondition, waitForScriptObject and waitForScriptSuccees
+ * Standardized the error message for missing elements between browsers.
+ * Fixed the missing sub-dictionaries that were not returned by executeScript
+ * The child console is now hidden by default
+
+v1.0.18.0  (2014/02/25)
+===============================================================================
+ * Updated Selenium libraries to 2.40.0
+ * Updated IEDriverServer to 2.40.0
+ * Updated Chrome driver to 2.9
+ * Updated SeleniumIDE to v2.5.0
+ * Updated PhantomJS to v1.9.7.0
+ * Added image compare
+ * Added import of performance data
+ * Added table and list web scraping
+ * Added SetClipboard and GetClipboard method
+ * Added Safari webdriver
+ * Added the use of the previous session for Excel
+ * Added an option to hide the window console when a driver is launched (HideCommandPromptWindow)
+ * Added automatic profile creation for Firefox if it doesn't exist
+ * Fixed some marshaling on arguments
+ * Fixed unhandled types returned by executeScript
+
+v1.0.17.0  (2013/12/28)
+===============================================================================
+ * Updated Selenium libraries to 2.39.0
+ * Updated IEDriverServer to 2.39.0
+ * Updated Chrome driver to 2.8
+ * Added image compare
+ * Added GetScreenShot in Utils
+
+v1.0.16.0  (2013/11/04)
+===============================================================================
+ * Updated Selenium libraries to 2.37.0
+ * Updated IEDriverServer to 2.37.0
+ * Fixed setPreference for chrome
+ * FindElementsBy now returns a WebElementCollection
+ * Fixed executeScript falling with WebElements collections
+ * Added sendKeysNat to Send keystrokes to the active window
+ * Added toClipboard to Send text to the clipboard
+ * Removed native methods (Will be included in a side library in a future release)
+ * Some code refactoring for interoperability
+
+v1.0.15.0 (2013/10/18)
+===============================================================================
+ * Updated Selenium libraries to 2.36.0
+ * Updated IEDriverServer to 2.36.0
+ * Updated Chrome driver to 2.4
+ * Updated PhantomJs to 1.9.2
+ * Updated selenium IDE to 2.4.0
+ * Added native methods to control a window, the mouse and the keyboard
+ * Issue 28 : CaptureEntirePageScreenshot is not working
+ * Issue 31 : executeScript can now take and return WebElements
+ * Refactored the action class
+
+v1.0.14.0 (2013/08/07)
+===============================================================================
+ * Updated Selenium libraries to 2.34.0
+ * Updated IEDriverServer to 2.34.0
+ * Updated Chrome driver to 2.2
+ * Updated PhantomJs to 1.9.1
+ * Added SeleniumIDE to the package
+ * Fixed screen capture for remote driver
+ * Rebuild of templates and examples
+ * Fixed regression on the exe.config file
+ * Fixed time-out message on wait commands 
+ * Fixed AsSelect property
+
+v1.0.13.3 (2013/05/23)
+===============================================================================
+ * Updated Selenium libraries to 2.33.0
+ * Updated IEDriverServer to 2.33.0
+ * Fixed temporary file cleaning
+ * Set templates and examples to trusted locations
+ * Code re-factoring
+ 
+v1.0.12.0 (2013/05/04)
+===============================================================================
+ * Updated Selenium libraries to 2.32.1
+ * Updated IEDriverServer to 2.32.3
+ * Updated Chrome driver to 0.8
+ * Updated PhantomJs to 1.9
+ * Fixed setProxy method
+
+v1.0.11.1 (2013/03/06)
+===============================================================================
+ * Updated Selenium libraries to 2.31.2
+
+v1.0.11.0 (2013/03/05)
+===============================================================================
+ * Updated Selenium libraries to 2.31.1
+ * Updated PhantomJS to 1.8.2
+ * Fixed path installation for Office 2010
+ 
+v1.0.10.0 (2013/02/19)
+===============================================================================
+ * Updated Selenium libraries to 2.30.1
+ * Updated IEDriverServer to 2.30.0
+ * Added methods switchToAlert, switchToFrame, switchToWindow
+ * Added actions chained methods
+ * Extended the cancellation when the ESC key is pressed
+
+v1.0.9.0 (2013/02/04)
+===============================================================================
+ * Added the PhantomJS headless web driver
+ * Updated Chrome Driver to version 26.0.1383
+ * Updated Selenium libraries to 2.29.1
+ * Updated IEDriverServer to 2.29.0
+ * Added setProxy, setProfile and setCapability methodes
+ * Added selenium 2 methodes
+ * Fixed Firefox Addon installation
+ * Added Selenium 2 formatting
+ * Refactored the PDF creation class
+ 
+v1.0.8.0 (2013/01/06)
+===============================================================================
+ * Fixed version issue (old workbooks weren't using the new driver version)
+ * Updated Selenium libraries to 2.28.0
+ * Updated IEDriverServer to 2.28.0
+ 
+v1.0.7.0 (2012/12/10)
+===============================================================================
+ * Updated Selenium libraries to 2.27.1
+ * Updated IEDriverServer to 2.27.0
+ 
+v1.0.6.3 (2012/10/22)
+===============================================================================
+ * fixed Issue 11: VBA runs successfully only once in FireFox 16.0.1
+ * fixed Excel crashes on unhandle exception
+ * refactored windowMaximize method
+ * refactored chooseOkOnNextConfirmation method
+ * refactored chooseCancelOnNextConfirmation method
+ 
+v1.0.6.2 (2012/10/20)
+===============================================================================
+ * updated chrome driver to version 23.0.1240
+ * added setTimeout command
+ * fixed Excel crashes
+ * added temporary file cleaning
+ 
+v1.0.6.1 (2012/08/26)
+===============================================================================
+ * updated IEDriverServer.exe to 2.25.3.0
+ * added setPreference command for firefox
+ * added PdfFile object and methods to create Pdf files
+ * Fixed error on escape key press
+
+v1.0.6.0 (2012/07/24)
+===============================================================================
+ * Updated Selenium libraries to 2.25.1
+ * Updated IEDriverServer to 2.25.2
+ * Updated Chrome Driver to 22.0.1203.b
+ * Improved methods invocation
+ * Fixed silent unhandled errors
+ * Fixed formatter parsing with double quotes and numbers
+ * Added FindElementBy methods and WebElement object
+ * Added methods to create a PDF document and insert captures
+ * Added regular expressions methods
+ * Added documentation for original methods
+
+v1.0.5.3 (2012/06/11)
+===============================================================================
+ * Updated Selenium libraries to 2.23.0
+ * Updated IEDriverServer to 2.23.0
+ * Updated Chrome Driver to 20.0.1133.0
+
+v1.0.5.2 (2012/05/22)
+===============================================================================
+ * Added uninstall at installation
+ * Added some tests at installation
+ * Added menus in excel/word templates
+ * Fixed Equals test with null objects
+ * Fixed installation compatibility with OS x64 and Office x64

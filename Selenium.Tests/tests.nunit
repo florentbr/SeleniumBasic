@@ -1,0 +1,6 @@
+﻿<NUnitProject>
+  <Settings activeconfig="Release" processModel="Default" domainUsage="Default" />
+  <Config name="Release" binpathtype="Auto">
+    <assembly path="bin\Test\Selenium.Tests.dll" />
+  </Config>
+</NUnitProject>

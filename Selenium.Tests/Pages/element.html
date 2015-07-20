@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style type="text/css">
+        #input__search {
+            border-width: 0;
+            border: solid;
+            color: red;
+        }
+
+        #input__search_hidden {
+            display: none;
+        }
+
+        fieldset {
+            margin: 4px;
+            padding: 3px;
+            border: 1px solid gray;
+        }
+    </style>
+</head>
+<body>
+    <form>
+
+        <fieldset id="forms__text">
+            <legend>Input box</legend>
+            <p>
+                <label for="input__search">Search</label>
+                <input id="input__search" type="search" placeholder="Enter Search Term" style="width:300px;height:50px">
+            </p>
+        </fieldset>
+
+        <fieldset id="forms__div">
+            <legend>Div for size and location</legend>
+            <div id="txt_div" style="width:300px;height:50px;padding:3px;margin:4px;border:1px solid black;">
+                DIV
+            </div>
+
+        </fieldset>
+
+        <fieldset id="forms__text_diabled">
+            <legend>Element disabled</legend>
+            <p>
+                <label for="input__search_disabled">Search</label>
+                <input id="input__search_disabled" type="search" placeholder="Enter Search Term" style="width:300px;" disabled>
+            </p>
+        </fieldset>
+
+        <fieldset id="forms__text_hidden">
+            <legend>Element hidden</legend>
+            <p>
+                <label for="input__search_hidden">Search</label>
+                <input id="input__search_hidden" type="search" placeholder="Enter Search Term" style="width:300px;">
+            </p>
+        </fieldset>
+
+
+        <fieldset id="forms__checkbox">
+            <legend>Checkboxes</legend>
+            <ul class="list list--bare">
+                <li><label for="checkbox1"><input id="checkbox1" name="checkbox" type="checkbox"> Choice A</label></li>
+                <li><label for="checkbox2"><input id="checkbox2" name="checkbox" type="checkbox" checked="checked"> Choice B</label></li>
+                <li><label for="checkbox3"><input id="checkbox3" name="checkbox" type="checkbox"> Choice C</label></li>
+            </ul>
+        </fieldset>
+
+        <fieldset id="forms__select">
+            <legend>Select</legend>
+            <label for="select">Select</label>
+            <select id="select">
+                <optgroup label="Option Group">
+                    <option id="select_item2">Option One</option>
+                    <option id="select_item2" selected>Option Two</option>
+                    <option id="select_item2">Option Three</option>
+                </optgroup>
+            </select>
+        </fieldset>
+
+
+        <fieldset id="forms__action">
+            <legend>Action buttons</legend>
+            <p>
+                <input id="bt_reset" type="reset" value="Reset">
+            </p>
+        </fieldset>
+
+    </form>
+</body>
+</html>

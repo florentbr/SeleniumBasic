@@ -1,0 +1,6 @@
+References
+bin
+obj
+*.exe
+*.log
+*.bak

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="selenium-ide-overlay-iw.css" type="text/css"?>
+
+<!DOCTYPE window [
+<!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd">
+%browserDTD;
+<!ENTITY % exportTcStatusDTD SYSTEM "chrome://implicit-wait/locale/implicit-wait.dtd">
+%exportTcStatusDTD;
+]>
+
+<overlay id="implicit-wait_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    <toolbar id="toolbar2">
+		<toolbarbutton id="implicitwait-button" insertbefore="play-suite-button" class="icon" tooltiptext="&toolbar.implicitwait.tooltip;"/>
+	</toolbar>
+</overlay>

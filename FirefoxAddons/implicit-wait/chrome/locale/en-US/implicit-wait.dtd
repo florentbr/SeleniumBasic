@@ -1,0 +1,2 @@
+﻿<!ENTITY toolbar.implicitwait.label "Wait">
+<!ENTITY toolbar.implicitwait.tooltip "Enable/disable implicit wait to locate elements">

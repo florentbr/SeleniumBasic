@@ -1,0 +1,100 @@
+
+"""Script to create the registration file for innosetup.
+Usage: ipy gen-registration.ipy c:\\assembly.dll c:\\outfile.pas 
+"""
+
+import os, sys, re, argparse, subprocess, tempfile
+import clr, System
+from System.Reflection import Assembly, AssemblyDescriptionAttribute
+from System.Runtime.InteropServices import GuidAttribute, TypeLibVersionAttribute \
+    , ComVisibleAttribute, InterfaceTypeAttribute, ProgIdAttribute
+
+PROXYSTUBS = [
+    '{00020424-0000-0000-C000-000000000046}',  #DUAL: PSOAInterface
+    '{00020424-0000-0000-C000-000000000046}',  #IUnknown: PSOAInterface
+    '{00020420-0000-0000-C000-000000000046}'   #IDispatch: PSDispatch
+]
+
+def main(args):
+    in_dll = os.path.abspath(args[0])
+    out_file = os.path.abspath(args[1])
+    
+    if not os.path.isfile(in_dll):
+        raise Exception('Assembly not found: "%s"' % in_dll)
+    
+    print "Assembly : .\%s" % os.path.relpath(in_dll, os.getcwd())
+    print "OutFile  : .\%s" % os.path.relpath(out_file, os.getcwd())
+    print ""
+    print 'Parse the .Net assembly ...'
+    
+    assembly = Assembly.LoadFile(in_dll)
+    assembly_fullname = assembly.FullName
+    assembly_filename = os.path.basename(in_dll)
+    ass_guid = GetAttribute(assembly, GuidAttribute)
+    ass_vers = GetAttribute(assembly, TypeLibVersionAttribute)
+    ass_desc = GetAttribute(assembly, AssemblyDescriptionAttribute)
+    
+    lines_classes = []
+    lines_interfaces = []
+    lines_values = []
+    
+    types = assembly.GetExportedTypes()
+    for type in types:
+        comvisible = GetAttribute(type, ComVisibleAttribute, silent = True)
+        if comvisible and comvisible.Value == True:
+            att_guid = GetAttribute(type, GuidAttribute)
+            guid = '{' + att_guid.Value + '}'
+            if type.IsClass:
+                hasConstructor = type.GetConstructor(System.Type.EmptyTypes) is not None
+                if hasConstructor:
+                    progid = GetAttribute(type, ProgIdAttribute).Value
+                    lines_classes.Add("RegClass(lib, '%s', '%s', '%s');" % (guid, progid, type.FullName))
+            elif type.IsValueType:
+                lines_values.Add("RegRecord(lib, '%s', '%s');" % (guid, type.FullName))
+            elif type.IsInterface:
+                interfaceType = GetAttribute(type, InterfaceTypeAttribute).Value
+                proxystub = PROXYSTUBS[int(interfaceType)]         
+                lines_interfaces.Add("RegInterface(lib, '%s', '%s', '%s');" % (guid, type.Name, proxystub))
+    
+    
+    print 'Genereate the registration file ...'
+    
+    with open(out_file, 'w') as f :
+        f.write("{\n")
+        f.write(" Code generated at each build by gen-registration.ipy\n")
+        f.write(" This is a subset of SeleniumBasicSetup.iss\n")
+        f.write("}\n\n")
+        
+        f.write("lib.Guid := '{%s}';\n" % ass_guid.Value)
+        f.write("lib.FullName := '%s';\n" % assembly_fullname)
+        f.write("lib.Description := '%s';\n" % ass_desc.Description)
+        f.write("lib.TypeVersion := '%s.%s';\n" % (ass_vers.MajorVersion, ass_vers.MinorVersion))
+        f.write("lib.PathDll := ExpandConstant('{app}\%s');\n" % assembly_filename)
+        f.write("lib.PathTlb32 := ExpandConstant('{app}\%s');\n" % re.sub('\.[^.]+$', '32.tlb', assembly_filename))
+        f.write("lib.PathTlb64 := ExpandConstant('{app}\%s');\n" % re.sub('\.[^.]+$', '64.tlb', assembly_filename))
+        f.write("lib.Runtime := '%s';\n" % assembly.ImageRuntimeVersion)
+        f.write("\n")
+        f.write("RegTypeLib(lib);\n")
+        for lines in [lines_classes, lines_interfaces, lines_values]:
+            f.write('\n')
+            lines.sort()
+            for line in lines:
+                f.write(line + '\n')
+
+    print "\nDone"
+
+def GetAttribute(obj, att_typename, silent = False):
+    type = clr.GetClrType(att_typename)
+    attributes = obj.GetCustomAttributes(type, False)
+    if attributes.Length == 0 :
+        if not silent:
+            raise Exception("Attribute {0} is missing on type {1}".format(type.Name, obj.FullName))
+        return None
+    return attributes[0]
+
+if __name__ == '__main__':
+    if len(sys.argv) == 3 :
+        main(sys.argv[1:])
+    else:
+        print __doc__
+    
