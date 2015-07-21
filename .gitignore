@@ -4,3 +4,5 @@ obj
 *.exe
 *.log
 *.bak
+*.user
+*.lnk
