@@ -18,35 +18,32 @@ __dir__ = os.path.dirname(os.path.realpath(__file__))
 HKCR = win32con.HKEY_CLASSES_ROOT
 HKLM = win32con.HKEY_LOCAL_MACHINE
 HKCU = win32con.HKEY_CURRENT_USER
-HKNAMES = {HKCR: 'HKCR', HKLM: 'HKLM', HKCU: 'HKCU'}
+HKMAP = {HKCR:'HKCR', HKLM:'HKLM', HKCU:'HKCU'}
+
+VIEW32 = win32con.KEY_WOW64_32KEY | win32con.KEY_ALL_ACCESS
+VIEW64 = win32con.KEY_WOW64_64KEY | win32con.KEY_ALL_ACCESS
+VIEWMAP = {VIEW32:'32', VIEW64:''}
 
 def main():
     print __doc__
     print "Start cleaning registry ..."
     print ""
     
-    for i in range(0, 2):
-        for keyname, res, cls, lwt in win32api.RegEnumKeyEx(HKCR):
-            if keyname.startswith(STARTSWITH_PROGID):
-                DeleteRegTree(HKCR, keyname)
-        
-        for folder in [r'TypeLib', r'CLSID', r'Wow6432Node\CLSID', r'Interface', r'Wow6432Node\Interface', r'Record']:
-            skey = win32api.RegOpenKeyEx(HKCR, folder, 0, win32con.KEY_READ)
-            if skey:
-                for keyname, res, cls, lwt in win32api.RegEnumKeyEx(skey):
-                    if keyname.startswith(STARTSWITH_GUID):
-                        DeleteRegTree(HKCR, folder + '\\' + keyname)
-                win32api.RegCloseKey(skey)
+    for view in (VIEW64, VIEW32):
+        hRoot = HKCR
+        for subkey1 in [r'', r'TypeLib', r'CLSID', r'Interface', r'Record']:
+            hKey = win32api.RegOpenKeyEx(hRoot, subkey1, 0, view)
+            for subkey2, r, c, l in win32api.RegEnumKeyEx(hKey):
+                if subkey2.startswith(STARTSWITH_GUID) or subkey2.startswith(STARTSWITH_PROGID):
+                    print '\\'.join((HKMAP[hRoot] + VIEWMAP[view], subkey1, subkey2)).replace('\\\\', '\\')
+                    try:
+                        win32api.RegDeleteTree(hKey, subkey2)
+                    except Exception as ex :
+                        print ' failed: %s' % ex.strerror
+            win32api.RegCloseKey(hKey)
     
     print "\nDone"
 
-def DeleteRegTree(root, subkey):
-    print r'rm %s\%s' % (HKNAMES[root], subkey)
-    try:
-        win32api.RegDeleteTree(root, subkey)
-    except Exception as ex :
-        print ' failed: %s' % ex.strerror
-    
 def elevate():
     import ctypes, win32com.shell.shell, win32event, win32process
     outpath = r'%s\%s.out' % (os.environ["TEMP"], os.path.basename(__file__))
