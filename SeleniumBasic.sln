@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Selenium.Tests", "Selenium.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VbsConsole", "VbsConsole\VbsConsole.csproj", "{FB9F9DAE-3024-49AF-B017-8AECFDECF844}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication2", "ConsoleApplication2\ConsoleApplication2.csproj", "{96CBA5BA-96FB-4F46-B2CF-657A05A1A0F7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,11 +33,6 @@ Global
 		{FB9F9DAE-3024-49AF-B017-8AECFDECF844}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FB9F9DAE-3024-49AF-B017-8AECFDECF844}.Test|Any CPU.ActiveCfg = Release|Any CPU
 		{FB9F9DAE-3024-49AF-B017-8AECFDECF844}.Test|Any CPU.Build.0 = Release|Any CPU
-		{96CBA5BA-96FB-4F46-B2CF-657A05A1A0F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{96CBA5BA-96FB-4F46-B2CF-657A05A1A0F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{96CBA5BA-96FB-4F46-B2CF-657A05A1A0F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{96CBA5BA-96FB-4F46-B2CF-657A05A1A0F7}.Test|Any CPU.ActiveCfg = Release|Any CPU
-		{96CBA5BA-96FB-4F46-B2CF-657A05A1A0F7}.Test|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
