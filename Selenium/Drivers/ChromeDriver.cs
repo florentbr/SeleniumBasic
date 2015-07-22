@@ -63,11 +63,21 @@ namespace Selenium {
             return svc;
         }
 
+        static readonly string[] OPTIONS = {"binary", "args", "extensions", "prefs"};
+
         internal static Capabilities ExtendCapabilities(WebDriver wd, bool remote = false) {
             var capa = wd.Capabilities;
             capa.Browser = "chrome";
 
             var opts = new Dictionary();
+
+            foreach (string key in OPTIONS) {
+                string value;
+                if (capa.TryGetValue(key, out value)){
+                    capa.Remove(key);
+                    opts.Add(key, value);
+                }
+            }
 
             if (wd.Profile != null)
                 wd.Arguments.Add("user-data-dir=" + ExpandProfile(wd.Profile, remote));

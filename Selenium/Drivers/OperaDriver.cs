@@ -63,19 +63,34 @@ namespace Selenium {
             return svc;
         }
 
+        static readonly string[] OPTIONS = { "binary", "args", "extensions", "prefs" };
+
         internal static Capabilities ExtendCapabilities(WebDriver wd, bool remote = false) {
             var capa = wd.Capabilities;
             capa.Browser = "opera";
 
             var opts = new Dictionary();
+
+            foreach (string key in OPTIONS) {
+                string value;
+                if (capa.TryGetValue(key, out value)) {
+                    capa.Remove(key);
+                    opts.Add(key, value);
+                }
+            }
+
             if (wd.Profile != null)
                 wd.Arguments.Add("user-data-dir=" + ExpandProfile(wd.Profile, remote));
+
             if (wd.Arguments.Count != 0)
                 opts.Add("args", wd.Arguments);
+
             if (wd.Extensions.Count != 0)
                 opts.Add("extensions", wd.Extensions);
+
             if (wd.Preferences.Count != 0)
                 opts.Add("prefs", wd.Preferences);
+
             capa["operaOptions"] = opts;
 
             return capa;
