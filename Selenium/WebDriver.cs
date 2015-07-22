@@ -318,10 +318,14 @@ namespace Selenium {
         /// Close the Browser and Dispose of WebDriver
         /// </summary>
         public virtual void Quit() {
-            if (_service != null) {
-                if (_service.GetType() != typeof(FirefoxService))
+            if (_session != null) {
+                if (_session.IsLocal) {
+                    if (_service.GetType() != typeof(FirefoxService))
+                        _session.Delete();
+                    _service.Quit();
+                } else {
                     _session.Delete();
-                _service.Quit();
+                }
             }
 
             this.Dispose();
