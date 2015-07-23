@@ -1,4 +1,5 @@
 ﻿using Selenium.Excel;
+using Selenium.Internal;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -34,11 +35,14 @@ namespace Selenium.ComInterfaces {
         [DispId(320), Description("Copy the image to the clipboard.")]
         void Copy(bool autoDispose = true);
 
-        [DispId(330), Description("Save as a PNG image file.")]
+        [DispId(330), Description("Save the image to a file. Supported format: png, bmp, gif and jpg.")]
         string SaveAs(string filePath, bool autoDispose = true);
 
         [DispId(350), Description("Paste the image to excel and returns the range")]
-        IRange ToExcel(object target = null);
+        IRange ToExcel(object target = null, bool autoDispose = true);
+
+        [DispId(389), Description("Returns a native StdPicture object")]
+        IStdPicture GetPicture(bool autoDispose = true);
 
         [DispId(9999), Description("Dispose the image resources.")]
         void Dispose();

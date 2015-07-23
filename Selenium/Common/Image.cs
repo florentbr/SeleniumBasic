@@ -124,17 +124,18 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Save the image to the provided path as a PNG image.
+        /// Save the image to a file. Supported format: png, bmp, gif and jpg.
         /// </summary>
-        /// <param name="filePath">PNG file path. Ex : C:\capture_{yyyyMMdd-HHmmss}.png</param>
+        /// <param name="filePath">File path. Ex: "C:\capture_{yyyyMMdd-HHmmss}.png"</param>
         /// <param name="autoDispose">Release the image resources once done</param>
         /// <returns>Full file path</returns>
         public string SaveAs(string filePath, bool autoDispose = true) {
             EnsureNotDisposed();
             try {
-                if (filePath.IndexOf('{') != -1)
+                if (filePath.IndexOf('{') != -1){
                     filePath = Regex.Replace(filePath, @"\{([^}]+)\}", 
                         (m)=> DateTime.UtcNow.ToString(m.Groups[1].Value));
+                }
 
                 filePath = IOExt.ExpandPath(filePath);
                 filePath = Path.GetFullPath(filePath);
@@ -142,10 +143,22 @@ namespace Selenium {
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);
                 File.Create(filePath).Dispose();
-                _bitmap.Save(filePath, ImageFormat.Png);
-                if (autoDispose) {
-                    Dispose();
+
+                ImageFormat format;
+                string ext = Path.GetExtension(filePath).ToLower();
+                switch(ext){
+                    case ".bmp": format = ImageFormat.Bmp; break;
+                    case ".png": format = ImageFormat.Png; break;
+                    case ".jpg": format = ImageFormat.Jpeg; break;
+                    case ".jpeg": format = ImageFormat.Jpeg; break;
+                    case ".gif": format = ImageFormat.Gif; break;
+                    default:
+                        throw new Errors.ImageError("Format not supported. Supported: bmp, png, jpg, gif.");
                 }
+                _bitmap.Save(filePath, format);
+                
+                if (autoDispose)
+                    Dispose();
             } catch (Exception ex) {
                 throw new Errors.ImageError(ex.Message);
             }
@@ -279,14 +292,29 @@ namespace Selenium {
         /// Insert the image in an Excel sheet.
         /// </summary>
         /// <param name="target">Excel address, worksheet, range or null to create a new sheet.</param>
+        /// <param name="autoDispose">Release the image resources once done</param>
         /// <returns>Range</returns>
-        public IRange ToExcel(object target = null) {
+        public IRange ToExcel(object target = null, bool autoDispose = true) {
             IRange range = ExcelApi.GetRange(target);
             IWorksheet worksheet = range.Worksheet;
             Clipboard.SetDataObject(_bitmap, false);
             worksheet.Paste(range, _bitmap);
             Clipboard.Clear();
+            if (autoDispose)
+                _bitmap.Dispose();
             return range;
+        }
+
+        /// <summary>
+        /// Returns a native Picture object
+        /// </summary>
+        /// <param name="autoDispose">Release the image resources once done</param>
+        /// <returns></returns>
+        IStdPicture ComInterfaces._Image.GetPicture(bool autoDispose) {
+            IStdPicture picture = ImgExt.ImageToPictureDisp(_bitmap);
+            if(autoDispose)
+                _bitmap.Dispose();
+            return picture;
         }
 
         #region Support
