@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Selenium.Internal;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace Selenium.Pdf {
 
@@ -59,7 +59,7 @@ namespace Selenium.Pdf {
             MemoryStream buffer = new MemoryStream();
             if (bitmap.PixelFormat != PixelFormat.Format24bppRgb) {
                 //Converts to a 3 channels RGB bitmmap as ARGB is not unsupported
-                using (Bitmap tmpBitmap = Convert(bitmap, PixelFormat.Format24bppRgb)) {
+                using (Bitmap tmpBitmap = ImgExt.RemoveAlphaChannel(bitmap)) {
                     tmpBitmap.Save(buffer, ENCODER_PNG, null);
                 }
             } else {
@@ -89,33 +89,11 @@ namespace Selenium.Pdf {
             return imageLength;
         }
 
-        public static Bitmap Convert(Bitmap bitmapSrc, PixelFormat format) {
-            Rectangle rect = new Rectangle(0, 0, bitmapSrc.Width, bitmapSrc.Height);
-            Bitmap bitmapDest = (Bitmap)new Bitmap(bitmapSrc.Width, bitmapSrc.Height, format);
-            BitmapData dataSrc = bitmapSrc.LockBits(rect, ImageLockMode.ReadOnly, format);
-            BitmapData dataDest = bitmapDest.LockBits(rect, ImageLockMode.WriteOnly, format);
-            NativeMethods.CopyMemory(dataDest.Scan0, dataSrc.Scan0,
-                (uint)dataSrc.Stride * (uint)dataSrc.Height);
-            bitmapSrc.UnlockBits(dataSrc);
-            bitmapDest.UnlockBits(dataDest);
-            return bitmapDest;
-        }
-
         private static int ReadInt32BE(byte[] bytes, int offset) {
             return bytes[offset] << 24
                 | bytes[offset + 1] << 16
                 | bytes[offset + 2] << 8
                 | bytes[offset + 3];
-        }
-
-
-        static class NativeMethods {
-
-            const string KERNEL32 = "Kernel32.dll";
-
-            [DllImport(KERNEL32)]
-            public extern static void CopyMemory(IntPtr dest, IntPtr src, uint length);
-
         }
 
     }
