@@ -20,6 +20,10 @@ namespace Selenium.ComInterfaces {
 
         [DispId(43), Description("Gets the text of the alert.")]
         string Text { get; }
+
+        [DispId(54), Description("Sets the user name and password in an alert prompting for credentials.")]
+        void SetAuthenticationCredentials(string user, string password);
+
     }
 
 }
