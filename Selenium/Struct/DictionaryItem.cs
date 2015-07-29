@@ -120,12 +120,7 @@ namespace Selenium {
                 _item = item;
             }
 
-            public string Key {
-                get {
-                    return _item.key;
-                }
-            }
-
+            [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
             public object Value {
                 get {
                     return _item.value;
