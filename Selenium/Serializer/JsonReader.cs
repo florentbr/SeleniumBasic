@@ -85,6 +85,7 @@ namespace Selenium.Serializer {
                     return DeserializeObject(depth);
                 case '[':  //Array
                     return DeserializeArray(depth);
+                case '\'':  //String
                 case '"':  //String
                     if (HasSequence(_buffer, _index + 1, "iVBORw0KG")) //PNG Base64
                         return DeserializePNGBase64();
@@ -171,7 +172,7 @@ namespace Selenium.Serializer {
 
         private JsonObject DeserializeObject(int depth) {
             JsonObject dictionary = new JsonObject();
-            while (MoveNextNonEmptyChar() && _current == '"') {
+            while (MoveNextNonEmptyChar() && (_current == '"' || _current == '\'')) {
 
                 string memberName = DeserializeString();
                 if (memberName == string.Empty
