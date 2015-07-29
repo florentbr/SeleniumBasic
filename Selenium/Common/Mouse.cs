@@ -52,11 +52,7 @@ namespace Selenium {
         /// </summary>
         /// <param name="button">{number} Which button, enum: {LEFT = 0, MIDDLE = 1 , RIGHT = 2}. Defaults to the left mouse button if not specified.</param>
         public Mouse Click(MouseButton button = MouseButton.Left) {
-            if (button == MouseButton.Left) {
-                _session.Send(RequestMethod.POST, "/click");
-            } else {
-                _session.Send(RequestMethod.POST, "/click", "button", (int)button);
-            }
+            _session.Send(RequestMethod.POST, "/click", "button", (int)button);
             return this;
         }
 
@@ -65,11 +61,7 @@ namespace Selenium {
         /// </summary>
         /// <param name="button">{number} Which button, enum: {LEFT = 0, MIDDLE = 1 , RIGHT = 2}. Defaults to the left mouse button if not specified.</param>
         public Mouse ClickAndHold(MouseButton button = MouseButton.Left) {
-            if (button == MouseButton.Left) {
-                _session.Send(RequestMethod.POST, "/buttondown");
-            } else {
-                _session.Send(RequestMethod.POST, "/buttondown", "button", (int)button);
-            }
+            _session.Send(RequestMethod.POST, "/buttondown", "button", (int)button);
             return this;
         }
 
@@ -78,11 +70,7 @@ namespace Selenium {
         /// </summary>
         /// <param name="button">{number} Which button, enum: {LEFT = 0, MIDDLE = 1 , RIGHT = 2}. Defaults to the left mouse button if not specified.</param>
         public Mouse Release(MouseButton button = MouseButton.Left) {
-            if (button == MouseButton.Left){
-                _session.Send(RequestMethod.POST, "/buttonup");
-            } else {
-                _session.Send(RequestMethod.POST, "/buttonup", "button", (int)button);
-            }
+            _session.Send(RequestMethod.POST, "/buttonup", "button", (int)button);
             return this;
         }
 
