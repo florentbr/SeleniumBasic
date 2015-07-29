@@ -35,20 +35,39 @@ namespace Selenium.Serializer {
                     buffer = newBuffer;
                 }
             }
-            JsonReader reader = new JsonReader();
-            return reader.DeserializeBytes(buffer, length);
+            object res = new JsonReader().DeserializeBytes(buffer, length);
+            return res;
         }
 
         public static object Deserialize(MemoryStream stream) {
-            JsonReader reader = new JsonReader();
-            return reader.DeserializeBytes(stream.GetBuffer(), (int)stream.Length);
+            object res = new JsonReader().DeserializeBytes(stream.GetBuffer(), (int)stream.Length);
+            return res;
         }
 
         public static object Deserialize(byte[] data, int length) {
-            JsonReader reader = new JsonReader();
-            return reader.DeserializeBytes(data, length);
+            object res = new JsonReader().DeserializeBytes(data, length);
+            return res;
         }
 
+        public static object Deserialize(string text) {
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(text);
+            object res = new JsonReader().DeserializeBytes(data, data.Length);
+            return res;
+        }
+
+        public static object Parse(object value) {
+            string json = value as string;
+            if (json != null && json.Length > 1) {
+                char fc = json[0];
+                char lc = json[json.Length - 1];
+                if (fc == '{' && lc == '}' || fc == '[' && lc == ']') {
+                    byte[] data = System.Text.Encoding.UTF8.GetBytes(json);
+                    object res = new JsonReader().DeserializeBytes(data, data.Length);
+                    return res;
+                }
+            }
+            return value;
+        }
 
 
         private byte[] _buffer;   //bytes to deserialize

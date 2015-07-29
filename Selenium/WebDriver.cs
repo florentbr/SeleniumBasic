@@ -139,7 +139,7 @@ namespace Selenium {
         /// <param name="key">Preference key</param>
         /// <param name="value">Preference value</param>
         public void SetPreference(string key, object value) {
-            Preferences.Add(key, value);
+            Preferences[key] = JsonReader.Parse(value);
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace Selenium {
         /// <param name="key">Capability key</param>
         /// <param name="value">Capability value</param>
         public void SetCapability(string key, object value) {
-            Capabilities[key] = value;
+            Capabilities[key] = JsonReader.Parse(value);
         }
 
         /// <summary>
