@@ -138,7 +138,6 @@
     <Compile Include="Pdf\PdfPages.cs" />
     <Compile Include="Pdf\PdfXRefs.cs" />
     <Compile Include="Application.cs" />
-    <Compile Include="RotWrapper.cs" />
     <Compile Include="Serializer\IJsonObject.cs" />
     <Compile Include="Serializer\JsonException.cs" />
     <Compile Include="Serializer\JsonReader.cs" />
