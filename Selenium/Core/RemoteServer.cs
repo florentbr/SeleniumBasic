@@ -187,9 +187,9 @@ namespace Selenium.Core {
                     SysWaiter.OnInterrupt = _request.Abort;
                     response = (HttpWebResponse)_request.GetResponse();
                     _response_content = GetHttpWebResponseContent(response);
-                } catch (ThreadInterruptedException ex) {
+                } catch (ThreadInterruptedException) {
                     return;
-                } catch (ThreadAbortException ex) {
+                } catch (ThreadAbortException) {
                     return;
                 } catch (WebException ex) {
                     if (ex.Status == WebExceptionStatus.RequestCanceled) {
