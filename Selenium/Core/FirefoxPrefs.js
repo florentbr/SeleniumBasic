@@ -86,6 +86,7 @@ user_pref("webdriver_assume_untrusted_issuer", true);
 user_pref("media.gmp-provider.enabled", false);
 user_pref("browser.devedition.theme.enabled", true);
 user_pref("lightweightThemes.update.enabled", false);
+user_pref("devtools.chrome.enabled", true);
 
 user_pref("extensions.logging.enabled", false);
 user_pref("webdriver.log.init", true);
