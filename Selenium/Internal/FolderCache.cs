@@ -1,6 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
-using System.Text;
+using System.Runtime.InteropServices;
 
 namespace Selenium.Internal {
 
@@ -10,7 +11,7 @@ namespace Selenium.Internal {
     /// </summary>
     static class FolderCache {
 
-        const ushort BUFFER_SIZE = 1024 * 7;
+        const int BUFFER_LENGTH = 1024 * 512;
 
         /// <summary>
         /// Saves a directory recursively to a backup file
@@ -18,39 +19,45 @@ namespace Selenium.Internal {
         /// <param name="folder">Full path of the directory source</param>
         /// <param name="path">Full path of the backup target file</param>
         /// <param name="excludes">Paths to exclude. ex: *.tmp</param>
-        public static void Save(string folder, string path, params string[] excludes) {
-            byte[] buffer = new byte[BUFFER_SIZE];
-            Encoding encoder = Encoding.Unicode;
+        public static unsafe void Save(string folder, string path, params string[] excludes) {
+            string[] files = Directory.GetFiles(folder, "*", SearchOption.AllDirectories);
+            int subPathIndex = folder.Length + 1;
 
-            //Add files to the binary file
-            var files = Directory.GetFiles(folder, "*", SearchOption.AllDirectories);
-            var subPathIndex = folder.Length + 1;
+            IntPtr buffer = Marshal.AllocHGlobal(BUFFER_LENGTH);
+            try {
+                IntPtr fileOut = CreateFile(path);
+                try {
+                    foreach (var filepath in files) {
+                        var relativePath = filepath.Substring(subPathIndex);
+                        if (WildcardMatchAny(relativePath.ToLowerInvariant(), excludes))
+                            continue;
 
-            using (var outStream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None, BUFFER_SIZE * 2)) {
-                foreach (var filepath in files) {
-                    var relativePath = filepath.Substring(subPathIndex);
-                    if (WildcardMatchAny(relativePath.ToLowerInvariant(), excludes))
-                        continue;
+                        IntPtr fileIn = OpenFile(filepath);
+                        try {
+                            int filesize = NativeMethods.GetFileSize(fileIn, IntPtr.Zero);
 
-                    using (var inStream = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, BUFFER_SIZE)) {
-                        //set the length of the file name and the filename in the header
-                        int namelen = encoder.GetBytes(relativePath, 0, relativePath.Length, buffer, 6);
-                        buffer[0] = (byte)(namelen);
-                        buffer[1] = (byte)(namelen >> 8);
+                            //set the length of the file name in the header
+                            Marshal.WriteInt16(buffer, 0, (short)relativePath.Length);
+                            //set the length of the data in the header
+                            Marshal.WriteInt32(buffer, 2, filesize);
+                            WriteBlock(fileOut, buffer, 6);
 
-                        //set the length of the data in the header
-                        int datalen = (int)inStream.Length;
-                        buffer[2] = (byte)(datalen);
-                        buffer[3] = (byte)(datalen >> 8);
-                        buffer[4] = (byte)(datalen >> 16);
-                        buffer[5] = (byte)(datalen >> 24);
+                            //set the filename in the header
+                            IntPtr bufName = Marshal.StringToHGlobalUni(relativePath);
+                            WriteBlock(fileOut, bufName, relativePath.Length * sizeof(char));
+                            Marshal.FreeHGlobal(bufName);
 
-                        //write the header to the stream
-                        outStream.Write(buffer, 0, 6 + namelen);
-                        //write the data to the stream
-                        CopyStream(inStream, outStream, buffer);
+                            Copy(fileIn, fileOut, filesize, buffer, BUFFER_LENGTH);
+                        } finally {
+                            NativeMethods.CloseHandle(fileIn);
+                        }
                     }
+
+                } finally {
+                    NativeMethods.CloseHandle(fileOut);
                 }
+            } finally {
+                Marshal.FreeHGlobal(buffer);
             }
         }
 
@@ -59,54 +66,93 @@ namespace Selenium.Internal {
         /// </summary>
         /// <param name="bakpath">Full path of the backup source file</param>
         /// <param name="targetdir">Full path of the target directory</param>
-        public unsafe static void Restore(string bakpath, string targetdir) {
-            byte[] buffer = new byte[BUFFER_SIZE];
-            string prevdir = null;
-            Encoding encoder = Encoding.Unicode;
+        public static void Restore(string bakpath, string targetdir) {
+            IntPtr buffer = Marshal.AllocHGlobal(BUFFER_LENGTH);
+            try {
+                //loads the binary file in the memory
+                IntPtr fileIn = OpenFile(bakpath);
+                try {
+                    string prevdir = null;
+                    //iterates all files
+                    while (ReadBlock(fileIn, buffer, 6) == 6) {
+                        //read the length of the file path / 2 bytes
+                        int namelen = Marshal.ReadInt16(buffer, 0);
+                        //read the data length / 4 bytes
+                        int datalen = Marshal.ReadInt32(buffer, 2);
 
-            //loads the binary file in the memory
-            using (var inStream = new FileStream(bakpath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, BUFFER_SIZE)) {
-                //iterates all files
-                while (inStream.Read(buffer, 0, 6) == 6) {
-                    //read the length of the file path / 2 bytes
-                    int namelen = buffer[0] | buffer[1] << 8;
-                    //read the data length / 4 bytes
-                    int datalen = buffer[2] | buffer[3] << 8 | buffer[4] << 16 | buffer[5] << 24;
-                    //read name
-                    inStream.Read(buffer, 0, namelen);
-                    string relativePath = encoder.GetString(buffer, 0, namelen);
+                        //read name
+                        ReadBlock(fileIn, buffer, namelen * sizeof(char));
+                        string relativePath = Marshal.PtrToStringUni(buffer, namelen);
 
-                    //create the folder if not present
-                    var filepath = Path.Combine(targetdir, relativePath);
-                    var dirname = Path.GetDirectoryName(filepath);
-                    if (prevdir != dirname)
-                        Directory.CreateDirectory(prevdir = dirname);
+                        //create the folder if not present
+                        string filepath = Path.Combine(targetdir, relativePath);
+                        string dirname = Path.GetDirectoryName(filepath);
+                        if (prevdir != dirname)
+                            Directory.CreateDirectory(prevdir = dirname);
 
-                    //Copy the data
-                    using (var outStream = new FileStream(filepath, FileMode.CreateNew, FileAccess.Write, FileShare.None, BUFFER_SIZE * 2)) {
-                        CopyStream(inStream, outStream, datalen, buffer);
+                        //copy the data
+                        IntPtr fileOut = CreateFile(filepath);
+                        try {
+                            Copy(fileIn, fileOut, datalen, buffer, BUFFER_LENGTH);
+                        } finally {
+                            NativeMethods.CloseHandle(fileOut);
+                        }
                     }
+                } finally {
+                    NativeMethods.CloseHandle(fileIn);
                 }
+            } finally {
+                Marshal.FreeHGlobal(buffer);
             }
         }
 
-        private static void CopyStream(Stream source, Stream target, byte[] buffer) {
-            int size = buffer.Length;
-            while ((size = source.Read(buffer, 0, size)) > 0)
-                target.Write(buffer, 0, size);
+        private static IntPtr OpenFile(string path) {
+            IntPtr handle = NativeMethods.CreateFile(path, NativeMethods.GENERIC_READ
+                , NativeMethods.FILE_SHARE_READWRITE, 0, NativeMethods.OPEN_EXISTING, 0, IntPtr.Zero);
+            if (handle == IntPtr.Zero)
+                throw new Win32Exception();
+            return handle;
         }
 
-        private static void CopyStream(Stream source, Stream target, int count, byte[] buffer) {
-            int size = Math.Min(buffer.Length, count);
-            while ((size = source.Read(buffer, 0, size)) > 0) {
-                target.Write(buffer, 0, size);
-                if ((count -= size) < size)
-                    size = count;
-            }
+        private static IntPtr CreateFile(string path) {
+            IntPtr handle = NativeMethods.CreateFile(path, NativeMethods.GENERIC_WRITE
+                , 0, 0, NativeMethods.CREATE_ALWAYS, 0, IntPtr.Zero);
+            if (handle == IntPtr.Zero)
+                throw new Win32Exception();
+            return handle;
+        }
+
+        private static int ReadBlock(IntPtr fileHandle, IntPtr buffer, int count) {
+            int read;
+            if (!NativeMethods.ReadFile(fileHandle, buffer, count, out read, IntPtr.Zero))
+                throw new Win32Exception();
+            return read;
+        }
+
+        private static int WriteBlock(IntPtr fileHandle, IntPtr buffer, int count) {
+            int read;
+            if (!NativeMethods.WriteFile(fileHandle, buffer, count, out read, IntPtr.Zero))
+                throw new Win32Exception();
+            return read;
+        }
+
+        private static void Copy(IntPtr fileSource, IntPtr fileTarget, int count, IntPtr buffer, int bufferSize) {
+            int read = Math.Min(count, bufferSize);
+            int wrote;
+            while (count > 0) {
+                if (!NativeMethods.ReadFile(fileSource, buffer, read, out read, IntPtr.Zero))
+                    throw new Win32Exception();
+                if (read == 0)
+                    break;
+                if (!NativeMethods.WriteFile(fileTarget, buffer, read, out wrote, IntPtr.Zero) || wrote == 0)
+                    throw new Win32Exception();
+                if ((count -= read) < read)
+                    read = count;
+            };
         }
 
         private unsafe static bool WildcardMatchAny(string text, string[] patterns) {
-            fixed (char* txt = text){
+            fixed (char* txt = text) {
                 foreach (string pattern in patterns) {
                     fixed (char* pat = pattern) {
                         if (WildcardMatch(txt, text.Length - 1, pat, pattern.Length - 1))
@@ -123,7 +169,7 @@ namespace Selenium.Internal {
                     return itxt < 0 || pat[0] == '*';
                 if (itxt < 0)
                     return ipat == 0 && pat[ipat] == '*';
-                if (pat[ipat] == '*'){
+                if (pat[ipat] == '*') {
                     return WildcardMatch(txt, itxt, pat, ipat - 1)
                         || WildcardMatch(txt, itxt - 1, pat, ipat);
                 }
@@ -132,6 +178,38 @@ namespace Selenium.Internal {
                 itxt--;
                 ipat--;
             }
+        }
+
+
+        class NativeMethods {
+
+            const string KERNEL32 = "kernel32";
+
+            public const uint GENERIC_READ = 0x80000000;
+            public const uint GENERIC_WRITE = 0x40000000;
+            public const uint FILE_SHARE_READWRITE = 0x00000003;
+            public const uint OPEN_EXISTING = 3;
+            public const uint CREATE_ALWAYS = 2;
+
+            [DllImport(KERNEL32, CharSet = CharSet.Unicode, SetLastError = true)]
+            public static extern IntPtr CreateFile(string FileName, uint DesiredAccess
+                , uint ShareMode, uint SecurityAttributes, uint CreationDisposition
+                , uint FlagsAndAttributes, IntPtr hTemplateFile);
+
+            [DllImport(KERNEL32, SetLastError = true)]
+            public static extern bool ReadFile(IntPtr handle, IntPtr bytes
+                , int numBytesToRead, out int numBytesRead, IntPtr mustBeZero);
+
+            [DllImport(KERNEL32, SetLastError = true)]
+            public static extern bool WriteFile(IntPtr handle, IntPtr bytes
+                , int numBytesToWrite, out int numBytesWritten, IntPtr mustBeZero);
+
+            [DllImport(KERNEL32, SetLastError = true)]
+            public static extern int GetFileSize(IntPtr hFile, IntPtr highSize);
+
+            [DllImport(KERNEL32, SetLastError = true)]
+            public static extern bool CloseHandle(IntPtr hObject);
+
         }
 
     }
