@@ -58,10 +58,6 @@ namespace Selenium.Internal {
                 , out IMoniker ppmk);
 
             [DllImport(OLEAUT32)]
-            public static extern int RegisterActiveObject([MarshalAs(UnmanagedType.IUnknown)] object punk
-                , ref Guid rclsid, uint dwFlags, out int pdwRegister);
-
-            [DllImport(OLEAUT32)]
             public static extern int RevokeActiveObject(int register, IntPtr reserved);
 
         }
