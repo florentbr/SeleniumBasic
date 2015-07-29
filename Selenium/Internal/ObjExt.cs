@@ -87,20 +87,19 @@ namespace Selenium.Internal {
             if (value is string)
                 return "\"" + ((string)value).Truncate(100) + "\"";
 
-            IEnumerable ev;
-            if ((ev = value as IEnumerable) != null) {
-                var sb = new StringBuilder("[");
-                var iter = ev.GetEnumerator();
-                if (iter.MoveNext()) {
-                    sb.Append(iter.Current);
-                    while (iter.MoveNext()) {
-                        sb.Append(',').Append(iter.Current);
-                    }
-                }
-                sb.Append(']');
-                return sb.ToString();
+            IEnumerable enumereble = value as IEnumerable;
+            if (enumereble == null) 
+                return value.ToString();
+            
+            var sb = new StringBuilder("[");
+            var iter = enumereble.GetEnumerator();
+            if (iter.MoveNext()) {
+                sb.Append(iter.Current);
+                while (iter.MoveNext())
+                    sb.Append(',').Append(iter.Current);
             }
-            return value.ToString();
+            sb.Append(']');
+            return sb.ToString();
         }
 
     }
