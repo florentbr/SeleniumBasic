@@ -57,17 +57,15 @@ namespace Selenium.Internal {
             Marshal.WriteInt32(buffer, bufferSize);
             var entryPtr = (NativeMethods.WinProcessEntry*)buffer;
             try {
-                if (NativeMethods.Process32First(snapshot, buffer)) {
-                    do {
-                        NativeMethods.WinProcessEntry entry = *entryPtr;
-                        items.Add(new ProcessInfo {
-                            Id = entry.th32ProcessID,
-                            ParentId = entry.th32ParentProcessID
-                        });
-                    } while (NativeMethods.Process32Next(snapshot, buffer));
-                } else {
+                if (!NativeMethods.Process32First(snapshot, buffer))
                     throw new Win32Exception();
-                }
+                do {
+                    NativeMethods.WinProcessEntry entry = *entryPtr;
+                    items.Add(new ProcessInfo {
+                        Id = entry.th32ProcessID,
+                        ParentId = entry.th32ParentProcessID
+                    });
+                } while (NativeMethods.Process32Next(snapshot, buffer));
             } finally {
                 Marshal.FreeHGlobal(buffer);
                 NativeMethods.CloseHandle(snapshot);
