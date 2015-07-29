@@ -608,7 +608,8 @@ namespace Selenium {
         /// <param name="arguments">The arguments to the script.</param>
         /// <returns>The value returned by the script.</returns>
         public object ExecuteScript(string script, object arguments = null) {
-            var result = session.javascript.Execute(script, arguments, true);
+            object args = FormatArguments(arguments);
+            object result = session.javascript.Execute(script, arguments, true);
             return result;
         }
 
@@ -620,8 +621,20 @@ namespace Selenium {
         /// <param name="timeout"></param>
         /// <returns></returns>
         public object WaitForScript(string script, object arguments, int timeout = -1) {
-            var result = session.javascript.WaitFor(script, arguments, timeout);
+            object args = FormatArguments(arguments);
+            object result = session.javascript.WaitFor(script, args, timeout);
             return result;
+        }
+
+        private static object FormatArguments(object arguments) {
+            object args;
+            if (arguments == null) {
+                return new object[0];
+            } else if (arguments is IEnumerable && !(arguments is string || arguments is Dictionary)) {
+                return arguments;
+            } else {
+                return new object[] { arguments };
+            }
         }
 
         #endregion

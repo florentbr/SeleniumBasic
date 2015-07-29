@@ -8,10 +8,10 @@ namespace Selenium.Core {
     /// </summary>
     class JavascriptContext {
 
-        private RemoteSession _session;
+        private readonly RemoteSession session;
 
         internal JavascriptContext(RemoteSession session) {
-            _session = session;
+            this.session = session;
         }
 
         /// <summary>
@@ -23,15 +23,7 @@ namespace Selenium.Core {
         /// <param name="unbox">Optional - Converts web elements to objects</param>
         /// <returns></returns>
         public object Execute(string script, object arguments = null, bool unbox = true) {
-            object args;
-            if (arguments == null) {
-                args = new object[0];
-            } else if (arguments is IEnumerable && !(arguments is string || arguments is Dictionary)) {
-                args = arguments;
-            } else {
-                args = new object[] { arguments };
-            }
-            object result = _session.Send(RequestMethod.POST, "/execute", "script", script, "args", args);
+            object result = this.session.Send(RequestMethod.POST, "/execute", "script", script, "args", arguments);
             if (unbox)
                 return Unbox(result);
             return result;
@@ -51,7 +43,7 @@ namespace Selenium.Core {
             if (!script.TrimEnd().EndsWith(";"))
                 script = script + ";";
 
-            object result = _session.SendUntil(timeout,
+            object result = this.session.SendUntil(timeout,
                 () => Execute(script, arguments, false),
                 (r) => r != null && !false.Equals(r)
             );
@@ -64,7 +56,7 @@ namespace Selenium.Core {
                 //try parse as web elementr
                 string id;
                 if (WebElement.TryParse(valDict, out id))
-                    return new WebElement(_session, id);
+                    return new WebElement(this.session, id);
 
                 foreach (DictionaryItem item in valDict)
                     item.Value = Unbox(item.Value);
