@@ -78,7 +78,7 @@ namespace Selenium.ComInterfaces {
         void ReleaseKeys(string modifierKeys);
 
         [DispId(945), Description("Simulates typing into the element.")]
-        void SendKeys(string keysOrModifier, string keys = null);
+        WebElement SendKeys(string keysOrModifier, string keys = null);
 
         [DispId(949), Description("Submits a form.")]
         void Submit();

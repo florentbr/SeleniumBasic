@@ -324,7 +324,7 @@ namespace Selenium {
         ///     driver.FindElementsById("id").sendKeys Keys.Control, "a"
         /// </code>
         /// </example>
-        public void SendKeys(string keysOrModifier, string keys = null) {
+        public WebElement SendKeys(string keysOrModifier, string keys = null) {
             var text = string.Concat(keysOrModifier, keys);
             if (text == null)
                 throw new ArgumentNullException("text", "text cannot be null");
@@ -333,6 +333,7 @@ namespace Selenium {
                 text = _session.UploadFile(text);
             }
             Send(RequestMethod.POST, "/value", "value", new string[] { text });
+            return this;
         }
 
         /// <summary>
