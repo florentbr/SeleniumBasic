@@ -48,9 +48,10 @@ namespace Selenium.Internal {
             _thread = new Thread(RunMessagePump);
             _thread.IsBackground = true;
             _thread.SetApartmentState(ApartmentState.STA);
-            _thread.Start();
-            lock (_threadLock)
+            lock (_threadLock){
+                _thread.Start();
                 Monitor.Wait(_threadLock);
+            }
         }
 
         ~HotKeyGlobal() {
@@ -115,6 +116,9 @@ namespace Selenium.Internal {
             IntPtr winHandle = NativeMethods.CreateWindowEx(0, classHandle, string.Empty
                 , 0, 0, 0, 0, 0, (IntPtr)0, (IntPtr)0, (IntPtr)0, (IntPtr)0);
 
+            //signal the message pump is up and running
+            lock (_threadLock)
+                Monitor.Pulse(_threadLock);
             //run message pump
             try {
                 DispatchThreadMessages();
@@ -122,8 +126,6 @@ namespace Selenium.Internal {
         }
 
         private void DispatchThreadMessages() {
-            lock (_threadLock)
-                Monitor.Pulse(_threadLock);    //Signals the message pump is running
             var msg = new NativeMethods.Message();
             while (NativeMethods.GetMessage(ref msg, (IntPtr)0, 0, 0) > 0) {
                 switch (msg.Msg) {
