@@ -110,7 +110,6 @@ namespace Selenium.Core {
 
             //Waits for the port to be listening
             if (!NetExt.WaitForLocalPortListening(_endpoint.Port, 10000, 150))
-                //if (!NetExt.WaitForPortConnectable(_endpoint, 10000, 100))
                 throw new Errors.TimeoutError("The driver failed to open the listening port {0} within 10s", _endpoint);
         }
 
