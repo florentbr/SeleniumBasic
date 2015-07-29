@@ -42,7 +42,7 @@ namespace Selenium.ComInterfaces {
         IRange ToExcel(object target = null, bool autoDispose = true);
 
         [DispId(389), Description("Returns a native StdPicture object")]
-        IStdPicture GetPicture(bool autoDispose = true);
+        Interop.IStdPicture GetPicture(bool autoDispose = true);
 
         [DispId(9999), Description("Dispose the image resources.")]
         void Dispose();
