@@ -1,13 +1,23 @@
 
-"""Basic tests to ensure all the brosers are launchable with the COM server
+"""Basic tests to ensure all the browsers are launchable with the COM server
 """
 
-import sys, os, unittest, threading, time, BaseHTTPServer
+import sys, os, unittest, threading, time, multiprocessing, BaseHTTPServer
 from win32com import client  #http://sourceforge.net/projects/pywin32/files/pywin32/
 
-SERVER_ADDRESS = ('127.0.0.1', 9589)
+SERVER_ADDRESS = ('127.0.0.1', 9393)
+SERVER_PAGE = """
+<html>
+<head>
+    <title>Title</title>
+</head>
+<body>
+    <a id="link">Test page</a>
+</body>
+</html>
+"""
 
-class TestStringMethods(unittest.TestCase):
+class Suite(unittest.TestCase):
     
     def test_list(self):
         lst = CreateObject("Selenium.List")
@@ -29,7 +39,7 @@ class TestStringMethods(unittest.TestCase):
     
     def test_phantomjs(self):
         self.assert_browser_display_page("Selenium.PhantomJSDriver")
-        
+    
     def assert_browser_display_page(self, progid):
         driver = CreateObject(progid)
         try:
@@ -40,42 +50,36 @@ class TestStringMethods(unittest.TestCase):
             driver.quit
 
 
-def CreateObject(appid):
-    return client.Dispatch(appid)
+
+def CreateObject(progid):
+    return client.Dispatch(progid)
+
+def RunHTTPServer():
+    server = BaseHTTPServer.HTTPServer(SERVER_ADDRESS, HTTPServerHandler)
+    server.serve_forever()
 
 class HTTPServerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    
+    def handle(self):
+        try:
+            return BaseHTTPServer.BaseHTTPRequestHandler.handle(self)
+        except: return
+    
+    def log_message(self, format, *args):
+        return
+    
     def do_GET(s):
         s.send_response(200)
         s.send_header('Content-type', 'text/html')
         s.end_headers()
-        s.wfile.write('<html>')
-        s.wfile.write('<head><title>Title</title></head>')
-        s.wfile.write('<body><a id="link">Test page</a></body>')
-        s.wfile.write('</html>')
-    
-    def log_message(self, format, *args):
-        return
+        s.wfile.write(SERVER_PAGE)
 
-class HTTPServer(threading.Thread):
-    def __init__(self, address, handler):
-        threading.Thread.__init__(self)
-        self.server_address = address
-        self.handler = handler
-    
-    def run(self):
-        self.httpd = BaseHTTPServer.HTTPServer(self.server_address, self.handler)
-        self.httpd.serve_forever()
-        
-    def stop(self):
-        self.httpd.shutdown()
 
 if __name__ == '__main__':
     print __doc__
-    print "Start tests ..."
-    server = HTTPServer(SERVER_ADDRESS, HTTPServerHandler)
+    print "Start tests ...\n"
+    server = multiprocessing.Process(target=RunHTTPServer)
+    server.start()
     try:
-        server.start()
-        time.sleep(0.1)
         unittest.main()
-    finally:
-        server.stop()
+    except SystemExit: pass
