@@ -1,4 +1,5 @@
-﻿using Selenium.Excel;
+﻿using Interop.Excel;
+using Selenium.Internal;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -254,7 +255,7 @@ namespace Selenium {
         /// <param name="target">Excel address, worksheet, range or null to create a new sheet.</param>
         /// <param name="clearFirst">Optional - If true, clears the cells first</param>
         public void ToExcel(object target = null, bool clearFirst = false) {
-            IRange rg = ExcelApi.GetRange(target);
+            IRange rg = ExcelExt.GetRange(target);
             if (clearFirst)
                 rg[rg.SpecialCells(XlCellType.xlCellTypeLastCell).Row, 1].Clear();
 

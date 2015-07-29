@@ -1,4 +1,4 @@
-﻿using Selenium.Excel;
+﻿using Interop.Excel;
 using Selenium.Internal;
 using System;
 using System.ComponentModel;

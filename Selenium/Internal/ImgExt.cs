@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Interop;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
 namespace Selenium.Internal {
-
-    [ComImport(), Guid("7BF80981-BF32-101A-8BBB-00AA00300CAB")]
-    public interface IStdPicture { }
 
     class ImgExt {
 

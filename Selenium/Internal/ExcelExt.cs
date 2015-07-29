@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Interop.Excel;
+using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Selenium.Excel {
+namespace Selenium.Internal {
 
-    class ExcelApi {
+    class ExcelExt {
 
         static CultureInfo CULTURE_US = new CultureInfo("en-US");
 
@@ -20,7 +21,7 @@ namespace Selenium.Excel {
         /// <returns>Range</returns>
         public static IRange GetRange(object source) {
             //Get a running instance of Excel or create one
-            IExcel excel = ExcelApi.GetInstance();
+            IExcel excel = ExcelExt.GetInstance();
 
             //Handle null source
             IWorksheets worksheets = excel.Worksheets;

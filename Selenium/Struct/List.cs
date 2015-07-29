@@ -1,4 +1,5 @@
-﻿using Selenium.Excel;
+﻿using Interop.Excel;
+using Selenium.Internal;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -186,7 +187,7 @@ namespace Selenium {
         /// lst.ToExcel [Sheet1!A1]
         /// </example>
         public IRange ToExcel(object target = null, string title = null, bool clearFirst = false) {
-            IRange rg = ExcelApi.GetRange(target);
+            IRange rg = ExcelExt.GetRange(target);
             
             if (clearFirst)
                 rg[rg.SpecialCells(XlCellType.xlCellTypeLastCell).Row, 1].Clear();

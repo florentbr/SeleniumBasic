@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Selenium.Excel {
+namespace Interop.Excel {
 #pragma warning disable 1591
 
     /// <summary>

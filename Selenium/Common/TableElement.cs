@@ -1,5 +1,5 @@
-﻿using Selenium.Core;
-using Selenium.Excel;
+﻿using Interop.Excel;
+using Selenium.Internal;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -77,7 +77,7 @@ namespace Selenium {
         /// lst.ToExcelRange Range("Sheet1!A1")
         /// </example>
         public void ToExcel(object target, bool clear = false) {
-            IRange range = ExcelApi.GetRange(target);
+            IRange range = ExcelExt.GetRange(target);
             if (clear)
                 range.CurrentRegion.Clear();
             object[,] values = Data();

@@ -63,6 +63,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interop\Excel\Excel.cs" />
+    <Compile Include="Interop\IStdPicture.cs" />
     <Compile Include="ComInterfaces\_Actions.cs" />
     <Compile Include="ComInterfaces\_Assert.cs" />
     <Compile Include="ComInterfaces\_By.cs" />
@@ -109,19 +111,20 @@
     <Compile Include="Errors\InvalidOperationError.cs" />
     <Compile Include="Errors\NotImplementedError.cs" />
     <Compile Include="Errors\PdfErrors.cs" />
-    <Compile Include="Excel\ICells.cs" />
-    <Compile Include="Excel\IExcel.cs" />
-    <Compile Include="Excel\IRange.cs" />
-    <Compile Include="Excel\IWorkbook.cs" />
-    <Compile Include="Excel\IWorkbooks.cs" />
-    <Compile Include="Excel\IWorksheet.cs" />
-    <Compile Include="Excel\IWorksheets.cs" />
+    <Compile Include="Interop\Excel\ICells.cs" />
+    <Compile Include="Interop\Excel\IExcel.cs" />
+    <Compile Include="Interop\Excel\IRange.cs" />
+    <Compile Include="Interop\Excel\IWorkbook.cs" />
+    <Compile Include="Interop\Excel\IWorkbooks.cs" />
+    <Compile Include="Interop\Excel\IWorksheet.cs" />
+    <Compile Include="Interop\Excel\IWorksheets.cs" />
     <Compile Include="Internal\AssemblyExt.cs" />
     <Compile Include="Internal\AssemblyURLAttribute.cs" />
     <Compile Include="Internal\Crc32.cs" />
     <Compile Include="Internal\HotKeyGlobal.cs" />
     <Compile Include="Core\SysWaiter.cs" />
     <Compile Include="Errors\WebRequestErrors.cs" />
+    <Compile Include="Internal\ImgExt.cs" />
     <Compile Include="Internal\IniFile.cs" />
     <Compile Include="Internal\ProcessExt.cs" />
     <Compile Include="Internal\RunningObject.cs" />
@@ -186,7 +189,7 @@
     <Compile Include="Core\DriverService.cs" />
     <Compile Include="Common\SelectElement.cs" />
     <Compile Include="Common\TableElement.cs" />
-    <Compile Include="Excel\ExcelApi.cs" />
+    <Compile Include="Internal\ExcelExt.cs" />
     <Compile Include="Core\RemoteServer.cs" />
     <Compile Include="Internal\IOExt.cs" />
     <Compile Include="Internal\NetExt.cs" />

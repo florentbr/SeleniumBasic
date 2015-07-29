@@ -1,4 +1,5 @@
-﻿using Selenium.Excel;
+﻿using Interop.Excel;
+using Selenium.Internal;
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -72,7 +73,7 @@ namespace Selenium {
         /// <returns><see cref="Table"/></returns>
         public Table From(object source, bool hasHeaders = true) {
             try {
-                IRange range = ExcelApi.GetRange(source);
+                IRange range = ExcelExt.GetRange(source);
                 if (range.Count == 1)
                     range = range.CurrentRegion;
 
@@ -171,7 +172,7 @@ namespace Selenium {
         /// <param name="target">Excel address, worksheet or range or null to create a new sheet</param>
         /// <param name="clearFirst">Optional - If true, clears the cells first</param>
         public void ToExcel(object target = null, bool clearFirst = false) {
-            IRange range = ExcelApi.GetRange(target);
+            IRange range = ExcelExt.GetRange(target);
             if (clearFirst) {
                 var lastCell = range.SpecialCells(XlCellType.xlCellTypeLastCell);
                 range[lastCell.Row, lastCell.Column].Clear();

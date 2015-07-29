@@ -2,12 +2,8 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Selenium.Excel {
+namespace Interop.Excel {
 #pragma warning disable 1591
-
-    [Guid("00024500-0000-0000-C000-000000000046"), ComImport, TypeLibType(2), ClassInterface((short)0)]
-    class Excel { }
-
 
     /// <summary>
     /// Range interface with the Range property as an indexer

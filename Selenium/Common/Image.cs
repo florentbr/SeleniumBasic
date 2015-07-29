@@ -1,4 +1,4 @@
-﻿using Selenium.Excel;
+﻿using Interop.Excel;
 using Selenium.Internal;
 using System;
 using System.ComponentModel;
@@ -295,10 +295,9 @@ namespace Selenium {
         /// <param name="autoDispose">Release the image resources once done</param>
         /// <returns>Range</returns>
         public IRange ToExcel(object target = null, bool autoDispose = true) {
-            IRange range = ExcelApi.GetRange(target);
-            IWorksheet worksheet = range.Worksheet;
+            IRange range = ExcelExt.GetRange(target);
             Clipboard.SetDataObject(_bitmap, false);
-            worksheet.Paste(range, _bitmap);
+            range.Worksheet.Paste(range, _bitmap);
             Clipboard.Clear();
             if (autoDispose)
                 _bitmap.Dispose();
@@ -310,8 +309,8 @@ namespace Selenium {
         /// </summary>
         /// <param name="autoDispose">Release the image resources once done</param>
         /// <returns></returns>
-        IStdPicture ComInterfaces._Image.GetPicture(bool autoDispose) {
-            IStdPicture picture = ImgExt.ImageToPictureDisp(_bitmap);
+        Interop.IStdPicture ComInterfaces._Image.GetPicture(bool autoDispose) {
+            Interop.IStdPicture picture = ImgExt.ImageToPictureDisp(_bitmap);
             if(autoDispose)
                 _bitmap.Dispose();
             return picture;
