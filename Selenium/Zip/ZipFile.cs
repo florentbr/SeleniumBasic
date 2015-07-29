@@ -82,7 +82,7 @@ namespace Selenium.Zip {
         */
 
 
-        const int BUFFER_BYTES_SIZE = 1024 * 12;
+        const int BUFFER_BYTES_SIZE = 1024 * 64;
         const int BUFFER_CHARS_SIZE = 1024;
         const int FLAG_COMPRESSION_STORE = 0x00;
         const int FLAG_COMPRESSION_DEFLATE = 0x08;
