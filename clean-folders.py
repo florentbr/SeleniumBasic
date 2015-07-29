@@ -3,7 +3,7 @@
 """
 
 DELETE_FOLDERS_PATTERNS = ['bin', 'obj']
-DELETE_FILES_PATTERNS = ['*.suo', '*.bak']
+DELETE_FILES_PATTERNS = ['*.suo', '*.bak', '*.pyc']
 
 import sys, os, fnmatch, shutil
 
