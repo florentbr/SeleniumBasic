@@ -25,7 +25,7 @@ namespace Selenium.Internal {
             if (depth-- < 0)  //To prevent overflow
                 return;
 
-            //terminates childs
+            //terminate childs
             foreach (ProcessInfo process in processesIds) {
                 if (process.ParentId == pid)
                     TerminateProcessTreeRecursive(process.Id, processesIds, depth);

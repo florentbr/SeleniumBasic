@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 namespace Selenium {
 
     /// <summary>
-    /// DataTable object
+    /// Table object
     /// </summary>
     [ProgId("Selenium.Table")]
     [Guid("0277FC34-FD1B-4616-BB19-B719752452AA")]
@@ -28,7 +28,7 @@ namespace Selenium {
         private int _cacheIndex;
 
         /// <summary>
-        /// Creates a new DataTable object.
+        /// Creates a new Table object.
         /// </summary>
         public Table() {
             _table = null;
