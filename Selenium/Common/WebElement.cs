@@ -1,8 +1,8 @@
 ﻿using Selenium.Core;
 using Selenium.Internal;
 using Selenium.Serializer;
-using Selenium;
 using System;
+using System.Collections;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -581,6 +581,7 @@ namespace Selenium {
         /// </summary>
         public TableElement AsTable() {
             return new TableElement(_session, this);
+        }
 
         #endregion
 

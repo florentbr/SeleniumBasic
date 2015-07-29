@@ -1,4 +1,5 @@
 ﻿using Interop.Excel;
+using Selenium.Core;
 using Selenium.Internal;
 using System;
 using System.Collections;

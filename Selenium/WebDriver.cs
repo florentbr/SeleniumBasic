@@ -1,6 +1,8 @@
 ﻿using Selenium.Core;
 using Selenium.Internal;
+using Selenium.Serializer;
 using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
