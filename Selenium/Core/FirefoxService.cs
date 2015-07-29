@@ -429,7 +429,7 @@ namespace Selenium.Core {
                 throw new Errors.ArgumentError("Extension not present at {0}", xpifile.FullName);
 
             string extensions_dir = profile_dir + @"\extensions\";
-            if (true || string.IsNullOrEmpty(xpi_id)) {
+            if (string.IsNullOrEmpty(xpi_id)) {
                 //Extract the xpi to a temporary folder
                 string tmp_dir = extensions_dir + Path.GetFileNameWithoutExtension(xpi_path);
                 Zip.ZipFile.ExtractAll(xpifile.FullName, tmp_dir);
