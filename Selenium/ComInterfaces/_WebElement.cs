@@ -226,6 +226,16 @@ namespace Selenium.ComInterfaces {
 
         #endregion
 
+
+        #region Javascript
+
+        [DispId(601), Description("Execute JavaScrip on the page")]
+        object ExecuteScript(string script, object arguments = null);
+
+        [DispId(605), Description("Waits for the Javascript engine to return true or not null")]
+        object WaitForScript(string script, object arguments, int timeout = -1);
+
+        #endregion
     }
 
 }

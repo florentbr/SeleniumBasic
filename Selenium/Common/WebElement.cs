@@ -581,6 +581,48 @@ namespace Selenium {
         /// </summary>
         public TableElement AsTable() {
             return new TableElement(_session, this);
+
+        #endregion
+
+        
+        #region Javascript
+
+        /// <summary>
+        /// Executes JavaScript in the context of the currently selected frame or window
+        /// </summary>
+        /// <param name="script">The JavaScript code to execute.</param>
+        /// <param name="arguments">The arguments to the script.</param>
+        /// <returns>The value returned by the script.</returns>
+        public object ExecuteScript(string script, object arguments = null) {
+            string newscript = "return (function(){" + script + "}).apply(arguments[0],arguments[1]);";
+            object newargs = FormatArguments(this, arguments);
+            var result = session.javascript.Execute(newscript, newargs, true);
+            return result;
+        }
+
+        /// <summary>
+        /// Waits for a script to return true or not null.
+        /// </summary>
+        /// <param name="script"></param>
+        /// <param name="arguments"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public object WaitForScript(string script, object arguments, int timeout = -1) {
+            string newscript = "return (function(){" + script + "}).apply(arguments[0],arguments[1]);";
+            object newargs = FormatArguments(this, arguments);
+            var result = session.javascript.WaitFor(newscript, newargs, timeout);
+            return result;
+        }
+
+        private static object FormatArguments(object item, object arguments){
+            object[] newargs = new[] { item, null };
+            if (arguments == null) {
+                return new[] { item, new object[0] };
+            } else if (arguments is IEnumerable && !(arguments is string || arguments is Dictionary)) {
+                return new[] { item, arguments };
+            } else {
+                return new[] { item, new[] { arguments } };
+            }
         }
 
         #endregion
