@@ -42,7 +42,8 @@ namespace Selenium {
         /// <param name="lastRowsToSkip">Last row(s) to skip. Ex : 2 will skip the last two rows</param>
         /// <returns>Excel array</returns>
         public object[,] Data(int firstRowsToSkip = 0, int lastRowsToSkip = 0) {
-            object response = _session.javascript.Execute("return (function(a){for(var d=[],b=0,g=a.length;b<g;b++){for(var e=a[b].cells,f=[],c=0,h=e.length;c<h;c++)f.push(e[c].textContent);d.push(f)}return d;})(arguments[0].rows);", _element, false);
+            const string script = "return (function(a){for(var d=[],b=0,g=a.length;b<g;b++){for(var e=a[b].cells,f=[],c=0,h=e.length;c<h;c++)f.push(e[c].textContent);d.push(f)}return d;})(arguments[0].rows);";
+            object response = _session.javascript.Execute(script, new[] { _element }, false);
             ICollection data = response as ICollection;
             if (data == null)
                 return null;

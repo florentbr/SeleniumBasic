@@ -329,7 +329,7 @@ namespace Selenium {
             if (text == null)
                 throw new ArgumentNullException("text", "text cannot be null");
 
-            if (!_session.IsLocal && text.IndexOf(":/") != -1 && File.Exists(text)){
+            if (!_session.IsLocal && text.IndexOf(":/") != -1 && File.Exists(text)) {
                 text = _session.UploadFile(text);
             }
             Send(RequestMethod.POST, "/value", "value", new string[] { text });
@@ -585,7 +585,7 @@ namespace Selenium {
 
         #endregion
 
-        
+
         #region Javascript
 
         /// <summary>
@@ -596,7 +596,7 @@ namespace Selenium {
         /// <returns>The value returned by the script.</returns>
         public object ExecuteScript(string script, object arguments = null) {
             string newscript = "return (function(){" + script + "}).apply(arguments[0],arguments[1]);";
-            object newargs = FormatArguments(this, arguments);
+            object[] newargs = FormatArguments(this, arguments);
             var result = session.javascript.Execute(newscript, newargs, true);
             return result;
         }
@@ -610,19 +610,19 @@ namespace Selenium {
         /// <returns></returns>
         public object WaitForScript(string script, object arguments, int timeout = -1) {
             string newscript = "return (function(){" + script + "}).apply(arguments[0],arguments[1]);";
-            object newargs = FormatArguments(this, arguments);
+            object[] newargs = FormatArguments(this, arguments);
             var result = session.javascript.WaitFor(newscript, newargs, timeout);
             return result;
         }
 
-        private static object FormatArguments(object item, object arguments){
-            object[] newargs = new[] { item, null };
+        private static object[] FormatArguments(object item, object arguments) {
+            object[] newargs = new object[] { item, null };
             if (arguments == null) {
                 return new[] { item, new object[0] };
             } else if (arguments is IEnumerable && !(arguments is string || arguments is Dictionary)) {
                 return new[] { item, arguments };
             } else {
-                return new[] { item, new[] { arguments } };
+                return new[] { item, new object[] { arguments } };
             }
         }
 
