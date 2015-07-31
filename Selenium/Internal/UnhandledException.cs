@@ -18,6 +18,8 @@ namespace Selenium.Core {
         }
 
         private static void On_UnhandledException(object sender, UnhandledExceptionEventArgs ex_arg) {
+            if (ex_arg.ExceptionObject is ThreadAbortException)
+                return;
             //Display the exception message box on another thread
             _thread = new Thread(new ParameterizedThreadStart((ex) =>
                 ExceptionDialog.ShowDialog((Exception)ex)
