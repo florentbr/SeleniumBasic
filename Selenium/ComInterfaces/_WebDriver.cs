@@ -31,6 +31,9 @@ namespace Selenium.ComInterfaces {
         [DispId(308), Description("")]
         Proxy Proxy { get; }
 
+        [DispId(310), Description("")]
+        void SetBinary(string path);
+
         #endregion
 
 

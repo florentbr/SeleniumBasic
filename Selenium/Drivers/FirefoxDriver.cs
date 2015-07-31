@@ -68,6 +68,10 @@ namespace Selenium {
                 {"driver", "OFF"},
                 {"browser", "OFF"}
             };
+
+            if (wd.Binary != null)
+                capa["firefox_binary"] = wd.Binary;
+
             return capa;
         }
 

@@ -91,6 +91,9 @@ namespace Selenium {
             if (wd.Preferences.Count != 0)
                 opts.Add("prefs", wd.Preferences);
 
+            if (wd.Binary != null)
+                opts.Add("binary", wd.Binary);
+
             capa["operaOptions"] = opts;
 
             return capa;

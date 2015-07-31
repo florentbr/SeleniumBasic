@@ -53,6 +53,7 @@ namespace Selenium {
         internal List Extensions = new List();
         internal List Arguments = new List();
         internal string Profile = null;
+        internal string Binary = null;
         internal bool Persistant = false;
 
         private IDriverService _service = null;
@@ -167,6 +168,14 @@ namespace Selenium {
         /// <param name="argument">Argument</param>
         public void AddArgument(string argument) {
             Arguments.Add(argument);
+        }
+
+        /// <summary>
+        /// Set a specific binary for the browser
+        /// </summary>
+        /// <param name="path">Full path</param>
+        public void SetBinary(string path){
+            this.Binary = path;
         }
 
         #endregion
@@ -611,7 +620,7 @@ namespace Selenium {
         /// <returns>The value returned by the script.</returns>
         public object ExecuteScript(string script, object arguments = null) {
             object args = FormatArguments(arguments);
-            object result = session.javascript.Execute(script, arguments, true);
+            object result = session.javascript.Execute(script, args, true);
             return result;
         }
 
