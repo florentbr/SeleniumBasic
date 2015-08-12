@@ -127,7 +127,7 @@
     <Compile Include="Internal\ImgExt.cs" />
     <Compile Include="Internal\IniFile.cs" />
     <Compile Include="Internal\ProcessExt.cs" />
-    <Compile Include="Internal\RunningObject.cs" />
+    <Compile Include="Internal\COMRunningObject.cs" />
     <Compile Include="Internal\StringExt.cs" />
     <Compile Include="Internal\ThreadExt.cs" />
     <Compile Include="Internal\UnhandledException.cs" />

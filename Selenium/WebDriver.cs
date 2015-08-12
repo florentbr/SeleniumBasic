@@ -48,6 +48,8 @@ namespace Selenium {
     [Description("Defines the interface through which the user controls the browser using WebDriver")]
     public class WebDriver : SearchContext, ComInterfaces._WebDriver, IDisposable {
 
+        const string RUNNING_OBJECT_NAME = "Selenium.WebDriver";
+
         internal Capabilities Capabilities = new Capabilities();
         internal Dictionary Preferences = new Dictionary();
         internal List Extensions = new List();
@@ -60,8 +62,7 @@ namespace Selenium {
         private RemoteSession _session = null;
         private string _baseUrl = null;
         private Proxy _proxy = null;
-        private RunningObject _runningObject = null;
-
+        private COMRunningObject _comRunningObj = null;
 
         /// <summary>
         /// Creates a new WebDriver object. 
@@ -69,7 +70,7 @@ namespace Selenium {
         public WebDriver() {
             UnhandledException.Initialize();
             SysWaiter.Initialize();
-            this.RegisterForGetObject();
+            RegisterRunningObject();
         }
 
         ~WebDriver() {
@@ -88,18 +89,19 @@ namespace Selenium {
                 _session.Dispose();
                 _session = null;
             }
-            if (_runningObject != null) {
-                _runningObject.Dispose();
-                _runningObject = null;
+            if (_comRunningObj != null) {
+                _comRunningObj.Dispose();
+                _comRunningObj = null;
             }
         }
 
-        private void RegisterForGetObject(){
-            if (_runningObject == null)
-                _runningObject = RunningObject.Register("Selenium.WebDriver", this);
+        private void RegisterRunningObject(){
+            if (_comRunningObj == null)
+                _comRunningObj = new COMRunningObject(this, RUNNING_OBJECT_NAME);
         }
 
         #region Setup
+
 
         /// <summary>
         /// 
@@ -219,8 +221,6 @@ namespace Selenium {
         /// </example>
         public void Start(string browser = null, string baseUrl = null) {
             try {
-                this.RegisterForGetObject();
-
                 if (browser != null)
                     browser = browser.ToLower().Replace("*", "");
 
@@ -261,6 +261,8 @@ namespace Selenium {
                         throw new Errors.ArgumentError("Browser not defined or not available:\n" + browser);
                 }
 
+                RegisterRunningObject();
+
                 _session = new RemoteSession(_service.Uri, capabilities, true);
                 _session.Start();
 
@@ -281,8 +283,6 @@ namespace Selenium {
         /// <param name="baseUrl">Base URL</param>
         public void StartRemotely(string browser, string remoteAddress, string baseUrl = null) {
             try {
-                this.RegisterForGetObject();
-
                 if (this.GetType() != typeof(WebDriver))
                     throw new Errors.InvalideCommandError("Command only available for a WebDriver instance");
 
@@ -312,6 +312,8 @@ namespace Selenium {
                         capabilities.Browser = browser;
                         break;
                 }
+
+                RegisterRunningObject();
 
                 _session = new RemoteSession(remoteAddress, capabilities, false);
                 _session.Start();
