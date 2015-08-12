@@ -183,7 +183,7 @@ namespace Selenium.Internal {
 
         class NativeMethods {
 
-            const string KERNEL32 = "kernel32";
+            const string KERNEL32 = "kernel32.dll";
 
             public const uint GENERIC_READ = 0x80000000;
             public const uint GENERIC_WRITE = 0x40000000;
