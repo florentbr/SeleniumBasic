@@ -7,21 +7,49 @@ using System.Runtime.InteropServices;
 
 namespace Selenium.Internal {
 
-    static class NetExt {
+    class EndPointExt : IDisposable {
 
         /// <summary>
-        /// Lock a new TCP end point and returns the socket so it can be unlocked later.
+        /// Lock a new TCP end point that can be unlocked later.
         /// </summary>
-        public static void LockNewEndPoint(IPAddress address, out Socket socket, out IPEndPoint endpoint) {
-            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        public static EndPointExt Create(IPAddress address, bool disableInheritence) {
+            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.NoDelay = true;
             socket.ReceiveBufferSize = 0;
             socket.SendBufferSize = 0;
             socket.Bind(new IPEndPoint(address, 0));
-            endpoint = (IPEndPoint)socket.LocalEndPoint;
+
             //Disable inheritance to the child processes so the main process can close the
             //socket once a child process is launched.
-            NativeMethods.SetHandleInformation(socket.Handle, 1, 0);
+            if (disableInheritence)
+                Native.SetHandleInformation(socket.Handle, 1, 0);
+
+            return new EndPointExt(socket, (IPEndPoint)socket.LocalEndPoint);
+        }
+
+
+        Socket _socket;
+        IPEndPoint _ipEndPoint;
+
+        public EndPointExt(Socket socket, IPEndPoint endpoint) {
+            _socket = socket;
+            _ipEndPoint = endpoint;
+        }
+
+        public void Dispose() {
+            if (_socket == null)
+                return;
+            _socket.Close();
+            _socket = null;
+        }
+
+        public IPEndPoint IPEndPoint {
+            get {
+                return _ipEndPoint;
+            }
+        }
+        public override string ToString() {
+            return _ipEndPoint.ToString();
         }
 
         /// <summary>
@@ -31,16 +59,17 @@ namespace Selenium.Internal {
         /// <param name="timeout">Timeout in millisecond</param>
         /// <param name="delay">Delay to retry in millisecond</param>
         /// <returns>True if succeed, false otherwise</returns>
-        public static bool WaitForPortConnectable(IPEndPoint endPoint, int timeout, int delay) {
+        public bool WaitForConnectable(int timeout, int delay) {
+            _socket.Close();
+
             var endtime = DateTime.UtcNow.AddMilliseconds(timeout);
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.ReceiveTimeout = socket.SendTimeout = 1;
             socket.NoDelay = true;
             try {
                 while (true) {
-                    DateTime start = DateTime.UtcNow;
                     try {
-                        socket.Connect(endPoint);
+                        socket.Connect(_ipEndPoint);
                         return true;
                     } catch (SocketException) {
                     } catch (Exception ex) {
@@ -64,18 +93,23 @@ namespace Selenium.Internal {
         /// <param name="timeout">Timeout in milliseconds</param>
         /// <param name="delay">Time to wait in milliseconds to wait before checking again</param>
         /// <returns></returns>
-        public static unsafe bool WaitForLocalPortListening(int port, int timeout, int delay) {
+        public bool WaitForListening(int timeout, int delay) {
+            _socket.Close();
+
             DateTime endtime = DateTime.UtcNow.AddMilliseconds(timeout);
-            int portBE = (port & 0xFF) << 8 | (port & 0xFF00) >> 8;  //Convert the port number to big endian
+            int portLE = _ipEndPoint.Port;
+            int portBE = (portLE & 0xFF) << 8 | (portLE & 0xFF00) >> 8;  //Convert port to big endian
 
             int bufferSize = 1024;
             IntPtr buffer = Marshal.AllocHGlobal(bufferSize);
+            int[] tcpTable = new int[bufferSize / sizeof(int)];
             try {
                 while (true) {
                     int result = 0;
-                    while (122 == (result = NativeMethods.GetTcpTable(buffer, ref bufferSize, false))) {
+                    while (122 == (result = Native.GetTcpTable(buffer, ref bufferSize, false))) {
                         Marshal.FreeHGlobal(buffer);
                         buffer = Marshal.AllocHGlobal(bufferSize);
+                        tcpTable = new int[bufferSize / sizeof(int)];
                     }
                     if (result != 0)
                         throw new NetworkInformationException(result);
@@ -90,7 +124,7 @@ namespace Selenium.Internal {
                     // int dwState      //MIB_TCPROW entry 2
                     // ...
 
-                    int* tcpTable = (int*)buffer;
+                    Marshal.Copy(buffer, tcpTable, 0, bufferSize / sizeof(int));
                     int dwNumEntries = tcpTable[0];
                     int tcpTableLength = 1 + dwNumEntries * 5;
 
@@ -118,7 +152,7 @@ namespace Selenium.Internal {
             }
         }
 
-        static class NativeMethods {
+        static class Native {
 
             const string IPHLPAPI = "Iphlpapi.dll";
             const string KERNEL32 = "kernel32.dll";

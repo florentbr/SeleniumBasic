@@ -2,13 +2,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
@@ -38,17 +35,17 @@ namespace Selenium.Core {
         private readonly string _profil_cache_path;
 
         private string _firefox_path;
-        private Process _firefox_process;
+        private ProcessExt _firefox_process;
         private string _profile_dir;
         private bool _is_profile_retored = false;
-        private IPEndPoint _endpoint;
-        private Socket _socketLock;
         private Exception _exception;
+        private EndPointExt _endpoint;
 
         public FirefoxService() {
             _this_assembly_dir = IOExt.GetAssemblyDirectory();
             _working_dir = DriverService.GetTempFolder();
             _profil_cache_path = Path.Combine(_working_dir, PROFILE_CACHE_FILENAME);
+            _endpoint = EndPointExt.Create(IPAddress.Loopback, false);
         }
 
         public void Dispose() {
@@ -59,10 +56,7 @@ namespace Selenium.Core {
                 }
             }
 
-            if (_socketLock != null) {
-                _socketLock.Close();
-                _socketLock = null;
-            }
+            _endpoint.Dispose();
         }
 
         /// <summary>
@@ -71,25 +65,16 @@ namespace Selenium.Core {
         public void Quit() {
             if (_firefox_process == null)
                 return;
-
-            if (!_firefox_process.HasExited) {
-                //QuitWithPostMoz();
-                ProcessExt.TerminateProcessTree(_firefox_process.Id);
-                _firefox_process.WaitForExit(5000);
-            }
-            _firefox_process.Close();
+            _firefox_process.Kill();
+            _firefox_process.WaitForExit();
+            _firefox_process.Dispose();
             _firefox_process = null;
             this.Dispose();
         }
 
-        private void QuitWithPostMoz() {
-            const int MOZ_WM_APP_QUIT = NativeMethods.WM_APP + 0x0300;
-            NativeMethods.PostMessage(_firefox_process.MainWindowHandle, MOZ_WM_APP_QUIT, IntPtr.Zero, IntPtr.Zero);
-        }
-
-        public IPEndPoint EndPoint {
-            get { 
-                return _endpoint;
+        public IPEndPoint IPEndPoint {
+            get {
+                return _endpoint.IPEndPoint;
             }
         }
 
@@ -118,9 +103,6 @@ namespace Selenium.Core {
             try {
                 //Gets the binary location of firefox
                 _firefox_path = GetBinaryLocation(this.Capabilities);
-
-                //Lock a free port
-                NetExt.LockNewEndPoint(IPAddress.Loopback, out _socketLock, out _endpoint);
 
                 SetupProfile();
 
@@ -186,7 +168,7 @@ namespace Selenium.Core {
             }
 
             //adds webdriver prefs
-            prefs["webdriver_firefox_port"] = _endpoint.Port;
+            prefs["webdriver_firefox_port"] = this.IPEndPoint.Port;
             using (var stream = typeof(FirefoxService).Assembly.GetManifestResourceStream(PREFS_RESOURCE_FILENAME))
                 CopyProfilePrefs(stream, ref prefs);
 
@@ -220,33 +202,21 @@ namespace Selenium.Core {
         }
 
         public void StartApplication(string firefoxPath, IEnumerable arguments, string profilePath) {
-            string cmd_line_args = StringExt.Join(arguments, " ");
-            _firefox_process = new Process();
-            ProcessStartInfo si = _firefox_process.StartInfo;
-            si.FileName = firefoxPath;
-            si.Arguments = cmd_line_args;
-            si.UseShellExecute = false;
-            StringDictionary env = si.EnvironmentVariables;
+            Hashtable env = ProcessExt.GetStdEnvironmentVariables();
             env["TEMP"] = _working_dir;
             env["TMP"] = _working_dir;
-            env.Add("XRE_PROFILE_PATH", profilePath);
-            env.Add("MOZ_NO_REMOTE", "1");
-            env.Add("MOZ_CRASHREPORTER_DISABLE", "1");
-            env.Add("NO_EM_RESTART", "1");
+            env["XRE_PROFILE_PATH"] = profilePath;
+            env["MOZ_NO_REMOTE"] = "1";
+            env["MOZ_CRASHREPORTER_DISABLE"] = "1";
+            env["NO_EM_RESTART"] = "1";
 
             //start the process
-            _firefox_process.Start();
-
-            //release the lock on the socket
-            _socketLock.Close();
-
-            //Waits for input idle
-            if (!_firefox_process.WaitForInputIdle(15000))
-                throw new Errors.TimeoutError("Failed to start Firefox within 15s");
+            _firefox_process = ProcessExt.Start(firefoxPath, arguments, null, env, false, true);
+            Thread.Sleep(500);
 
             //Waits for the port to be listening
             SysWaiter.Wait(100);
-            if (!NetExt.WaitForLocalPortListening(_endpoint.Port, 15000, 60))
+            if (!_endpoint.WaitForListening(15000, 100))
                 throw new Errors.TimeoutError("Firefox failed to open the listening port {0} within 15s", _endpoint);
         }
 
@@ -264,14 +234,12 @@ namespace Selenium.Core {
         }
 
         static void CreateProfile(string binary_path, string appdata_dir, string profile_name, out string profile_dir) {
-            using (var p = new Process()) {
-                ProcessStartInfo si = p.StartInfo;
-                si.FileName = binary_path;
-                si.Arguments = "-CreateProfile " + profile_name;
-                si.UseShellExecute = false;
-                si.EnvironmentVariables.Add("MOZ_NO_REMOTE", "1");
-                //start and waits exit
-                p.Start();
+            Hashtable env = ProcessExt.GetStdEnvironmentVariables();
+            env["MOZ_NO_REMOTE"] = "1";
+
+            string[] args = { "-CreateProfile", profile_name };
+
+            using(var p = ProcessExt.Start(binary_path, args, null, env, false, false)){
                 if (!p.WaitForExit(10000))
                     throw new Errors.TimeoutError("Failed to create the profile. The process didn't exit within 10s.");
             }
@@ -456,24 +424,12 @@ namespace Selenium.Core {
             int istart = text.IndexOf(tagLeft, StringComparison.OrdinalIgnoreCase) + tagLeft.Length;
             if (istart == -1)
                 throw new SeleniumException("Tag not found in the provided text: " + tagLeft);
-            
+
             int iend = text.IndexOf(tagRight, istart, StringComparison.OrdinalIgnoreCase);
             if (iend == -1)
                 throw new SeleniumException("Closing tag not found in the provided text: " + tagRight);
-            
+
             return text.Substring(istart, iend - istart);
-        }
-
-
-        static class NativeMethods {
-
-            const string USER32 = "user32.dll";
-
-            public const int WM_APP = 0x8000;
-
-            [DllImport(USER32, SetLastError = false)]
-            public static extern bool PostMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
-
         }
 
     }

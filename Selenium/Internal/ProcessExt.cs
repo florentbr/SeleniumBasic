@@ -1,102 +1,375 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Selenium.Internal {
 
-    static class ProcessExt {
+    public class ProcessExt : IDisposable {
 
-        public struct ProcessInfo {
-            public int Id;
-            public int ParentId;
+        #region Standard Environemnt Variables
+
+        static readonly string[] STD_ENV_VARS = {
+            "ALLUSERSPROFILE","APPDATA","COMPUTERNAME","ComSpec","CommonProgramFiles",
+            "CommonProgramFiles(x86)","CommonProgramW6432","HOMEDRIVE","HOMEPATH",
+            "LOCALAPPDATA","LOGONSERVER","NUMBER_OF_PROCESSORS","OS","PATHEXT",
+            "PROCESSOR_ARCHITECTURE","PROCESSOR_ARCHITEW6432","PROCESSOR_IDENTIFIER",
+            "PROCESSOR_LEVEL","PROCESSOR_REVISION","PUBLIC","ProgramData","ProgramFiles",
+            "ProgramFiles(x86)","ProgramW6432","SystemDrive","SystemRoot","TEMP","TMP",
+            "USERDOMAIN","USERDOMAIN_ROAMINGPROFILE","USERNAME","USERPROFILE","WINDIR"
+        };
+
+        #endregion
+
+
+        /// <summary>
+        /// Starts a process
+        /// </summary>
+        /// <param name="filepath">File path</param>
+        /// <param name="args">Arguments</param>
+        /// <param name="dir">Working dir. Inherits the current directory if null</param>
+        /// <param name="env">Environement variables. Inherits all of them if null</param>
+        /// <param name="noWindow">Hides the window if true</param>
+        /// <param name="createJob">Creates a Job if true</param>
+        /// <returns></returns>
+        public static ProcessExt Start(string filepath, IEnumerable args
+            , string dir, Hashtable env, bool noWindow, bool createJob) {
+
+            string cmd = ProcessExt.BuildCommandLine(filepath, args);
+
+            var si = new Native.STARTUPINFO();
+            var pi = new Native.PROCESS_INFORMATION();
+            int createFlags = noWindow ? Native.CREATE_NO_WINDOW : 0;
+
+            var hEnvVars = PinEnvironmentVars(env);
+            try {
+                bool success = Native.CreateProcess(null
+                    , cmd
+                    , IntPtr.Zero
+                    , IntPtr.Zero
+                    , false
+                    , createFlags
+                    , hEnvVars
+                    , Environment.CurrentDirectory, si, pi);
+
+                if (!success)
+                    throw new Win32Exception();
+
+                IntPtr hJob = createJob ? CreateJob(pi.hProcess) : IntPtr.Zero;
+                return new ProcessExt(pi.dwProcessId, pi.hProcess, hJob);
+
+            } finally {
+                Native.CloseHandle(pi.hThread);
+                Marshal.FreeHGlobal(hEnvVars);
+            }
         }
 
         /// <summary>
-        /// Terminates a process tree starting with the children.
+        /// Execute a command line.
         /// </summary>
-        /// <param name="pid">Process id</param>
-        public static void TerminateProcessTree(int pid) {
-            ProcessInfo[] processes = GetRunningProcesses();
-            TerminateProcessTreeRecursive(pid, processes, 20);
+        /// <param name="cmd">Command line</param>
+        /// <param name="dir">Working dir. Inherits the current directory if null.</param>
+        /// <param name="env">Environement variables. Inherits all of them if null.</param>
+        /// <param name="noWindow">Hides the window if true</param>
+        public static void Execute(string cmd, string dir
+            , Hashtable env = null, bool noWindow = false) {
+
+            var si = new Native.STARTUPINFO();
+            var pi = new Native.PROCESS_INFORMATION();
+            int createFlags = noWindow ? Native.CREATE_NO_WINDOW : 0;
+            var hEnvVars = PinEnvironmentVars(env);
+            try {
+
+                bool success = Native.CreateProcess(null
+                    , cmd
+                    , IntPtr.Zero
+                    , IntPtr.Zero
+                    , false
+                    , createFlags
+                    , hEnvVars
+                    , dir, si, pi);
+
+                if (!success)
+                    throw new Win32Exception();
+            } finally {
+                Native.CloseHandle(pi.hThread);
+                Native.CloseHandle(pi.hProcess);
+                Marshal.FreeHGlobal(hEnvVars);
+            }
         }
 
-        private static void TerminateProcessTreeRecursive(int pid, ProcessInfo[] processesIds, int depth) {
-            if (depth-- < 0)  //To prevent overflow
+        /// <summary>
+        /// Returns all the standards environement variables.
+        /// </summary>
+        /// <returns></returns>
+        public static Hashtable GetStdEnvironmentVariables() {
+            IDictionary dict = Environment.GetEnvironmentVariables();
+            Hashtable newDict = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
+            foreach (string key in STD_ENV_VARS) {
+                object value = dict[key];
+                if (value != null)
+                    newDict.Add(key, (string)value);
+            }
+            return newDict;
+        }
+
+
+        [DebuggerDisplay("{Id} {FileName}")]
+        public class ProcessEntry {
+            public int Id;
+            public int ParentId;
+            public string FileName;
+        }
+
+        /// <summary>
+        /// Returns a list of processes.
+        /// </summary>
+        /// <returns></returns>
+        public static unsafe ProcessEntry[] GetProcessEntries() {
+            var entries = new List<ProcessEntry>(100);
+
+            IntPtr snapshot = Native.CreateToolhelp32Snapshot(Native.TH32CS_SNAPPROCESS, 0);
+
+            int bufferSize = sizeof(Native.WinProcessEntry);
+            IntPtr buffer = Marshal.AllocHGlobal(bufferSize);
+            Marshal.WriteInt32(buffer, bufferSize);
+
+            var natEntryPtr = (Native.WinProcessEntry*)buffer;
+            try {
+                if (!Native.Process32First(snapshot, buffer))
+                    throw new Win32Exception();
+                do {
+                    var natEntry = *natEntryPtr;
+                    var entry = new ProcessEntry();
+                    entry.Id = natEntry.th32ProcessID;
+                    entry.ParentId = natEntry.th32ParentProcessID;
+                    entry.FileName = Marshal.PtrToStringAnsi((IntPtr)natEntry.fileName);
+                    entries.Add(entry);
+                } while (Native.Process32Next(snapshot, buffer));
+            } finally {
+                Marshal.FreeHGlobal(buffer);
+                Native.CloseHandle(snapshot);
+            }
+            return entries.ToArray();
+        }
+
+
+        #region Instance
+
+        private int _pid;
+        private IntPtr _hJob;
+        private IntPtr _hProcess;
+
+        // Summary:
+        //     Initializes a new instance of the System.Diagnostics.Process class.
+        private ProcessExt(int pid, IntPtr hProcess, IntPtr hJob) {
+            _pid = pid;
+            _hJob = hJob;
+            _hProcess = hProcess;
+        }
+
+        ~ProcessExt() {
+            this.Dispose();
+        }
+
+        /// <summary>
+        /// Release the resources
+        /// </summary>
+        public void Dispose() {
+            if (_hJob != IntPtr.Zero) {
+                Native.CloseHandle(_hJob);
+                _hJob = IntPtr.Zero;
+            }
+            if (_hProcess != IntPtr.Zero) {
+                Native.CloseHandle(_hProcess);
+                _hProcess = IntPtr.Zero;
+            }
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Process id
+        /// </summary>
+        public int Id {
+            get {
+                return _pid;
+            }
+        }
+
+        /// <summary>
+        /// Immediately stops the associated process and children processes.
+        /// </summary>
+        public void Kill() {
+            if (_hJob != IntPtr.Zero) {
+                if (!Native.TerminateJobObject(_hJob, -1))
+                    throw new Win32Exception();
+            } else if (_hProcess != IntPtr.Zero) {
+                ProcessEntry[] processes = GetProcessEntries();
+                TerminateProcessTree(_pid, processes);
+            }
+        }
+
+        /// <summary>
+        /// Waits the specified number of milliseconds for the associated process to exit.
+        /// </summary>
+        /// <param name="milliseconds">Amount of time, in milliseconds</param>
+        /// <returns>True if the associated process has exited, false otherwise</returns>
+        public bool WaitForExit(int milliseconds = -1) {
+            if (_hProcess == IntPtr.Zero)
+                return true;
+            int ret = Native.WaitForSingleObject(_hProcess, milliseconds);
+            if (ret == unchecked((int)0xFFFFFFFF))  // == WAIT_FAILED
+                throw new Win32Exception();
+
+            if (ret == 0x00000102L) // == WAIT_TIMEOUT
+                return false;
+
+            return true;
+        }
+
+        public int GetExitCode() {
+            if (_hProcess == IntPtr.Zero)
+                return 0;
+
+            int code;
+            if (!Native.GetExitCodeProcess(_hProcess, out code))
+                throw new Win32Exception();
+
+            return code;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the associated process has been terminated.
+        /// </summary>
+        public bool HasExited {
+            get {
+                return this.WaitForExit(0);
+            }
+        }
+
+        #endregion
+
+
+        #region Support
+
+
+        private static string BuildCommandLine(string filepath, IEnumerable args) {
+            var cmd = new StringBuilder();
+            cmd.Append('"').Append(filepath.Trim('"')).Append('"');
+            foreach (string arg in args)
+                cmd.Append(' ').Append(arg);
+            return cmd.ToString();
+        }
+
+
+        private static IntPtr CreateJob(IntPtr hProcess) {
+            IntPtr hJob = Native.CreateJobObject(IntPtr.Zero, null);
+            if (hJob == IntPtr.Zero)
+                throw new Win32Exception();
+
+            var jeli = new Native.JOBOBJECT_EXTENDED_LIMIT_INFORMATION();
+            jeli.BasicLimitInformation.LimitFlags = Native.JOB_OBJECT_LIMIT_BREAKAWAY_OK
+                | Native.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+
+            var hJeli = PinObject(jeli);
+            try {
+                bool success = Native.SetInformationJobObject(hJob
+                    , Native.JOB_EXTENDED_LIMIT_INFORMATION
+                    , hJeli
+                    , Marshal.SizeOf(jeli));
+
+                if (!success)
+                    throw new Win32Exception();
+            } finally {
+                Marshal.FreeHGlobal(hJeli);
+            }
+
+            if (!Native.AssignProcessToJobObject(hJob, hProcess))
+                throw new Win32Exception();
+
+            return hJob;
+        }
+
+
+        private static IntPtr PinEnvironmentVars(Hashtable dict) {
+            if (dict == null)
+                return IntPtr.Zero;
+
+            string[] keys = new string[dict.Count];
+            string[] values = new string[dict.Count];
+            dict.Keys.CopyTo(keys, 0);
+            dict.Values.CopyTo(values, 0);
+
+            Array.Sort(keys, values, CaseInsensitiveComparer.Default);
+
+            StringBuilder sb = new StringBuilder(800);
+            for (int i = 0; i < dict.Count; ++i) {
+                sb.Append(keys[i]);
+                sb.Append('=');
+                sb.Append(values[i]);
+                sb.Append('\0');
+            }
+            sb.Append('\0');
+
+            byte[] bytes = Encoding.Default.GetBytes(sb.ToString());
+            IntPtr handle = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, handle, bytes.Length);
+            return handle;
+        }
+
+
+        private static IntPtr PinObject(object obj) {
+            IntPtr h = Marshal.AllocHGlobal(Marshal.SizeOf(obj));
+            Marshal.StructureToPtr(obj, h, false);
+            return h;
+        }
+
+        private static void TerminateProcessTree(int pid, ProcessEntry[] entries) {
+            if (pid == 0)
                 return;
 
-            //terminate childs
-            foreach (ProcessInfo process in processesIds) {
-                if (process.ParentId == pid)
-                    TerminateProcessTreeRecursive(process.Id, processesIds, depth);
+            //terminate childs recursively
+            for (int i = entries.Length; i-- > 0; ) {
+                ProcessEntry process = entries[i];
+                if (process.ParentId == pid) {
+                    process.ParentId = 0;
+                    TerminateProcessTree(process.Id, entries);
+                }
             }
 
             //terminate the process
-            IntPtr procHandle = NativeMethods.OpenProcess(NativeMethods.PROCESS_ALL_ACCESS, false, pid);
+            IntPtr procHandle = Native.OpenProcess(Native.PROCESS_ALL_ACCESS, false, pid);
             if (procHandle != IntPtr.Zero) {
                 try {
-                    NativeMethods.TerminateProcess(procHandle, -1);
+                    Native.TerminateProcess(procHandle, -1);
                 } catch {
+
                 } finally {
-                    NativeMethods.CloseHandle(procHandle);
+                    Native.CloseHandle(procHandle);
                 }
             }
         }
 
-        /// <summary>
-        /// Returns a list of process ids.
-        /// </summary>
-        /// <returns></returns>
-        public static unsafe ProcessInfo[] GetRunningProcesses() {
-            List<ProcessInfo> items = new List<ProcessInfo>(100);
 
-            IntPtr snapshot = NativeMethods.CreateToolhelp32Snapshot(NativeMethods.TH32CS_SNAPPROCESS, 0);
-
-            int bufferSize = sizeof(NativeMethods.WinProcessEntry);
-            IntPtr buffer = Marshal.AllocHGlobal(bufferSize);
-            Marshal.WriteInt32(buffer, bufferSize);
-            var entryPtr = (NativeMethods.WinProcessEntry*)buffer;
-            try {
-                if (!NativeMethods.Process32First(snapshot, buffer))
-                    throw new Win32Exception();
-                do {
-                    NativeMethods.WinProcessEntry entry = *entryPtr;
-                    items.Add(new ProcessInfo {
-                        Id = entry.th32ProcessID,
-                        ParentId = entry.th32ParentProcessID
-                    });
-                } while (NativeMethods.Process32Next(snapshot, buffer));
-            } finally {
-                Marshal.FreeHGlobal(buffer);
-                NativeMethods.CloseHandle(snapshot);
-            }
-            return items.ToArray();
-        }
-
-        static class NativeMethods {
+        class Native {
 
             const string KERNEL32 = "kernel32.dll";
+            const string USER32 = "user32.dll";
+
+            public const int JOB_OBJECT_LIMIT_BREAKAWAY_OK = 0x00000800;
+            public const int JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE = 0x00002000;
+            public const int JOB_EXTENDED_LIMIT_INFORMATION = 9;
+
+            public const int CREATE_NO_WINDOW = 0x08000000;
 
             public const int PROCESS_ALL_ACCESS = 0x001f0fff;
             public const int TH32CS_SNAPPROCESS = 0x00000002;
 
-            [DllImport(KERNEL32, SetLastError = true)]
-            public static extern IntPtr CreateToolhelp32Snapshot(int flags, int processId);
-
-            [DllImport(KERNEL32, SetLastError = true)]
-            public static extern bool Process32First(IntPtr handle, IntPtr entry);
-
-            [DllImport(KERNEL32)]
-            public static extern bool Process32Next(IntPtr handle, IntPtr entry);
-
-            [DllImport(KERNEL32, ExactSpelling = true)]
-            public static extern bool CloseHandle(IntPtr handle);
-
-            [DllImport(KERNEL32)]
-            public static extern bool TerminateProcess(IntPtr processHandle, int exitCode);
-
-            [DllImport(KERNEL32)]
-            public static extern IntPtr OpenProcess(int access, bool inherit, int processId);
+            public const int STARTF_USESHOWWINDOW = 0x00000001;
+            public const short SW_SHOWNOACTIVATE = 0x00000004;
 
 
             [StructLayout(LayoutKind.Sequential)]
@@ -113,7 +386,133 @@ namespace Selenium.Internal {
                 public fixed byte fileName[260];
             }
 
+            [StructLayout(LayoutKind.Sequential)]
+            public class STARTUPINFO {
+                public int cb;
+                public IntPtr lpReserved = IntPtr.Zero;
+                public IntPtr lpDesktop = IntPtr.Zero;
+                public IntPtr lpTitle = IntPtr.Zero;
+                public int dwX = 0;
+                public int dwY = 0;
+                public int dwXSize = 0;
+                public int dwYSize = 0;
+                public int dwXCountChars = 0;
+                public int dwYCountChars = 0;
+                public int dwFillAttribute = 0;
+                public int dwFlags = 0;
+                public short wShowWindow = 0;
+                public short cbReserved2 = 0;
+                public IntPtr lpReserved2 = IntPtr.Zero;
+                public IntPtr hStdInput = IntPtr.Zero;
+                public IntPtr hStdOutput = IntPtr.Zero;
+                public IntPtr hStdError = IntPtr.Zero;
+
+                public STARTUPINFO() {
+                    cb = Marshal.SizeOf(this);
+                }
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public class PROCESS_INFORMATION {
+                public IntPtr hProcess = IntPtr.Zero;
+                public IntPtr hThread = IntPtr.Zero;
+                public int dwProcessId = 0;
+                public int dwThreadId = 0;
+            }
+
+            [DllImport(KERNEL32, CharSet = CharSet.Auto, SetLastError = true, BestFitMapping = false)]
+            public static extern bool CreateProcess(
+                [MarshalAs(UnmanagedType.LPTStr)]
+                string lpApplicationName,
+                string lpCommandLine,
+                IntPtr lpProcessAttributes,
+                IntPtr lpThreadAttributes,
+                bool bInheritHandles,
+                int dwCreationFlags,
+                IntPtr lpEnvironment,
+                [MarshalAs(UnmanagedType.LPTStr)]           
+                string lpCurrentDirectory,
+                STARTUPINFO lpStartupInfo,
+                PROCESS_INFORMATION lpProcessInformation
+            );
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct IO_COUNTERS {
+                public UInt64 ReadOperationCount;
+                public UInt64 WriteOperationCount;
+                public UInt64 OtherOperationCount;
+                public UInt64 ReadTransferCount;
+                public UInt64 WriteTransferCount;
+                public UInt64 OtherTransferCount;
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct JOBOBJECT_EXTENDED_LIMIT_INFORMATION {
+                public JOBOBJECT_BASIC_LIMIT_INFORMATION BasicLimitInformation;
+                public IO_COUNTERS IoInfo;
+                public UIntPtr ProcessMemoryLimit;
+                public UIntPtr JobMemoryLimit;
+                public UIntPtr PeakProcessMemoryUsed;
+                public UIntPtr PeakJobMemoryUsed;
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct JOBOBJECT_BASIC_LIMIT_INFORMATION {
+                public Int64 PerProcessUserTimeLimit;
+                public Int64 PerJobUserTimeLimit;
+                public UInt32 LimitFlags;
+                public UIntPtr MinimumWorkingSetSize;
+                public UIntPtr MaximumWorkingSetSize;
+                public UInt32 ActiveProcessLimit;
+                public UIntPtr Affinity;
+                public UInt32 PriorityClass;
+                public UInt32 SchedulingClass;
+            }
+
+            [DllImport(KERNEL32, SetLastError = true, CharSet = CharSet.Ansi)]
+            public static extern IntPtr CreateJobObject(IntPtr a, string lpName);
+
+            [DllImport(KERNEL32, SetLastError = true)]
+            public static extern bool SetInformationJobObject(IntPtr hJob, int infoType
+                , IntPtr lpJobObjectInfo, int cbJobObjectInfoLength);
+
+            [DllImport(KERNEL32, SetLastError = true)]
+            public static extern bool AssignProcessToJobObject(IntPtr job, IntPtr process);
+
+            [DllImport(KERNEL32, SetLastError = true)]
+            public static extern bool TerminateJobObject(IntPtr processHandle, int exitCode);
+
+
+
+            [DllImport(KERNEL32)]
+            public static extern IntPtr OpenProcess(int access, bool inherit, int processId);
+
+            [DllImport(KERNEL32)]
+            public static extern bool TerminateProcess(IntPtr processHandle, int exitCode);
+
+
+            [DllImport(KERNEL32, SetLastError = true)]
+            public static extern bool CloseHandle(IntPtr hObject);
+
+            [DllImport(KERNEL32, SetLastError = true, ExactSpelling = true)]
+            public static extern int WaitForSingleObject(IntPtr hHandle, int dwMilliseconds);
+
+            [DllImport(KERNEL32, SetLastError = true)]
+            public static extern bool GetExitCodeProcess(IntPtr hProcess, out int lpExitCode);
+
+
+            [DllImport(KERNEL32, SetLastError = true, CharSet = CharSet.Ansi)]
+            public static extern IntPtr CreateToolhelp32Snapshot(int flags, int processId);
+
+            [DllImport(KERNEL32, SetLastError = true, CharSet = CharSet.Ansi)]
+            public static extern bool Process32First(IntPtr handle, IntPtr entry);
+
+            [DllImport(KERNEL32, CharSet = CharSet.Ansi)]
+            public static extern bool Process32Next(IntPtr handle, IntPtr entry);
+
         }
+
+        #endregion
 
     }
 

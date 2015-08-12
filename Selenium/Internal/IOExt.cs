@@ -1,9 +1,11 @@
 ﻿using Microsoft.Win32;
 using Selenium.Core;
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Selenium.Internal {
 
@@ -100,15 +102,12 @@ namespace Selenium.Internal {
         public static void DeleteDirectoryByShell(string directory) {
             if (!Directory.Exists(directory))
                 return;
-            using (Process process = new Process()) {
-                ProcessStartInfo si = process.StartInfo;
-                si.WindowStyle = ProcessWindowStyle.Hidden;
-                si.UseShellExecute = true;
-                si.CreateNoWindow = true;
-                si.FileName = "cmd.exe";
-                si.Arguments = string.Format("/C RD /S /Q \"{0}\"", directory);
-                process.Start();
-            };
+
+            Hashtable env = new Hashtable();
+            env["PATH"] = Environment.GetFolderPath(Environment.SpecialFolder.System);
+
+            var cmd = "cmd.exe /C RD /S /Q \"" + directory + "\"";
+            ProcessExt.Execute(cmd, null, env, true);
         }
 
         /// <summary>

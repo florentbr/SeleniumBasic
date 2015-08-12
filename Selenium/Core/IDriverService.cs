@@ -5,7 +5,7 @@ namespace Selenium.Core {
 
     interface IDriverService {
 
-        IPEndPoint EndPoint { get; }
+        IPEndPoint IPEndPoint { get; }
 
         string Uri { get; }
 
