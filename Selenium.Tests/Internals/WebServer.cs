@@ -45,6 +45,10 @@ namespace Selenium.Tests.Internals {
             AppDomain.CurrentDomain.DomainUnload += new EventHandler((s, e) => this.Stop());
         }
 
+        ~WebServer(){
+            this.Stop();
+        }
+
         public void Start() {
             _exit = false;
             _cache = new Dictionary<string, byte[]>();
@@ -55,6 +59,7 @@ namespace Selenium.Tests.Internals {
 
             _thread = new Thread(Run);
             _thread.SetApartmentState(ApartmentState.MTA);
+            _thread.IsBackground = true;
             _thread.Start();
         }
 
