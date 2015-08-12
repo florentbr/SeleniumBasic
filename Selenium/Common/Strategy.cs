@@ -12,9 +12,9 @@ namespace Selenium {
         /// <summary></summary>
         None = 0,
         /// <summary></summary>
-        ClassName = 1,
+        Class = 1,
         /// <summary></summary>
-        CssSelector = 2,
+        Css = 2,
         /// <summary></summary>
         Id = 3,
         /// <summary></summary>
@@ -24,7 +24,7 @@ namespace Selenium {
         /// <summary></summary>
         PartialLinkText = 6,
         /// <summary></summary>
-        TagName = 7,
+        Tag = 7,
         /// <summary></summary>
         XPath = 8,
         /// <summary></summary>

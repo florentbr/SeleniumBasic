@@ -117,10 +117,10 @@ namespace Selenium.ComInterfaces {
         WebElement FindElementBy(Strategy strategy, string value, int timeout = -1, bool raise = true);
 
         [DispId(1178), Description("Finds the first element matching the specified CSS class.")]
-        WebElement FindElementByClassName(string classname, int timeout = -1, bool raise = true);
+        WebElement FindElementByClass(string classname, int timeout = -1, bool raise = true);
 
         [DispId(1180), Description("Finds the first element matching the specified CSS selector.")]
-        WebElement FindElementByCssSelector(string cssselector, int timeout = -1, bool raise = true);
+        WebElement FindElementByCss(string cssselector, int timeout = -1, bool raise = true);
 
         [DispId(1183), Description("Finds the first element matching the specified id.")]
         WebElement FindElementById(string id, int timeout = -1, bool raise = true);
@@ -135,11 +135,10 @@ namespace Selenium.ComInterfaces {
         WebElement FindElementByPartialLinkText(string partiallinktext, int timeout = -1, bool raise = true);
 
         [DispId(1191), Description("Finds the first element matching the specified tag name.")]
-        WebElement FindElementByTagName(string tagname, int timeout = -1, bool raise = true);
+        WebElement FindElementByTag(string tagname, int timeout = -1, bool raise = true);
 
         [DispId(1193), Description("Finds the first element matching the specified XPath query.")]
         WebElement FindElementByXPath(string xpath, int timeout = -1, bool raise = true);
-
 
         [DispId(1200), Description("Find all elements within the current context using the given mechanism.")]
         WebElements FindElements([MarshalAs(UnmanagedType.Struct)]By by, int minimum = 0, int timeout = 0);
@@ -147,11 +146,11 @@ namespace Selenium.ComInterfaces {
         [DispId(1210), Description("Find all elements for a given strategy and value.")]
         WebElements FindElementsBy(Strategy strategy, string value, int minimum = 0, int timeout = 0);
 
-        [DispId(1220), Description("Finds elements matching the specified CSS class.")]
-        WebElements FindElementsByClassName(string classname, int minimum = 0, int timeout = 0);
+        [DispId(1220), Description("Finds elements matching the specified class name.")]
+        WebElements FindElementsByClass(string classname, int minimum = 0, int timeout = 0);
 
         [DispId(1221), Description("Finds elements matching the specified CSS selector.")]
-        WebElements FindElementsByCssSelector(string cssselector, int minimum = 0, int timeout = 0);
+        WebElements FindElementsByCss(string cssselector, int minimum = 0, int timeout = 0);
 
         [DispId(1223), Description("Finds elements matching the specified id.")]
         WebElements FindElementsById(string id, int minimum = 0, int timeout = 0);
@@ -166,17 +165,40 @@ namespace Selenium.ComInterfaces {
         WebElements FindElementsByPartialLinkText(string partiallinktext, int minimum = 0, int timeout = 0);
 
         [DispId(1235), Description("Finds elements matching the specified tag name.")]
-        WebElements FindElementsByTagName(string tagname, int minimum = 0, int timeout = 0);
+        WebElements FindElementsByTag(string tagname, int minimum = 0, int timeout = 0);
 
         [DispId(1239), Description("Finds elements matching the specified XPath query.")]
         WebElements FindElementsByXPath(string xpath, int minimum = 0, int timeout = 0);
-
 
         [DispId(1250), Description("Indicates whether a WebElement is present using the given method.")]
         bool IsElementPresent([MarshalAs(UnmanagedType.Struct)]By by, int timeout = 0);
 
         [DispId(1260), Description("Waits for an element to disappear from the page")]
         void WaitNotElement([MarshalAs(UnmanagedType.Struct)]By by, int timeout = -1);
+
+
+        //TODO: remove in a later release
+        #region Deprecated
+
+        [DispId(1179), Description("Deprecated, use FindElementByClass instead")]
+        WebElement FindElementByClassName(string classname, int timeout = -1, bool raise = true);
+
+        [DispId(1181), Description("Deprecated, use FindElementByCss instead")]
+        WebElement FindElementByCssSelector(string cssselector, int timeout = -1, bool raise = true);
+
+        [DispId(1192), Description("Deprecated, use FindElementByTag instead")]
+        WebElement FindElementByTagName(string tagname, int timeout = -1, bool raise = true);
+
+        [DispId(1219), Description("Deprecated, use FindElementsByClass instead")]
+        WebElements FindElementsByClassName(string classname, int minimum = 0, int timeout = 0);
+
+        [DispId(1222), Description("Deprecated, use FindElementsByCss instead")]
+        WebElements FindElementsByCssSelector(string cssselector, int minimum = 0, int timeout = 0);
+
+        [DispId(1236), Description("Deprecated, use FindElementsByTag instead")]
+        WebElements FindElementsByTagName(string tagname, int minimum = 0, int timeout = 0);
+        
+        #endregion
 
         #endregion
 

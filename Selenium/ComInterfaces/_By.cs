@@ -16,10 +16,10 @@ namespace Selenium.ComInterfaces {
         string Value { get; }
 
         [DispId(20), Description("Finds elements based on the HTML class name attribute.")]
-        By ClassName(string className);
+        By Class(string className);
 
         [DispId(21), Description("Finds elements using a CSS expression.")]
-        By CssSelector(string cssSelector);
+        By Css(string cssSelector);
 
         [DispId(22), Description("Finds elements based on the HTML id attribute.")]
         By Id(string id);
@@ -34,7 +34,7 @@ namespace Selenium.ComInterfaces {
         By PartialLinkText(string partialLinkText);
 
         [DispId(26), Description("Finds elements based on the HTML tag name")]
-        By TagName(string tagName);
+        By Tag(string tagName);
 
         [DispId(27), Description("Finds elements using an XPATH expression.")]
         By XPath(string xpath);

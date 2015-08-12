@@ -33,7 +33,7 @@ namespace Selenium.Tests {
         [TestCase]
         public void ShouldProcessWebElements() {
             //Webelements
-            var eles = driver.FindElementsByTagName("input");
+            var eles = driver.FindElementsByTag("input");
             var resEles = (WebElements)driver.ExecuteScript("return arguments;", eles);
             A.AreEqual(eles.Count, resEles.Count);
             A.True(eles.First().Equals(resEles.First()));

@@ -30,13 +30,13 @@ namespace Selenium {
 
         internal static string FormatStrategy(Strategy strategy) {
             switch (strategy) {
-                case Strategy.ClassName: return "class name";
-                case Strategy.CssSelector: return "css selector";
+                case Strategy.Class: return "class name";
+                case Strategy.Css: return "css selector";
                 case Strategy.Id: return "id";
                 case Strategy.Name: return "name";
                 case Strategy.LinkText: return "link text";
                 case Strategy.PartialLinkText: return "partial link text";
-                case Strategy.TagName: return "tag name";
+                case Strategy.Tag: return "tag name";
                 case Strategy.XPath: return "xpath";
                 case Strategy.Any: return "multiple";
             }
@@ -45,13 +45,13 @@ namespace Selenium {
 
         internal static Strategy ParseStrategy(string strategy) {
             switch (strategy.Remove(' ').ToLower()) {
-                case "class": return Strategy.ClassName;
-                case "css": return Strategy.CssSelector;
+                case "class": return Strategy.Class;
+                case "css": return Strategy.Css;
                 case "id": return Strategy.Id;
                 case "name": return Strategy.Name;
                 case "link": return Strategy.LinkText;
                 case "partiallink": return Strategy.PartialLinkText;
-                case "tag": return Strategy.TagName;
+                case "tag": return Strategy.Tag;
                 case "xpath": return Strategy.XPath;
             }
             throw new SeleniumError("Unknown strategy: {0}", strategy);
@@ -125,8 +125,8 @@ namespace Selenium {
         /// </summary>
         /// <param name="className">Element class name</param>
         /// <returns></returns>
-        public By ClassName(string className) {
-            return new By(Strategy.ClassName, className);
+        public By Class(string className) {
+            return new By(Strategy.Class, className);
         }
 
         /// <summary>
@@ -134,8 +134,8 @@ namespace Selenium {
         /// </summary>
         /// <param name="cssSelector">CSS seletor</param>
         /// <returns>By object</returns>
-        public By CssSelector(string cssSelector) {
-            return new By(Strategy.CssSelector, cssSelector);
+        public By Css(string cssSelector) {
+            return new By(Strategy.Css, cssSelector);
         }
 
         /// <summary>
@@ -170,8 +170,8 @@ namespace Selenium {
         /// </summary>
         /// <param name="tagName">Element tag name</param>
         /// <returns>By object</returns>
-        public By TagName(string tagName) {
-            return new By(Strategy.TagName, tagName);
+        public By Tag(string tagName) {
+            return new By(Strategy.Tag, tagName);
         }
 
         /// <summary>

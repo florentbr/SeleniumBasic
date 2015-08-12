@@ -122,19 +122,19 @@ namespace Selenium {
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
         /// <returns><see cref="WebElement" /> or null</returns>
-        public WebElement FindElementByClassName(string classname, int timeout = -1, bool raise = true) {
-            return this.FindElementBy(Strategy.ClassName, classname, timeout, raise);
+        public WebElement FindElementByClass(string classname, int timeout = -1, bool raise = true) {
+            return this.FindElementBy(Strategy.Class, classname, timeout, raise);
         }
 
         /// <summary>
         /// Finds the first element matching the specified CSS selector.
         /// </summary>
-        /// <param name="cssselector">CSS seletor</param>
+        /// <param name="cssselector">CSS selector</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
         /// <returns><see cref="WebElement" /> or null</returns>
-        public WebElement FindElementByCssSelector(string cssselector, int timeout = -1, bool raise = true) {
-            return this.FindElementBy(Strategy.CssSelector, cssselector, timeout, raise);
+        public WebElement FindElementByCss(string cssselector, int timeout = -1, bool raise = true) {
+            return this.FindElementBy(Strategy.Css, cssselector, timeout, raise);
         }
 
         /// <summary>
@@ -166,10 +166,9 @@ namespace Selenium {
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
         /// <returns><see cref="WebElement" /> or null</returns>
-        public WebElement FindElementByTagName(string tagname, int timeout = -1, bool raise = true) {
-            return this.FindElementBy(Strategy.TagName, tagname, timeout, raise);
+        public WebElement FindElementByTag(string tagname, int timeout = -1, bool raise = true) {
+            return this.FindElementBy(Strategy.Tag, tagname, timeout, raise);
         }
-
 
 
         /// <summary>
@@ -242,8 +241,8 @@ namespace Selenium {
         /// <param name="minimum">Minimum number of elements to wait for</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <returns><see cref="WebElements" /></returns>
-        public WebElements FindElementsByClassName(string classname, int minimum = 0, int timeout = 0) {
-            return this.FindElementsBy(Strategy.ClassName, classname, minimum, timeout);
+        public WebElements FindElementsByClass(string classname, int minimum = 0, int timeout = 0) {
+            return this.FindElementsBy(Strategy.Class, classname, minimum, timeout);
         }
 
         /// <summary>
@@ -253,8 +252,8 @@ namespace Selenium {
         /// <param name="minimum">Minimum number of elements to wait for</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <returns><see cref="WebElements" /></returns>
-        public WebElements FindElementsByCssSelector(string cssselector, int minimum = 0, int timeout = 0) {
-            return this.FindElementsBy(Strategy.CssSelector, cssselector, minimum, timeout);
+        public WebElements FindElementsByCss(string cssselector, int minimum = 0, int timeout = 0) {
+            return this.FindElementsBy(Strategy.Css, cssselector, minimum, timeout);
         }
 
         /// <summary>
@@ -286,12 +285,81 @@ namespace Selenium {
         /// <param name="minimum">Minimum number of elements to wait for</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <returns><see cref="WebElements" /></returns>
-        public WebElements FindElementsByTagName(string tagname, int minimum = 0, int timeout = 0) {
-            return this.FindElementsBy(Strategy.TagName, tagname, minimum, timeout);
+        public WebElements FindElementsByTag(string tagname, int minimum = 0, int timeout = 0) {
+            return this.FindElementsBy(Strategy.Tag, tagname, minimum, timeout);
         }
 
 
+        //TODO: remove in a later release
+        #region Deprecated
 
+        /// <summary>
+        /// Deprecated, use FindElementByClass intead.
+        /// </summary>
+        /// <param name="classname">Classname</param>
+        /// <param name="timeout">Optional timeout in milliseconds</param>
+        /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
+        /// <returns><see cref="WebElement" /> or null</returns>
+        public WebElement FindElementByClassName(string classname, int timeout = -1, bool raise = true) {
+            throw new SeleniumError("FindElementByClassName has been renamed to FindElementByClass");
+        }
+
+        /// <summary>
+        /// Deprecated, use FindElementByCss intead.
+        /// </summary>
+        /// <param name="cssselector">CSS selector</param>
+        /// <param name="timeout">Optional timeout in milliseconds</param>
+        /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
+        /// <returns><see cref="WebElement" /> or null</returns>
+        public WebElement FindElementByCssSelector(string cssselector, int timeout = -1, bool raise = true) {
+            throw new SeleniumError("FindElementByCssSelector has been renamed to FindElementByCss");
+        }
+
+        /// <summary>
+        /// Deprecated, use FindElementByTag intead.
+        /// </summary>
+        /// <param name="tagname">Tag name</param>
+        /// <param name="timeout">Optional timeout in milliseconds</param>
+        /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
+        /// <returns><see cref="WebElement" /> or null</returns>
+        public WebElement FindElementByTagName(string tagname, int timeout = -1, bool raise = true) {
+            throw new SeleniumError("FindElementByTagName has been renamed to FindElementByTag");
+        }
+
+        /// <summary>
+        /// Deprecated, use FindElementsByClass intead.
+        /// </summary>
+        /// <param name="classname">Class name</param>
+        /// <param name="minimum">Minimum number of elements to wait for</param>
+        /// <param name="timeout">Optional timeout in milliseconds</param>
+        /// <returns><see cref="WebElements" /></returns>
+        public WebElements FindElementsByClassName(string classname, int minimum = 0, int timeout = 0) {
+            throw new SeleniumError("FindElementsByClassName has been renamed to FindElementsByClass");
+        }
+
+        /// <summary>
+        /// Deprecated, use FindElementsByCss intead.
+        /// </summary>
+        /// <param name="cssselector">CSS selector</param>
+        /// <param name="minimum">Minimum number of elements to wait for</param>
+        /// <param name="timeout">Optional timeout in milliseconds</param>
+        /// <returns><see cref="WebElements" /></returns>
+        public WebElements FindElementsByCssSelector(string cssselector, int minimum = 0, int timeout = 0) {
+            throw new SeleniumError("FindElementsByCssSelector has been renamed to FindElementsByCss");
+        }
+
+        /// <summary>
+        /// Deprecated, use FindElementsByTag intead.
+        /// </summary>
+        /// <param name="tagname">Tag name</param>
+        /// <param name="minimum">Minimum number of elements to wait for</param>
+        /// <param name="timeout">Optional timeout in milliseconds</param>
+        /// <returns><see cref="WebElements" /></returns>
+        public WebElements FindElementsByTagName(string tagname, int minimum = 0, int timeout = 0) {
+            throw new SeleniumError("FindElementsByTagName has been renamed to FindElementsByTag");
+        }
+
+        #endregion
 
 
         /// <summary>

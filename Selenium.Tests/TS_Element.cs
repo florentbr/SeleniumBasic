@@ -57,7 +57,7 @@ namespace Selenium.Tests {
 
         [TestCase]
         public void ShouldReturnText() {
-            var ele1 = driver.FindElementByCssSelector("#forms__text label");
+            var ele1 = driver.FindElementByCss("#forms__text label");
             A.AreEqual("Search", ele1.Text());
         }
 

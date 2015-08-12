@@ -43,7 +43,7 @@ namespace Selenium {
         /// </summary>
         public WebElements Options {
             get {
-                return _element.FindElementsByTagName("option");
+                return _element.FindElementsByTag("option");
             }
         }
 
@@ -104,7 +104,7 @@ namespace Selenium {
                 string substringWithoutSpace = GetLongestToken(text);
                 WebElements candidates;
                 if (string.IsNullOrEmpty(substringWithoutSpace)) {
-                    candidates = _element.FindElementsByTagName("option");
+                    candidates = _element.FindElementsByTag("option");
                 } else {
                     candidates = _element.FindElementsByXPath(".//option[contains(., " + EscapeString(substringWithoutSpace) + ")]");
                 }

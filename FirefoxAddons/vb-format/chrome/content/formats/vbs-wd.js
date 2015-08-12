@@ -365,9 +365,9 @@ WDAPI.Driver.searchContext = function(locatorType, locator) {
     case 'xpath':
       return 'XPath' + locatorString.replace(/""/g, "'");
     case 'class_name':
-      return 'ClassName' + locatorString;
+      return 'Class' + locatorString;
     case 'css':
-      return 'CssSelector' + locatorString.replace(/""/g, "'");
+      return 'Css' + locatorString.replace(/""/g, "'");
     case 'id':
       return 'Id' + locatorString;
     case 'link':
@@ -375,7 +375,7 @@ WDAPI.Driver.searchContext = function(locatorType, locator) {
     case 'name':
       return 'Name' + locatorString;
     case 'tag_name':
-      return 'TagName' + locatorString;
+      return 'Tag' + locatorString;
   }
   throw 'Error: unknown strategy [' + locatorType + '] for locator [' + locator + ']';
 };

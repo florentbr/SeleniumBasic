@@ -26,14 +26,14 @@ namespace Selenium.Tests {
         }
 
         [TestCase]
-        public void ShouldFindElementByClassName() {
-            var ele = driver.FindElement(by.ClassName("class"));
+        public void ShouldFindElementByClass() {
+            var ele = driver.FindElement(by.Class("class"));
             A.AreEqual("Div2", ele.Text());
         }
 
         [TestCase]
-        public void ShouldFindElementByCssSelector() {
-            var ele = driver.FindElement(by.CssSelector("#id-5"));
+        public void ShouldFindElementByCss() {
+            var ele = driver.FindElement(by.Css("#id-5"));
             A.AreEqual("Div5", ele.Text());
         }
 
@@ -56,8 +56,8 @@ namespace Selenium.Tests {
         }
 
         [TestCase]
-        public void ShouldFindElementByTagName() {
-            var ele = driver.FindElement(by.TagName("span"));
+        public void ShouldFindElementByTag() {
+            var ele = driver.FindElement(by.Tag("span"));
             A.AreEqual("Div5", ele.Text());
         }
 
@@ -83,15 +83,15 @@ namespace Selenium.Tests {
         }
 
         [TestCase]
-        public void ShouldFindElementsByClassName() {
-            var elts = driver.FindElements(by.ClassName("class"));
+        public void ShouldFindElementsByClass() {
+            var elts = driver.FindElements(by.Class("class"));
             A.AreEqual(1, elts.Count);
             A.AreEqual("Div2", elts[0].Text());
         }
 
         [TestCase]
-        public void ShouldFindElementsByCssSelector() {
-            var elts = driver.FindElements(by.CssSelector("div a"));
+        public void ShouldFindElementsByCss() {
+            var elts = driver.FindElements(by.Css("div a"));
             A.AreEqual(2, elts.Count);
             A.AreEqual("Link2", elts[1].Text());
         }
@@ -118,8 +118,8 @@ namespace Selenium.Tests {
         }
 
         [TestCase]
-        public void ShouldFindElementsByTagName() {
-            var elts = driver.FindElements(by.TagName("a"));
+        public void ShouldFindElementsByTag() {
+            var elts = driver.FindElements(by.Tag("a"));
             A.AreEqual(2, elts.Count);
             A.AreEqual("Link2", elts[1].Text());
         }
@@ -133,7 +133,7 @@ namespace Selenium.Tests {
 
         [TestCase]
         public void ShouldFindElementsByAny() {
-            var elts = driver.FindElements(By.Any(By.ClassName("class"), By.TagName("a")));
+            var elts = driver.FindElements(By.Any(By.Class("class"), By.Tag("a")));
             A.AreEqual(3, elts.Count);
         }
 
