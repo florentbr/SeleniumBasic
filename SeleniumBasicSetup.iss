@@ -99,6 +99,7 @@ Name: "{group}\Examples"; Filename: "{app}\Examples"; WorkingDir: "{app}";
 Name: "{group}\Templates"; Filename: "{app}\Templates"; WorkingDir: "{app}";
 Name: "{group}\QuickTest"; Filename: "{app}\Scripts\QuickTest.vbs"; WorkingDir: "{app}";
 Name: "{group}\RunCleaner"; Filename: "{app}\Scripts\RunCleaner.vbs"; WorkingDir: "{app}";
+Name: "{group}\Start Firefox"; Filename: "{app}\Scripts\StartFirefox.vbs"; WorkingDir: "{app}";
 Name: "{group}\API documentation"; Filename: "{app}\Selenium.chm"; WorkingDir: "{app}";
 Name: "{group}\ChangeLog"; Filename: "{app}\CHANGELOG.txt"; WorkingDir: "{app}";
 Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
