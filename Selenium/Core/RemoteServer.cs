@@ -52,11 +52,11 @@ namespace Selenium.Core {
 
         public void Dispose() {
             _disposed = true;
-            if (_request != null){
+            if (_request != null) {
                 _request.Abort();
                 _request = null;
             }
-            if(_thread != null){
+            if (_thread != null) {
                 _thread.Interrupt();
                 _thread = null;
             }
@@ -197,7 +197,11 @@ namespace Selenium.Core {
                     } else if (ex.Status == WebExceptionStatus.Timeout) {
                         _response_exception = new Errors.WebRequestTimeout(_request);
                     } else if ((response = ex.Response as HttpWebResponse) != null) {
-                        _response_content = GetHttpWebResponseContent(response);
+                        try {
+                            _response_content = GetHttpWebResponseContent(response);
+                        } catch (Exception ex2) {
+                            _response_exception = new SeleniumException(ex2);
+                        }
                     } else {
                         _response_exception = new Errors.WebRequestError(ex.Message);
                     }
@@ -206,6 +210,8 @@ namespace Selenium.Core {
                 } finally {
                     SysWaiter.OnInterrupt = null;
                     _event_received.Set();
+                    if (response != null)
+                        response.Close();
                 }
             }
         }
@@ -231,18 +237,20 @@ namespace Selenium.Core {
         }
 
         private static Dictionary GetHttpWebResponseContent(HttpWebResponse response) {
-            try {
-                using (Stream stream = response.GetResponseStream()) {
-                    if (IsJsonResponse(response)) {
-                        Dictionary dict = (Dictionary)JsonReader.Deserialize(stream);
-                        return dict;
-                    } else {
-                        string msg = new StreamReader(stream).ReadToEnd();
-                        throw new SeleniumError(msg);
+            using (Stream stream = response.GetResponseStream()) {
+                if (IsJsonResponse(response)) {
+                    Dictionary dict = (Dictionary)JsonReader.Deserialize(stream);
+                    return dict;
+                } else {
+                    string bodyText = new StreamReader(stream).ReadToEnd();
+                    switch ((int)response.StatusCode) {
+                        case 400: throw new Exception("Missing Command Parameters: " + bodyText);
+                        case 404: throw new Exception("Unknown Commands: " + bodyText);
+                        case 405: throw new Exception("Invalid Command Method: " + bodyText);
+                        case 501: throw new Exception("Unimplemented Commands: " + bodyText);
+                        default: throw new Exception(response.StatusDescription);
                     }
                 }
-            } catch (Exception ex) {
-                throw new SeleniumException(ex);
             }
         }
 
