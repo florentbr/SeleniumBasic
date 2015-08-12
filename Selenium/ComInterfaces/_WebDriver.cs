@@ -1,8 +1,6 @@
-﻿using Selenium;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace Selenium.ComInterfaces {
 #pragma warning disable 1591
@@ -31,7 +29,7 @@ namespace Selenium.ComInterfaces {
         [DispId(308), Description("")]
         Proxy Proxy { get; }
 
-        [DispId(310), Description("")]
+        [DispId(310), Description("Set the path to the browser executable to use")]
         void SetBinary(string path);
 
         #endregion
@@ -39,7 +37,7 @@ namespace Selenium.ComInterfaces {
 
         #region Session
 
-        [DispId(12), Description("Starts a new Selenium testing session")]
+        [DispId(12), Description("Starts a new Selenium session")]
         void Start(string browser = null, string baseUrl = null);
 
         [DispId(15), Description("Starts remotely a new Selenium session")]
