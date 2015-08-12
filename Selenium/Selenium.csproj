@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\COMDisposable.cs" />
     <Compile Include="Internal\ProcessExt.cs" />
     <Compile Include="Interop\Excel\Excel.cs" />
     <Compile Include="Interop\IStdPicture.cs" />

@@ -40,6 +40,11 @@ namespace Selenium {
         public PdfFile() {
             _writer = new PdfWriter();
             _writer.AddPage(_pageWidthPt, _pageHeightPt);
+            COMDisposable.Subscribe(this, typeof(ComInterfaces._PdfFile));
+        }
+
+        ~PdfFile() {
+            this.Dispose();
         }
 
         /// <summary>

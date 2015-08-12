@@ -40,6 +40,7 @@ namespace Selenium {
             using (var stream = new MemoryStream(bytes)) {
                 _bitmap = (Bitmap)Bitmap.FromStream(stream, false, false);
             }
+            COMDisposable.Subscribe(this, typeof(ComInterfaces._Image));
         }
 
         /// <summary>
@@ -48,6 +49,7 @@ namespace Selenium {
         /// <param name="image"></param>
         public Image(Bitmap image) {
             _bitmap = image;
+            COMDisposable.Subscribe(this, typeof(ComInterfaces._Image));
         }
 
         /// <summary>
