@@ -78,9 +78,9 @@ Source: "References\phantomjs.exe"; DestDir: "{app}"; Flags: ignoreversion; Comp
 
 Source: "FirefoxAddons\bin\selenium-ide.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ide;
                                                                                                                                                       
-Source: "Scripts\*.*" ; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist overwritereadonly ; Attribs:readonly; Components: pkg_core;
-Source: "Examples\*.*"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist overwritereadonly ; Attribs:readonly; Components: pkg_doc;
-Source: "Templates\*.*" ; DestDir: "{app}\Templates"; Flags: ignoreversion skipifsourcedoesntexist overwritereadonly ; Attribs:readonly; Components: pkg_doc;
+Source: "Scripts\*.*" ; DestDir: "{app}\Scripts"; Flags: ignoreversion skipifsourcedoesntexist overwritereadonly recursesubdirs; Attribs:readonly; Components: pkg_core;
+Source: "Examples\*.*"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist overwritereadonly recursesubdirs; Attribs:readonly; Components: pkg_doc;
+Source: "Templates\*.*" ; DestDir: "{app}\Templates"; Flags: ignoreversion skipifsourcedoesntexist overwritereadonly recursesubdirs; Attribs:readonly; Components: pkg_doc;
 
 ;copy config file
 Source: "References\exe.config" ; DestDir: "{sys}"; DestName: "wscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
@@ -97,8 +97,8 @@ Name: "{group}\Project Home Page"; Filename: {#AppURL}; WorkingDir: "{app}";
 Name: "{group}\Vbs Console"; Filename: "{app}\vbsc.exe"; WorkingDir: "{app}"; Components: pkg_cons;
 Name: "{group}\Examples"; Filename: "{app}\Examples"; WorkingDir: "{app}";
 Name: "{group}\Templates"; Filename: "{app}\Templates"; WorkingDir: "{app}";
-Name: "{group}\QuickTest"; Filename: "{app}\QuickTest.vbs"; WorkingDir: "{app}";
-Name: "{group}\RunCleaner"; Filename: "{app}\RunCleaner.vbs"; WorkingDir: "{app}";
+Name: "{group}\QuickTest"; Filename: "{app}\Scripts\QuickTest.vbs"; WorkingDir: "{app}";
+Name: "{group}\RunCleaner"; Filename: "{app}\Scripts\RunCleaner.vbs"; WorkingDir: "{app}";
 Name: "{group}\API documentation"; Filename: "{app}\Selenium.chm"; WorkingDir: "{app}";
 Name: "{group}\ChangeLog"; Filename: "{app}\CHANGELOG.txt"; WorkingDir: "{app}";
 Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
@@ -122,6 +122,30 @@ Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Zoom"; ValueName: "Zoo
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Isolation"; Flags: dontcreatekey deletevalue; Components: pkg_ie;
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Isolation64Bit";  Flags: dontcreatekey deletevalue; Check: IsWin64; Components: pkg_ie;
 
+;IE tweaks: Disable autocomplete
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoComplete"; ValueName: "AutoSuggest"; ValueType: string; ValueData: "no"; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Use FormSuggest"; ValueType: string; ValueData: "no"; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "FormSuggest Passwords"; ValueType: string; ValueData: "no"; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "FormSuggest PW Ask"; ValueType: string; ValueData: "no"; Components: pkg_ie;
+
+;IE tweaks: Disable warn
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings"; ValueName: "WarnonBadCertRecving"; ValueType: dword; ValueData: 0; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings"; ValueName: "WarnonZoneCrossing"; ValueType: dword; ValueData: 0; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings"; ValueName: "WarnOnPostRedirect"; ValueType: dword; ValueData: 0; Components: pkg_ie;
+
+;IE tweaks: Disable Check for publisher's certificate revocation
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\WinTrust\Trust Providers\Software Publishing"; ValueName: "State"; ValueType: dword; ValueData: 146944; Components: pkg_ie;
+;IE tweaks: Disable Check for server certificate revocation
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings"; ValueName: "CertificateRevocation"; ValueType: dword; ValueData: 0; Components: pkg_ie;
+;IE tweaks: Disable Check for signatures on downloaded programs
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Download"; ValueName: "CheckExeSignatures"; ValueType: string; ValueData: "no"; Components: pkg_ie;
+
+;IE tweaks: Disable Check default browser
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Check_Associations"; ValueType: string; ValueData: "no"; Components: pkg_ie;
+
+;IE tweaks: Disable accelerator button
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Activities"; ValueName: "NoActivities"; ValueType: dword; ValueData: 1; Components: pkg_ie;
+
 ;IE tweaks: Disable protected mode for all zones  Disable=3 Enable=0
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "NoProtectedModeBanner"; ValueType: dword; ValueData: 1; Components: pkg_ie;
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0"; ValueName: "2500"; ValueType: dword; ValueData: 3; Components: pkg_ie;
@@ -130,8 +154,19 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3"; ValueName: "2500"; ValueType: dword; ValueData: 3; Components: pkg_ie;
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\4"; ValueName: "2500"; ValueType: dword; ValueData: 3; Components: pkg_ie;
 
+;IE tweaks: Enable all cookies
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings"; ValueName: "PrivacyAdvanced"; ValueType: dword; ValueData: 1; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3"; ValueName: "1A10"; ValueType: dword; ValueData: 1; Components: pkg_ie;
+
 ;IE tweak: Allow HTTP Basic Authentication in url
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_HTTP_USERNAME_PASSWORD_DISABLE"; ValueName: "iexplore.exe"; ValueType: dword; ValueData: 0; Components: pkg_ie;
+
+;IE tweak: Turn off popup blocker
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\New Windows"; ValueName: "PopupMgr"; ValueType: dword; ValueData: 0; Components: pkg_ie;
+
+;IE tweak: Delete browsing history on exit
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Privacy"; ValueName: "ClearBrowsingHistoryOnExit"; ValueType: dword; ValueData: 1; Components: pkg_ie;
+
 
 ;File association for the console
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\App Paths\vbsc.exe"; ValueType: string; ValueData: "{app}\vbsc.exe"; Flags: deletekey uninsdeletekey; Components: pkg_cons;
