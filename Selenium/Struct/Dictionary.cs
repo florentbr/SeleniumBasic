@@ -161,6 +161,31 @@ namespace Selenium {
             return false;
         }
 
+
+        /// <summary>
+        /// Moves an item to a target dictionary.
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <param name="target">Target dictionary</param>
+        /// <returns>True if the key was found, false otherwise</returns>
+        internal bool TryMove(string key, Dictionary target) {
+            int hash = key.GetHashCode();
+            DictionaryItem last = null;
+            for (DictionaryItem node = _head; node != null; node = node.next) {
+                if (hash == node.hash && key.Equals(node.key)) {
+                    if (last == null) {
+                        _head = node.next;
+                    } else {
+                        last.next = node.next;
+                    }
+                    target.Add(key, node.value);
+                    return true;
+                }
+                last = node;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Returns true if the key is present, false otherwise.
         /// </summary>

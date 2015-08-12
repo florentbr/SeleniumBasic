@@ -44,17 +44,14 @@ namespace Selenium {
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     public class PhantomJSDriver : WebDriver, ComInterfaces._WebDriver {
 
-        internal override IDriverService StartService() {
-            return PhantomJSDriver.StartService(this);
-        }
+        const string BROWSER_NAME = "phantomjs";
 
-        internal override Capabilities ExtendCapabilities() {
-            return PhantomJSDriver.ExtendCapabilities(this);
-        }
+        public PhantomJSDriver()
+            : base(BROWSER_NAME) { }
 
         internal static IDriverService StartService(WebDriver wd) {
             var svc = new DriverService(IPAddress.Loopback);
-            svc.AddArgument("--webdriver=" + svc.EndPoint.ToString());
+            svc.AddArgument("--webdriver=" + svc.IPEndPoint.ToString());
             svc.AddArgument("--webdriver-loglevel=ERROR");
             svc.AddArgument("--ignore-ssl-errors=true");
             svc.Start("phantomjs.exe");
@@ -63,11 +60,12 @@ namespace Selenium {
 
         internal static Capabilities ExtendCapabilities(WebDriver wd, bool remote = false) {
             var capa = wd.Capabilities;
-            capa.Browser = "phantomjs";
+            capa.BrowserName = "phantomjs";
             if (wd.Arguments.Count > 0)
                 capa["phantomjs.cli.args"] = wd.Arguments;
             return capa;
         }
+
     }
 
 }

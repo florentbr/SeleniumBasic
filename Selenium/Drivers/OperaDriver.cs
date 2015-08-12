@@ -47,37 +47,27 @@ namespace Selenium {
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     public class OperaDriver : WebDriver, ComInterfaces._WebDriver {
 
-        internal override IDriverService StartService() {
-            return OperaDriver.StartService(this);
-        }
+        const string BROWSER_NAME = "opera";
 
-        internal override Capabilities ExtendCapabilities() {
-            return OperaDriver.ExtendCapabilities(this);
-        }
+        public OperaDriver()
+            : base(BROWSER_NAME) { }
 
         internal static IDriverService StartService(WebDriver wd) {
             var svc = new DriverService(IPAddress.Loopback);
-            svc.AddArgument("--port=" + svc.EndPoint.Port.ToString());
+            svc.AddArgument("--port=" + svc.IPEndPoint.Port.ToString());
             svc.AddArgument("--silent");
             svc.Start("operadriver.exe");
             return svc;
         }
 
-        static readonly string[] OPTIONS = { "binary", "args", "extensions", "prefs" };
-
         internal static Capabilities ExtendCapabilities(WebDriver wd, bool remote = false) {
             var capa = wd.Capabilities;
-            capa.Browser = "opera";
 
-            var opts = new Dictionary();
+            Dictionary opts;
+            if (!capa.TryGetValue("operaOptions", out opts))
+                capa["operaOptions"] = opts = new Dictionary();
 
-            foreach (string key in OPTIONS) {
-                string value;
-                if (capa.TryGetValue(key, out value)) {
-                    capa.Remove(key);
-                    opts.Add(key, value);
-                }
-            }
+            capa.TryMove("debuggerAddress", opts);
 
             if (wd.Profile != null)
                 wd.Arguments.Add("user-data-dir=" + ExpandProfile(wd.Profile, remote));
@@ -93,8 +83,6 @@ namespace Selenium {
 
             if (wd.Binary != null)
                 opts.Add("binary", wd.Binary);
-
-            capa["operaOptions"] = opts;
 
             return capa;
         }

@@ -47,27 +47,27 @@ namespace Selenium {
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     public class ChromeDriver : WebDriver, ComInterfaces._WebDriver {
 
-        internal override IDriverService StartService() {
-            return ChromeDriver.StartService(this);
-        }
+        const string BROWSER_NAME = "chrome";
 
-        internal override Capabilities ExtendCapabilities() {
-            return ChromeDriver.ExtendCapabilities(this);
-        }
+        public ChromeDriver()
+            : base(BROWSER_NAME) { }
 
         internal static IDriverService StartService(WebDriver wd) {
             var svc = new DriverService(IPAddress.Loopback);
-            svc.AddArgument("--port=" + svc.EndPoint.Port.ToString());
+            svc.AddArgument("--port=" + svc.IPEndPoint.Port.ToString());
             svc.AddArgument("--silent");
             svc.Start("chromedriver.exe");
             return svc;
         }
 
         internal static Capabilities ExtendCapabilities(WebDriver wd, bool remote = false) {
-            var capa = wd.Capabilities;
-            capa.Browser = "chrome";
+            Capabilities capa = wd.Capabilities;
 
-            var opts = new Dictionary();
+            Dictionary opts;
+            if (!capa.TryGetValue("chromeOptions", out opts))
+                capa["chromeOptions"] = opts = new Dictionary();
+
+            capa.TryMove("debuggerAddress", opts);
 
             if (wd.Profile != null)
                 wd.Arguments.Add("user-data-dir=" + ExpandProfile(wd.Profile, remote));
@@ -83,8 +83,6 @@ namespace Selenium {
 
             if (wd.Binary != null)
                 opts.Add("binary", wd.Binary);
-
-            capa["chromeOptions"] = opts;
 
             return capa;
         }
@@ -102,4 +100,5 @@ namespace Selenium {
         }
 
     }
+
 }

@@ -73,6 +73,11 @@ namespace Selenium {
             RegisterRunningObject();
         }
 
+        public WebDriver(string browser)
+            : this() {
+            this.Capabilities.BrowserName = browser;
+        }
+
         ~WebDriver() {
             this.Dispose();
         }
@@ -173,10 +178,10 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Set a specific binary for the browser
+        /// Set the path to the browser executable to use
         /// </summary>
         /// <param name="path">Full path</param>
-        public void SetBinary(string path){
+        public void SetBinary(string path) {
             this.Binary = path;
         }
 
@@ -184,14 +189,6 @@ namespace Selenium {
 
 
         #region Session
-
-        internal virtual IDriverService StartService() {
-            throw new Errors.BrowserNotStartedError();
-        }
-
-        internal virtual Capabilities ExtendCapabilities() {
-            throw new SeleniumException("Abstract method.");
-        }
 
         internal override RemoteSession session {
             get {
@@ -221,45 +218,33 @@ namespace Selenium {
         /// </example>
         public void Start(string browser = null, string baseUrl = null) {
             try {
-                if (browser != null)
-                    browser = browser.ToLower().Replace("*", "");
-
+                browser = ExpendBrowserName(browser);
                 Capabilities capabilities = null;
                 switch (browser) {
-                    case null:
-                        _service = this.StartService();
-                        capabilities = this.ExtendCapabilities();
-                        break;
                     case "firefox":
-                    case "ff":
                         _service = FirefoxDriver.StartService(this);
                         capabilities = FirefoxDriver.ExtendCapabilities(this);
                         break;
-                    case "cr":
                     case "chrome":
                         _service = ChromeDriver.StartService(this);
                         capabilities = ChromeDriver.ExtendCapabilities(this);
                         break;
                     case "phantomjs":
-                    case "pjs":
                         _service = PhantomJSDriver.StartService(this);
                         capabilities = PhantomJSDriver.ExtendCapabilities(this);
                         break;
                     case "internet explorer":
-                    case "internetexplorer":
-                    case "iexplore":
-                    case "ie":
                         _service = IEDriver.StartService(this);
                         capabilities = IEDriver.ExtendCapabilities(this);
                         break;
                     case "opera":
-                    case "op":
                         _service = OperaDriver.StartService(this);
                         capabilities = OperaDriver.ExtendCapabilities(this);
                         break;
                     default:
-                        throw new Errors.ArgumentError("Browser not defined or not available:\n" + browser);
+                        throw new Errors.ArgumentError("Invalid browser name: {0}", browser);
                 }
+                capabilities.BrowserName = browser;
 
                 RegisterRunningObject();
 
@@ -278,48 +263,57 @@ namespace Selenium {
         /// <summary>
         /// Starts remotely a new Selenium testing session
         /// </summary>
+        /// <param name="executorUri">Remote executor address (ex : "http://localhost:4444/wd/hub")</param>
         /// <param name="browser">Name of the browser : firefox, ie, chrome, phantomjs, htmlunit, htmlunitwithjavascript, android, ipad, opera</param>
-        /// <param name="remoteAddress">Remote url address (ex : "http://localhost:4444/wd/hub")</param>
-        /// <param name="baseUrl">Base URL</param>
-        public void StartRemotely(string browser, string remoteAddress, string baseUrl = null) {
+        /// <param name="version">Browser version</param>
+        /// <param name="platform">Platform: WINDOWS, LINUX, MAC, ANDROID...</param>
+        /// <example>
+        /// <code lang="vbs">	
+        ///     Dim driver As New WebDriver()
+        ///     driver.StartRemotely "http://localhost:4444/wd/hub", "ie", 11
+        ///     driver.Get "/"
+        /// </code>
+        /// </example>
+        public void StartRemotely(string executorUri, string browser = null, string version = null, string platform = "ANY") {
             try {
-                if (this.GetType() != typeof(WebDriver))
-                    throw new Errors.InvalideCommandError("Command only available for a WebDriver instance");
-
+                browser = ExpendBrowserName(browser);
                 Capabilities capabilities = null;
-                browser = browser.ToLower().Replace("*", "");
                 switch (browser) {
                     case "firefox":
-                    case "ff":
-                        capabilities = FirefoxDriver.ExtendCapabilities(this, true); break;
+                        capabilities = FirefoxDriver.ExtendCapabilities(this, true);
+                        break;
                     case "chrome":
-                    case "cr":
-                        capabilities = ChromeDriver.ExtendCapabilities(this, true); break;
+                        capabilities = ChromeDriver.ExtendCapabilities(this, true);
+                        break;
                     case "phantomjs":
-                    case "pjs":
-                        capabilities = PhantomJSDriver.ExtendCapabilities(this, true); break;
+                        capabilities = PhantomJSDriver.ExtendCapabilities(this, true);
+                        break;
                     case "internet explorer":
-                    case "iexplore":
-                    case "ie":
-                        capabilities = IEDriver.ExtendCapabilities(this, true); break;
+                        capabilities = IEDriver.ExtendCapabilities(this, true);
+                        break;
                     case "opera":
-                    case "op":
-                        capabilities = OperaDriver.ExtendCapabilities(this, true); break;
+                        capabilities = OperaDriver.ExtendCapabilities(this, true);
+                        break;
                     default:
-                        if (browser != "htmlunit" && browser != "safari" && browser != "iPhone" && browser != "ipad" && browser != "android")
-                            throw new Errors.ArgumentError("Remote browser {0} is not available.", browser);
+                        if (browser != "htmlunit"
+                            && browser != "safari"
+                            && browser != "iPhone"
+                            && browser != "ipad"
+                            && browser != "android") {
+                            throw new Errors.ArgumentError("Invalid browser name: {0}", browser);
+                        }
                         capabilities = this.Capabilities;
-                        capabilities.Browser = browser;
                         break;
                 }
+                capabilities.BrowserName = browser;
+                capabilities.BrowserVersion = version;
+                capabilities.PlatformName = platform;
 
                 RegisterRunningObject();
 
-                _session = new RemoteSession(remoteAddress, capabilities, false);
+                _session = new RemoteSession(executorUri, capabilities, false);
                 _session.Start();
 
-                if (!string.IsNullOrEmpty(baseUrl))
-                    this.BaseUrl = baseUrl;
             } catch (SeleniumException) {
                 throw;
             } catch (Exception ex) {
@@ -342,6 +336,38 @@ namespace Selenium {
             }
 
             this.Dispose();
+        }
+
+        private string ExpendBrowserName(string browser) {
+            if (string.IsNullOrEmpty(browser)) {
+                string browserName = this.Capabilities.BrowserName;
+                if (string.IsNullOrEmpty(browserName))
+                    throw new Errors.ArgumentError("Browser not defined");
+                return browserName;
+            } else {
+                string browserName = browser.ToLower().Replace("*", "");
+                switch (browserName) {
+                    case "firefox":
+                    case "ff":
+                        return "firefox";
+                    case "chrome":
+                    case "cr":
+                        return "chrome";
+                    case "phantomjs":
+                    case "pjs":
+                        return "phantomjs";
+                    case "internet explorer":
+                    case "internetexplorer":
+                    case "iexplore":
+                    case "ie":
+                        return "internet explorer";
+                    case "opera":
+                    case "op":
+                        return "opera";
+                    default:
+                        return browserName;
+                }
+            }
         }
 
         #endregion

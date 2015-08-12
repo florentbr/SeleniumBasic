@@ -46,18 +46,15 @@ namespace Selenium {
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     public class IEDriver : WebDriver, ComInterfaces._WebDriver {
 
-        internal override IDriverService StartService() {
-            return IEDriver.StartService(this);
-        }
+        const string BROWSER_NAME = "internet explorer";
 
-        internal override Capabilities ExtendCapabilities() {
-            return IEDriver.ExtendCapabilities(this);
-        }
+        public IEDriver()
+            : base(BROWSER_NAME) { }
 
         internal static IDriverService StartService(WebDriver wd) {
             var svc = new DriverService(IPAddress.Loopback);
-            svc.AddArgument("/host=" + svc.EndPoint.Address.ToString());
-            svc.AddArgument("/port=" + svc.EndPoint.Port.ToString());
+            svc.AddArgument("/host=" + svc.IPEndPoint.Address.ToString());
+            svc.AddArgument("/port=" + svc.IPEndPoint.Port.ToString());
             svc.AddArgument("/log-level=ERROR");
             svc.AddArgument("/silent");
             svc.Start("iedriver.exe", true);
@@ -66,7 +63,6 @@ namespace Selenium {
 
         internal static Capabilities ExtendCapabilities(WebDriver wd, bool remote = false) {
             var capa = wd.Capabilities;
-            capa.Browser = "internet explorer";
             capa["silent"] = true;
             capa["nativeEvents"] = true;
             //capa["requireWindowFocus"] = true;

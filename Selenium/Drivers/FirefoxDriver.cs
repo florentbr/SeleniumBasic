@@ -45,13 +45,10 @@ namespace Selenium {
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     public class FirefoxDriver : WebDriver, ComInterfaces._WebDriver {
 
-        internal override IDriverService StartService() {
-            return FirefoxDriver.StartService(this);
-        }
+        const string BROWSER_NAME = "firefox";
 
-        internal override Capabilities ExtendCapabilities() {
-            return FirefoxDriver.ExtendCapabilities(this);
-        }
+        public FirefoxDriver()
+            : base(BROWSER_NAME) { }
 
         internal static IDriverService StartService(WebDriver wd) {
             FirefoxService svc = new FirefoxService();
@@ -61,7 +58,6 @@ namespace Selenium {
 
         internal static Capabilities ExtendCapabilities(WebDriver wd, bool remote = false) {
             var capa = wd.Capabilities;
-            capa.Browser = "firefox";
             capa["webdriver.logging.profiler.enabled"] = false;
             capa["loggingPrefs"] = new Dictionary {
                 {"profiler", "OFF"},

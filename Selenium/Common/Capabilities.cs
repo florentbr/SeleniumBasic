@@ -1,5 +1,5 @@
-﻿
-using Selenium;
+﻿using Selenium;
+
 namespace Selenium {
 
     /// <summary>
@@ -16,35 +16,50 @@ namespace Selenium {
         const string KEY_ALERT_BEHAVIOUR = "unexpectedAlertBehaviour";
 
         /// <summary>
-        /// 
+        /// Browser name
         /// </summary>
-        public Capabilities() {
-
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="browserName"></param>
-        /// <param name="browserVersion"></param>
-        /// <param name="platformName"></param>
-        /// <param name="platformVersion"></param>
-        internal Capabilities(string browserName, string browserVersion = null, string platformName = null, string platformVersion = null) {
-            Add(KEY_BROWSER_NAME, browserName);
-            Add(KEY_BROWSER_VERSION, browserVersion ?? null);
-            Add(KEY_PLATFORM_NAME, platformName ?? "ANY");
-            Add(KEY_PLATFORM_VERSION, platformVersion ?? null);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Browser {
+        public string BrowserName {
             get {
                 return (string)base.Get(KEY_BROWSER_NAME, null);
             }
             set {
                 base[KEY_BROWSER_NAME] = value;
+            }
+        }
+
+        /// <summary>
+        /// Browser version
+        /// </summary>
+        public string BrowserVersion {
+            get {
+                return (string)base.Get(KEY_BROWSER_VERSION, null);
+            }
+            set {
+                base[KEY_BROWSER_VERSION] = value;
+            }
+        }
+
+        /// <summary>
+        /// Platform name
+        /// </summary>
+        public string PlatformName {
+            get {
+                return (string)base.Get(KEY_PLATFORM_NAME, "ANY");
+            }
+            set {
+                base[KEY_PLATFORM_NAME] = value ?? "ANY";
+            }
+        }
+
+        /// <summary>
+        /// Platform version
+        /// </summary>
+        public string PlatformVersion {
+            get {
+                return (string)base.Get(KEY_PLATFORM_VERSION, null);
+            }
+            set {
+                base[KEY_PLATFORM_VERSION] = value;
             }
         }
 
@@ -61,7 +76,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// 
+        /// Accept untrusted certificates
         /// </summary>
         public bool AcceptUntrustedCertificates {
             get {
@@ -73,7 +88,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// 
+        /// Unexpected alert behaviour
         /// </summary>
         public string UnexpectedAlertBehaviour {
             get {
