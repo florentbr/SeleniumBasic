@@ -42,8 +42,8 @@ namespace Selenium.ComInterfaces {
         [DispId(12), Description("Starts a new Selenium testing session")]
         void Start(string browser = null, string baseUrl = null);
 
-        [DispId(15), Description("Starts remotely a new Selenium testing session")]
-        void StartRemotely(string browser, string remoteAddress, string baseUrl = null);
+        [DispId(15), Description("Starts remotely a new Selenium session")]
+        void StartRemotely(string executorUri, string browser = null, string version = null, string platform = "ANY");
 
         [DispId(20), Description("Quits this driver, closing every associated window. Same as stop.")]
         void Quit();
