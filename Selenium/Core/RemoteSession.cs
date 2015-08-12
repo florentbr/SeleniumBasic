@@ -211,8 +211,6 @@ namespace Selenium.Core {
         /// <param name="predicate">Predicate function</param>
         /// <returns>Result of the send function</returns>
         internal T SendUntil<T>(int timeout, Func<T> sendfn, Func<T, bool> predicate) {
-            if (timeout == 0)
-                return sendfn();
             DateTime endTime = GetEndTime(timeout);
             bool retry = false;
             while (true) {
