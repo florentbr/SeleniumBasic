@@ -44,19 +44,20 @@
     </DocumentationSources>
     <VisibleItems>InheritedMembers</VisibleItems>
     <ApiFilter>
-      <Filter entryType="Namespace" fullName="Selenium" isExposed="True">
+      <Filter entryType="Namespace" fullName="Interop" isExposed="False" />
+<Filter entryType="Namespace" fullName="Interop.Excel" isExposed="False" />
+<Filter entryType="Namespace" fullName="Selenium" isExposed="True">
   <Filter entryType="Class" fullName="Selenium.Dictionary.DictionaryEnumerator" filterName="Dictionary.DictionaryEnumerator" isExposed="False" />
   <Filter entryType="Class" fullName="Selenium.DictionaryItem.DictionaryItemEnumerator" filterName="DictionaryItem.DictionaryItemEnumerator" isExposed="False" />
   <Filter entryType="Class" fullName="Selenium.List.ListEnumerator" filterName="List.ListEnumerator" isExposed="False" />
   <Filter entryType="Class" fullName="Selenium.Logs" filterName="Logs" isExposed="False" />
-  <Filter entryType="Class" fullName="Selenium.PdfFile.PdfError" filterName="PdfFile.PdfError" isExposed="False" />
   <Filter entryType="Class" fullName="Selenium.SeleniumError" filterName="SeleniumError" isExposed="False" />
   <Filter entryType="Class" fullName="Selenium.SeleniumException" filterName="SeleniumException" isExposed="False" />
   <Filter entryType="Enumeration" fullName="Selenium.Strategy" filterName="Strategy" isExposed="False" />
 </Filter>
 <Filter entryType="Namespace" fullName="Selenium.ComInterfaces" isExposed="False" />
 <Filter entryType="Namespace" fullName="Selenium.Errors" isExposed="False" />
-<Filter entryType="Namespace" fullName="Selenium.Excel" isExposed="False" /></ApiFilter>
+<Filter entryType="Namespace" fullName="Selenium.Internal" isExposed="False" /></ApiFilter>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in order for Visual Studio to perform
 			 the build.  The others are optional common platform types that may appear. -->
