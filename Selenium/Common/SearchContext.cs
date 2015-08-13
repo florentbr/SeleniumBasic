@@ -394,7 +394,7 @@ namespace Selenium {
             RemoteSession session = this.session;
             string relativeUri = this.uri + "/element";
             Dictionary element;
-            var endTime = session.GetEndTime(timeout);
+            DateTime endTime = session.GetEndTime(timeout);
             while (true) {
                 foreach (By by in (By[])byAny.Value) {
                     if (by == null)
@@ -422,7 +422,7 @@ namespace Selenium {
                 var method = By.FormatStrategy(strategy);
                 List elements = session.SendUntil(timeout,
                     () => (List)session.Send(RequestMethod.POST, uri, "using", method, "value", value),
-                    (r) => r.Count > minimum
+                    (r) => r.Count >= minimum
                 );
                 return new WebElements(session, elements);
             } catch (Errors.TimeoutError) {
@@ -433,8 +433,8 @@ namespace Selenium {
         private WebElements FindAnyElements(By byAny, int minimum, int timeout) {
             RemoteSession session = this.session;
             string uri = this.uri + "/elements";
-            var webelements = new WebElements();
-            var endTime = session.GetEndTime(timeout);
+            WebElements webelements = new WebElements();
+            DateTime endTime = session.GetEndTime(timeout);
             while (true) {
                 foreach (By by in (By[])byAny.Value) {
                     if (by == null)
@@ -458,8 +458,8 @@ namespace Selenium {
         private void WaitElementNotPresent(Strategy strategy, string value, int timeout) {
             RemoteSession session = this.session;
             string uri = this.uri + "/element";
-            var method = By.FormatStrategy(strategy);
-            var endTime = session.GetEndTime(timeout);
+            string method = By.FormatStrategy(strategy);
+            DateTime endTime = session.GetEndTime(timeout);
             try {
                 session.Send(RequestMethod.POST, uri, "using", method, "value", value);
                 while (true) {
@@ -477,7 +477,7 @@ namespace Selenium {
         private void WaitAnyElementNotPresent(By byAny, int timeout) {
             RemoteSession session = this.session;
             string uri = this.uri + "/element";
-            var endTime = session.GetEndTime(timeout);
+            DateTime endTime = session.GetEndTime(timeout);
             foreach (By by in (By[])byAny.Value) {
                 if (by == null)
                     break;
