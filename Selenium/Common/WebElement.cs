@@ -589,7 +589,7 @@ namespace Selenium {
         #region Javascript
 
         /// <summary>
-        /// Executes JavaScript in the context of the currently selected frame or window
+        /// Executes a JavaScript function in the context of the current element and returns the return value of the function.
         /// </summary>
         /// <param name="script">The JavaScript code to execute.</param>
         /// <param name="arguments">The arguments to the script.</param>
