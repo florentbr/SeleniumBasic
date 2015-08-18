@@ -30,7 +30,7 @@ namespace Selenium {
         public override string Message {
             get {
                 var typename = this.GetType().Name;
-                return string.Format("{0}:\n{1}", typename, _message);
+                return string.Format("{0}\n{1}", typename, _message);
             }
         }
 
