@@ -103,6 +103,8 @@ namespace Selenium.Core {
             try {
                 //Gets the binary location of firefox
                 _firefox_path = GetBinaryLocation(this.Capabilities);
+                if (!File.Exists(_firefox_path))
+                    throw new Errors.FileNotFoundError(_firefox_path);
 
                 SetupProfile();
 

@@ -87,6 +87,8 @@ namespace Selenium.Core {
             env["TMP"] = _temp_folder;
 
             string servicePath = Path.Combine(_library_dir, filename);
+            if (!File.Exists(servicePath))
+                throw new Errors.FileNotFoundError(servicePath);
 
             //Start the process
             _process = ProcessExt.Start(servicePath, _arguments, null, env, true, true);
