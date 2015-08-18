@@ -37,14 +37,17 @@ namespace Selenium.Internal {
         /// <returns></returns>
         public static ProcessExt Start(string filepath, IEnumerable args
             , string dir, Hashtable env, bool noWindow, bool createJob) {
-
+    
             string cmd = ProcessExt.BuildCommandLine(filepath, args);
 
             var si = new Native.STARTUPINFO();
             var pi = new Native.PROCESS_INFORMATION();
-            int createFlags = noWindow ? Native.CREATE_NO_WINDOW : 0;
 
-            var hEnvVars = PinEnvironmentVars(env);
+            int createFlags = Native.CREATE_UNICODE_ENVIRONMENT;
+            if (noWindow)
+                createFlags |= Native.CREATE_NO_WINDOW;
+
+            StringBuilder envVars = BuildEnvironmentVars(env);
             try {
                 bool success = Native.CreateProcess(null
                     , cmd
@@ -52,7 +55,7 @@ namespace Selenium.Internal {
                     , IntPtr.Zero
                     , false
                     , createFlags
-                    , hEnvVars
+                    , envVars
                     , Environment.CurrentDirectory, si, pi);
 
                 if (!success)
@@ -63,7 +66,6 @@ namespace Selenium.Internal {
 
             } finally {
                 Native.CloseHandle(pi.hThread);
-                Marshal.FreeHGlobal(hEnvVars);
             }
         }
 
@@ -79,8 +81,12 @@ namespace Selenium.Internal {
 
             var si = new Native.STARTUPINFO();
             var pi = new Native.PROCESS_INFORMATION();
-            int createFlags = noWindow ? Native.CREATE_NO_WINDOW : 0;
-            var hEnvVars = PinEnvironmentVars(env);
+
+            int createFlags = Native.CREATE_UNICODE_ENVIRONMENT;
+            if (noWindow)
+                createFlags |= Native.CREATE_NO_WINDOW;
+
+            StringBuilder envVars = BuildEnvironmentVars(env);
             try {
 
                 bool success = Native.CreateProcess(null
@@ -89,7 +95,7 @@ namespace Selenium.Internal {
                     , IntPtr.Zero
                     , false
                     , createFlags
-                    , hEnvVars
+                    , envVars
                     , dir, si, pi);
 
                 if (!success)
@@ -97,7 +103,6 @@ namespace Selenium.Internal {
             } finally {
                 Native.CloseHandle(pi.hThread);
                 Native.CloseHandle(pi.hProcess);
-                Marshal.FreeHGlobal(hEnvVars);
             }
         }
 
@@ -142,8 +147,8 @@ namespace Selenium.Internal {
                 if (!Native.Process32First(snapshot, buffer))
                     throw new Win32Exception();
                 do {
-                    var natEntry = *natEntryPtr;
-                    var entry = new ProcessEntry();
+                    Native.WinProcessEntry natEntry = *natEntryPtr;
+                    ProcessEntry entry = new ProcessEntry();
                     entry.Id = natEntry.th32ProcessID;
                     entry.ParentId = natEntry.th32ParentProcessID;
                     entry.FileName = Marshal.PtrToStringAnsi((IntPtr)natEntry.fileName);
@@ -274,18 +279,13 @@ namespace Selenium.Internal {
             jeli.BasicLimitInformation.LimitFlags = Native.JOB_OBJECT_LIMIT_BREAKAWAY_OK
                 | Native.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 
-            var hJeli = PinObject(jeli);
-            try {
-                bool success = Native.SetInformationJobObject(hJob
-                    , Native.JOB_EXTENDED_LIMIT_INFORMATION
-                    , hJeli
-                    , Marshal.SizeOf(jeli));
+            bool success = Native.SetInformationJobObject(hJob
+                , Native.JOB_EXTENDED_LIMIT_INFORMATION
+                , ref jeli
+                , Marshal.SizeOf(typeof(Native.JOBOBJECT_EXTENDED_LIMIT_INFORMATION)));
 
-                if (!success)
-                    throw new Win32Exception();
-            } finally {
-                Marshal.FreeHGlobal(hJeli);
-            }
+            if (!success)
+                throw new Win32Exception();
 
             if (!Native.AssignProcessToJobObject(hJob, hProcess))
                 throw new Win32Exception();
@@ -294,9 +294,9 @@ namespace Selenium.Internal {
         }
 
 
-        private static IntPtr PinEnvironmentVars(Hashtable dict) {
+        private static StringBuilder BuildEnvironmentVars(Hashtable dict) {
             if (dict == null)
-                return IntPtr.Zero;
+                return null;
 
             string[] keys = new string[dict.Count];
             string[] values = new string[dict.Count];
@@ -312,19 +312,8 @@ namespace Selenium.Internal {
                 sb.Append(values[i]);
                 sb.Append('\0');
             }
-            sb.Append('\0');
 
-            byte[] bytes = Encoding.Default.GetBytes(sb.ToString());
-            IntPtr handle = Marshal.AllocHGlobal(bytes.Length);
-            Marshal.Copy(bytes, 0, handle, bytes.Length);
-            return handle;
-        }
-
-
-        private static IntPtr PinObject(object obj) {
-            IntPtr h = Marshal.AllocHGlobal(Marshal.SizeOf(obj));
-            Marshal.StructureToPtr(obj, h, false);
-            return h;
+            return sb;
         }
 
         private static void TerminateProcessTree(int pid, ProcessEntry[] entries) {
@@ -364,6 +353,7 @@ namespace Selenium.Internal {
             public const int JOB_EXTENDED_LIMIT_INFORMATION = 9;
 
             public const int CREATE_NO_WINDOW = 0x08000000;
+            public const int CREATE_UNICODE_ENVIRONMENT = 0x00000400;
 
             public const int PROCESS_ALL_ACCESS = 0x001f0fff;
             public const int TH32CS_SNAPPROCESS = 0x00000002;
@@ -372,7 +362,7 @@ namespace Selenium.Internal {
             public const short SW_SHOWNOACTIVATE = 0x00000004;
 
 
-            [StructLayout(LayoutKind.Sequential)]
+            [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
             public unsafe struct WinProcessEntry {
                 public int dwSize;
                 public int cntUsage;
@@ -388,7 +378,7 @@ namespace Selenium.Internal {
 
             [StructLayout(LayoutKind.Sequential)]
             public class STARTUPINFO {
-                public int cb;
+                public int cb = Marshal.SizeOf(typeof(STARTUPINFO));
                 public IntPtr lpReserved = IntPtr.Zero;
                 public IntPtr lpDesktop = IntPtr.Zero;
                 public IntPtr lpTitle = IntPtr.Zero;
@@ -406,10 +396,6 @@ namespace Selenium.Internal {
                 public IntPtr hStdInput = IntPtr.Zero;
                 public IntPtr hStdOutput = IntPtr.Zero;
                 public IntPtr hStdError = IntPtr.Zero;
-
-                public STARTUPINFO() {
-                    cb = Marshal.SizeOf(this);
-                }
             }
 
             [StructLayout(LayoutKind.Sequential)]
@@ -429,7 +415,8 @@ namespace Selenium.Internal {
                 IntPtr lpThreadAttributes,
                 bool bInheritHandles,
                 int dwCreationFlags,
-                IntPtr lpEnvironment,
+                [MarshalAs(UnmanagedType.LPWStr)]   
+                StringBuilder lpEnvironment,
                 [MarshalAs(UnmanagedType.LPTStr)]           
                 string lpCurrentDirectory,
                 STARTUPINFO lpStartupInfo,
@@ -474,14 +461,13 @@ namespace Selenium.Internal {
 
             [DllImport(KERNEL32, SetLastError = true)]
             public static extern bool SetInformationJobObject(IntPtr hJob, int infoType
-                , IntPtr lpJobObjectInfo, int cbJobObjectInfoLength);
+                , ref JOBOBJECT_EXTENDED_LIMIT_INFORMATION lpJobObjectInfo, int cbJobObjectInfoLength);
 
             [DllImport(KERNEL32, SetLastError = true)]
             public static extern bool AssignProcessToJobObject(IntPtr job, IntPtr process);
 
             [DllImport(KERNEL32, SetLastError = true)]
             public static extern bool TerminateJobObject(IntPtr processHandle, int exitCode);
-
 
 
             [DllImport(KERNEL32)]
