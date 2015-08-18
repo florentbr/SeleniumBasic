@@ -1,5 +1,6 @@
 ﻿user_pref("app.update.auto", false);
 user_pref("app.update.enabled", false);
+user_pref("browser.bookmarks.restore_default_bookmarks", false);
 user_pref("browser.EULA.3.accepted", true);
 user_pref("browser.EULA.override", true);
 user_pref("browser.displayedE10SNotice", 4);
@@ -83,10 +84,10 @@ user_pref("startup.homepage_welcome_url", "about:blank");
 user_pref("webdriver_accept_untrusted_certs", true);
 user_pref("webdriver_assume_untrusted_issuer", true);
 
-user_pref("media.gmp-provider.enabled", false);
-user_pref("browser.devedition.theme.enabled", true);
-user_pref("lightweightThemes.update.enabled", false);
 user_pref("devtools.chrome.enabled", true);
+user_pref("media.eme.enabled", false);
+user_pref("media.gmp-provider.enabled", false);
+user_pref("plugin.default.state", 0);
 
 user_pref("extensions.logging.enabled", false);
 user_pref("webdriver.log.init", true);
