@@ -220,36 +220,30 @@ namespace Selenium {
         public void Start(string browser = null, string baseUrl = null) {
             try {
                 browser = ExpendBrowserName(browser);
-                Capabilities capabilities = null;
                 switch (browser) {
                     case "firefox":
                         _service = FirefoxDriver.StartService(this);
-                        capabilities = FirefoxDriver.ExtendCapabilities(this);
                         break;
                     case "chrome":
                         _service = ChromeDriver.StartService(this);
-                        capabilities = ChromeDriver.ExtendCapabilities(this);
                         break;
                     case "phantomjs":
                         _service = PhantomJSDriver.StartService(this);
-                        capabilities = PhantomJSDriver.ExtendCapabilities(this);
                         break;
                     case "internet explorer":
                         _service = IEDriver.StartService(this);
-                        capabilities = IEDriver.ExtendCapabilities(this);
                         break;
                     case "opera":
                         _service = OperaDriver.StartService(this);
-                        capabilities = OperaDriver.ExtendCapabilities(this);
                         break;
                     default:
                         throw new Errors.ArgumentError("Invalid browser name: {0}", browser);
                 }
-                capabilities.BrowserName = browser;
+                this.Capabilities.BrowserName = browser;
 
                 RegisterRunningObject();
 
-                _session = new RemoteSession(_service.Uri, capabilities, true);
+                _session = new RemoteSession(_service.Uri, this.Capabilities, true);
                 _session.Start();
 
                 if (!string.IsNullOrEmpty(baseUrl))
@@ -278,22 +272,21 @@ namespace Selenium {
         public void StartRemotely(string executorUri, string browser = null, string version = null, string platform = "ANY") {
             try {
                 browser = ExpendBrowserName(browser);
-                Capabilities capabilities = null;
                 switch (browser) {
                     case "firefox":
-                        capabilities = FirefoxDriver.ExtendCapabilities(this, true);
+                        FirefoxDriver.ExtendCapabilities(this, true);
                         break;
                     case "chrome":
-                        capabilities = ChromeDriver.ExtendCapabilities(this, true);
+                        ChromeDriver.ExtendCapabilities(this, true);
                         break;
                     case "phantomjs":
-                        capabilities = PhantomJSDriver.ExtendCapabilities(this, true);
+                        PhantomJSDriver.ExtendCapabilities(this, true);
                         break;
                     case "internet explorer":
-                        capabilities = IEDriver.ExtendCapabilities(this, true);
+                        IEDriver.ExtendCapabilities(this, true);
                         break;
                     case "opera":
-                        capabilities = OperaDriver.ExtendCapabilities(this, true);
+                        OperaDriver.ExtendCapabilities(this, true);
                         break;
                     default:
                         if (browser != "htmlunit"
@@ -303,16 +296,15 @@ namespace Selenium {
                             && browser != "android") {
                             throw new Errors.ArgumentError("Invalid browser name: {0}", browser);
                         }
-                        capabilities = this.Capabilities;
                         break;
                 }
-                capabilities.BrowserName = browser;
-                capabilities.BrowserVersion = version;
-                capabilities.PlatformName = platform;
+                this.Capabilities.BrowserName = browser;
+                this.Capabilities.BrowserVersion = version;
+                this.Capabilities.PlatformName = platform;
 
                 RegisterRunningObject();
 
-                _session = new RemoteSession(executorUri, capabilities, false);
+                _session = new RemoteSession(executorUri, this.Capabilities, false);
                 _session.Start();
 
             } catch (SeleniumException) {

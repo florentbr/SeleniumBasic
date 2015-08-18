@@ -51,12 +51,14 @@ namespace Selenium {
             : base(BROWSER_NAME) { }
 
         internal static IDriverService StartService(WebDriver wd) {
+            ExtendCapabilities(wd, false);
+
             FirefoxService svc = new FirefoxService();
             svc.Start(wd.Arguments, wd.Preferences, wd.Extensions, wd.Capabilities, wd.Profile, wd.Persistant);
             return svc;
         }
 
-        internal static Capabilities ExtendCapabilities(WebDriver wd, bool remote = false) {
+        internal static void ExtendCapabilities(WebDriver wd, bool remote) {
             var capa = wd.Capabilities;
             capa["webdriver.logging.profiler.enabled"] = false;
             capa["loggingPrefs"] = new Dictionary {
@@ -67,8 +69,6 @@ namespace Selenium {
 
             if (wd.Binary != null)
                 capa["firefox_binary"] = wd.Binary;
-
-            return capa;
         }
 
     }

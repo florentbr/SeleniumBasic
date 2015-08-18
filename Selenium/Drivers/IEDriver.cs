@@ -52,6 +52,8 @@ namespace Selenium {
             : base(BROWSER_NAME) { }
 
         internal static IDriverService StartService(WebDriver wd) {
+            ExtendCapabilities(wd, false);
+
             var svc = new DriverService(IPAddress.Loopback);
             svc.AddArgument("/host=" + svc.IPEndPoint.Address.ToString());
             svc.AddArgument("/port=" + svc.IPEndPoint.Port.ToString());
@@ -61,14 +63,13 @@ namespace Selenium {
             return svc;
         }
 
-        internal static Capabilities ExtendCapabilities(WebDriver wd, bool remote = false) {
+        internal static void ExtendCapabilities(WebDriver wd, bool remote) {
             var capa = wd.Capabilities;
             capa["silent"] = true;
             capa["nativeEvents"] = true;
             //capa["requireWindowFocus"] = true;
             if (wd.Arguments.Count > 0)
                 capa["ie.browserCommandLineSwitches"] = wd.Arguments;
-            return capa;
         }
 
     }

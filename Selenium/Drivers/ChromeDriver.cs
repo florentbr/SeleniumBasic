@@ -53,6 +53,8 @@ namespace Selenium {
             : base(BROWSER_NAME) { }
 
         internal static IDriverService StartService(WebDriver wd) {
+            ExtendCapabilities(wd, false);
+
             var svc = new DriverService(IPAddress.Loopback);
             svc.AddArgument("--port=" + svc.IPEndPoint.Port.ToString());
             svc.AddArgument("--silent");
@@ -60,7 +62,7 @@ namespace Selenium {
             return svc;
         }
 
-        internal static Capabilities ExtendCapabilities(WebDriver wd, bool remote = false) {
+        internal static void ExtendCapabilities(WebDriver wd, bool remote) {
             Capabilities capa = wd.Capabilities;
 
             Dictionary opts;
@@ -83,8 +85,6 @@ namespace Selenium {
 
             if (wd.Binary != null)
                 opts.Add("binary", wd.Binary);
-
-            return capa;
         }
 
         private static string ExpandProfile(string profile, bool remote) {

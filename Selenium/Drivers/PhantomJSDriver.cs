@@ -50,6 +50,8 @@ namespace Selenium {
             : base(BROWSER_NAME) { }
 
         internal static IDriverService StartService(WebDriver wd) {
+            ExtendCapabilities(wd, false);
+
             var svc = new DriverService(IPAddress.Loopback);
             svc.AddArgument("--webdriver=" + svc.IPEndPoint.ToString());
             svc.AddArgument("--webdriver-loglevel=ERROR");
@@ -58,12 +60,11 @@ namespace Selenium {
             return svc;
         }
 
-        internal static Capabilities ExtendCapabilities(WebDriver wd, bool remote = false) {
+        internal static void ExtendCapabilities(WebDriver wd, bool remote) {
             var capa = wd.Capabilities;
             capa.BrowserName = "phantomjs";
             if (wd.Arguments.Count > 0)
                 capa["phantomjs.cli.args"] = wd.Arguments;
-            return capa;
         }
 
     }
