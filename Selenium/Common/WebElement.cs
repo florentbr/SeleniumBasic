@@ -616,7 +616,6 @@ namespace Selenium {
         }
 
         private static object[] FormatArguments(object item, object arguments) {
-            object[] newargs = new object[] { item, null };
             if (arguments == null) {
                 return new[] { item, new object[0] };
             } else if (arguments is IEnumerable && !(arguments is string || arguments is Dictionary)) {
