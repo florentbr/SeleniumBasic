@@ -71,7 +71,7 @@ Source: "CHANGELOG.txt"; DestDir: "{app}"; Flags: ignoreversion overwritereadonl
 Source: "VbsConsole\bin\Release\vbsc.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cons;
 
 Source: "References\firefoxdriver.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ff;
-Source: "References\chromedriver.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cr
+Source: "References\chromedriver.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cr;
 Source: "References\iedriver.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;
 Source: "References\operadriver.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_op;
 Source: "References\phantomjs.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_pjs;
@@ -97,12 +97,18 @@ Name: "{group}\Project Home Page"; Filename: {#AppURL}; WorkingDir: "{app}";
 Name: "{group}\Vbs Console"; Filename: "{app}\vbsc.exe"; WorkingDir: "{app}"; Components: pkg_cons;
 Name: "{group}\Examples"; Filename: "{app}\Examples"; WorkingDir: "{app}";
 Name: "{group}\Templates"; Filename: "{app}\Templates"; WorkingDir: "{app}";
-Name: "{group}\QuickTest"; Filename: "{app}\Scripts\QuickTest.vbs"; WorkingDir: "{app}";
 Name: "{group}\RunCleaner"; Filename: "{app}\Scripts\RunCleaner.vbs"; WorkingDir: "{app}";
-Name: "{group}\Start Firefox"; Filename: "{app}\Scripts\StartFirefox.vbs"; WorkingDir: "{app}";
 Name: "{group}\API documentation"; Filename: "{app}\Selenium.chm"; WorkingDir: "{app}";
 Name: "{group}\ChangeLog"; Filename: "{app}\CHANGELOG.txt"; WorkingDir: "{app}";
 Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
+
+Name: "{group}\Start Firefox"; Filename: "{app}\Scripts\StartFirefox.vbs"; WorkingDir: "{app}"; Components: pkg_ff;
+Name: "{group}\Start Chrome"; Filename: "{app}\Scripts\StartChrome.vbs"; WorkingDir: "{app}"; Components: pkg_cr;
+Name: "{group}\Start Chrome Debug"; Filename: "{app}\Scripts\StartChromeDebug.vbs"; WorkingDir: "{app}"; Components: pkg_cr;
+Name: "{group}\Start IE"; Filename: "{app}\Scripts\StartInternetExplorer.vbs"; WorkingDir: "{app}"; Components: pkg_ie;
+Name: "{group}\Start Opera"; Filename: "{app}\Scripts\StartOpera.vbs"; WorkingDir: "{app}"; Components: pkg_op;
+Name: "{group}\Start PhantomJS"; Filename: "{app}\Scripts\StartPhantomJS.vbs"; WorkingDir: "{app}"; Components: pkg_pjs;
+
 
 [Registry]
 
