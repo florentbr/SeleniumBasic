@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
@@ -37,7 +36,6 @@ namespace Selenium.Core {
         private string _firefox_path;
         private ProcessExt _firefox_process;
         private string _profile_dir;
-        private bool _is_profile_retored = false;
         private Exception _exception;
         private EndPointExt _endpoint;
 
@@ -111,10 +109,6 @@ namespace Selenium.Core {
                 //starts firefox with the given profile
                 StartApplication(_firefox_path, this.Arguments, _profile_dir);
 
-                //backup the profile for future reuse
-                if (!this.Persistant && !_is_profile_retored)
-                    SaveProfile(_profile_dir, _profil_cache_path);
-
             } catch (SeleniumException ex) {
                 _exception = ex;
             } catch (Exception ex) {
@@ -131,8 +125,6 @@ namespace Selenium.Core {
                 } else {
                     //create temp profile
                     _profile_dir = Path.Combine(_working_dir, PROFILE_PREFIX_TEMP_FOLDER + IOExt.GetRandomName());
-                    //Attempt to reuse the last archived profile if it is less than 24hrs
-                    _is_profile_retored = RestoreProfile(_profil_cache_path, _profile_dir, 24);
                 }
             } else {
                 //Use an existing profile or create one
@@ -186,16 +178,14 @@ namespace Selenium.Core {
             //writes the new prefs
             SaveProfilePrefs(prefs, prefs_path);
 
-            //install extensions
-            if (!_is_profile_retored) {
-                //Install the WebDriver extention
-                string ext_wd_path = Path.Combine(_this_assembly_dir, EXT_WEBDRIVER_FILENAME);
-                InstallExtension(ext_wd_path, _profile_dir, EXT_WEBDRIVER_RID);
-                //Install the provided extensions
-                if (!this.Persistant && this.Extensions != null) {
-                    foreach (string ext_path in this.Extensions)
-                        InstallExtension(ext_path, _profile_dir);
-                }
+            //Install the WebDriver extention
+            string ext_wd_path = Path.Combine(_this_assembly_dir, EXT_WEBDRIVER_FILENAME);
+            InstallExtension(ext_wd_path, _profile_dir, EXT_WEBDRIVER_RID);
+            
+            //Install the provided extensions
+            if (this.Extensions != null && !this.Persistant) {
+                foreach (string ext_path in this.Extensions)
+                    InstallExtension(ext_path, _profile_dir);
             }
 
             //delete logs
@@ -278,28 +268,6 @@ namespace Selenium.Core {
                         prefs[prefKey1] = items[1];
                 }
             }
-        }
-
-        static bool RestoreProfile(string backupPath, string targetFolder, int expirationTimeHrs = 24) {
-            FileInfo backupFile = new FileInfo(backupPath);
-            if (!backupFile.Exists)
-                return false;
-
-            if ((backupFile.CreationTime - DateTime.UtcNow).TotalHours > expirationTimeHrs) {
-                backupFile.Delete();
-                return false;
-            }
-
-            FolderCache.Restore(backupFile.FullName, targetFolder);
-            return true;
-        }
-
-        static void SaveProfile(string source_dir, string backup_path) {
-            FileInfo backupFile = new FileInfo(backup_path);
-            if (backupFile.Exists)
-                backupFile.Delete();
-
-            FolderCache.Save(source_dir, backup_path, "*.lock", "*.txt", "*.so");
         }
 
         /// <summary>

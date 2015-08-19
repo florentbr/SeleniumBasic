@@ -172,7 +172,7 @@
     </Compile>
     <Compile Include="Internal\ClipboardExt.cs" />
     <Compile Include="Internal\COMExt.cs" />
-    <Compile Include="Internal\FolderCache.cs" />
+    <None Include="Internal\FolderCache.cs" />
     <Compile Include="Common\Storage.cs" />
     <Compile Include="Core\RemoteSession.cs" />
     <Compile Include="SeleniumError.cs" />

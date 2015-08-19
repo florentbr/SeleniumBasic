@@ -32,13 +32,7 @@ namespace Selenium.Internal {
                         if (WildcardMatchAny(relativePath.ToLowerInvariant(), excludes))
                             continue;
 
-                        IntPtr fileIn;
-                        try {
-                            fileIn = OpenFile(filepath);
-                        } catch {
-                            continue;
-                        }
-
+                        IntPtr fileIn = OpenFile(filepath);
                         try {
                             int filesize = NativeMethods.GetFileSize(fileIn, IntPtr.Zero);
 
