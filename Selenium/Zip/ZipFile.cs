@@ -116,7 +116,7 @@ namespace Selenium.Zip {
                     stream.Position = --offset_eocd;
                 }
             } catch (IOException) {
-                throw new ZipException("Failed to locate the end of central directory");
+                throw new ZipException("Failed to locate the end of central directory.");
             }
 
             //read the end of the central directory
@@ -126,17 +126,16 @@ namespace Selenium.Zip {
             if (h_entries_count == 0x0FFFF || h_centraledir_offset == 0xFFFFFFFFL)
                 throw new ZipException("Zip 64 bits not supported.");
 
-            //create the main directory if missing
-            Directory.CreateDirectory(directory);
-
             //read entries
+            string prevdir = null;
             long offset_next_entry = h_centraledir_offset;
             while (h_entries_count-- > 0) {
                 //read the central directory headers
                 stream.Position = offset_next_entry;
                 stream.Read(bufBytes, 0, 46);
-                if (ReadUInt32(bufBytes, 0) != 0x02014b50)
-                    throw new ZipException("Wrong central directory signature.");
+                uint h_header_signature = ReadUInt32(bufBytes, 0);
+                if (h_header_signature != 0x02014b50)
+                    throw new ZipException("Wrong central directory header signature.");
                 int h_bit_flags = ReadUInt16(bufBytes, 8);
                 int h_compression_method = ReadUInt16(bufBytes, 10);
                 if (h_compression_method != FLAG_COMPRESSION_DEFLATE
@@ -145,7 +144,7 @@ namespace Selenium.Zip {
                 uint h_lastwrite_dostime = ReadUInt32(bufBytes, 12);
                 long h_uncompressed_size = ReadUInt32(bufBytes, 24);
                 int h_filename_length = ReadUInt16(bufBytes, 28);
-                int h_extrafile_length = ReadUInt16(bufBytes, 30);
+                int h_extrafield_length = ReadUInt16(bufBytes, 30);
                 int h_comment_length = ReadUInt16(bufBytes, 32);
                 long h_header_offset = ReadUInt32(bufBytes, 42);
 
@@ -158,20 +157,37 @@ namespace Selenium.Zip {
                 if (string.IsNullOrEmpty(filename))
                     throw new ZipException(string.Format("Invalid file name: {0}", filename));
                 string filepath = Path.Combine(directory, filename);
+                string dir = Path.GetDirectoryName(filepath);
 
-                offset_next_entry = stream.Position + h_extrafile_length + h_comment_length;
+                //convert the last write time
+                DateTime lastwrite_datetime = ConvertDosTimeToDateTime(h_lastwrite_dostime);
 
-                //read the local entry data and create the file or directory
+                //create directories if needed
+                if (dir != prevdir) {
+                    Directory.CreateDirectory(dir);
+                    Directory.SetLastWriteTime(dir, lastwrite_datetime);
+                    prevdir = dir;
+                }
+
+                //save offset of the next entry
+                offset_next_entry = stream.Position + h_extrafield_length + h_comment_length;
+
+                //read the local entry and create the file or directory
                 if (h_uncompressed_size > 0) {
                     stream.Position = h_header_offset;
 
-                    //Check the local entry signature (0x04034B50)
-                    stream.Read(bufBytes, 0, 4);
-                    if (ReadUInt32(bufBytes, 0) != 0x04034B50)
-                        throw new ZipException("Invalid entry signature");
+                    //read the local file header
+                    stream.Read(bufBytes, 0, 30);
+                    uint hl_header_signature = ReadUInt32(bufBytes, 0);
+                    if (hl_header_signature != 0x04034B50)
+                        throw new ZipException("Wrong local file header signature.");
+                    uint hl_filename_length = ReadUInt16(bufBytes, 26);
+                    uint hl_extrafield_length = ReadUInt16(bufBytes, 28);
 
-                    //read the file data at offset 26
-                    stream.Seek(26 + h_filename_length + h_extrafile_length, SeekOrigin.Current);
+                    //seek begining of data
+                    stream.Seek(hl_filename_length + hl_extrafield_length, SeekOrigin.Current);
+
+                    //read the data and create the file
                     using (var outStream = new FileStream(filepath, FileMode.CreateNew, FileAccess.Write)) {
                         if (h_compression_method == FLAG_COMPRESSION_DEFLATE) {
                             var defStream = new DeflateStream(stream, CompressionMode.Decompress, true);
@@ -181,18 +197,14 @@ namespace Selenium.Zip {
                         }
                     }
 
-                    //Update the file time
-                    DateTime lastwrite_datetime = ConvertDosTimeToDateTime(h_lastwrite_dostime);
+                    //update the time of the file
                     File.SetLastWriteTime(filepath, lastwrite_datetime);
-
                 } else {
                     char lastChar = filename[filename.Length - 1];
-                    if (lastChar == Path.DirectorySeparatorChar) {
-                        //creates a directory
-                        Directory.CreateDirectory(filepath.TrimEnd(lastChar));
-                    } else {
+                    if (lastChar != Path.DirectorySeparatorChar) {
                         //creates an empty empty file
                         File.Create(filepath).Dispose();
+                        File.SetLastWriteTime(filepath, lastwrite_datetime);
                     }
                 }
             }
