@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 namespace Selenium {
 
@@ -23,15 +24,26 @@ namespace Selenium {
         /// </summary>
         public override string Message {
             get {
-                StackFrame frame = new StackTrace(base.InnerException ?? this, true).GetFrame(0);
-                string filename = Path.GetFileName(frame.GetFileName());
-                int errline = frame.GetFileLineNumber();
+                StackTrace stack = new StackTrace(base.InnerException ?? this, true);
+
+                string filename = null;
+                int errline = 0;
+                for (int i = 0; i < stack.FrameCount; i++) {
+                    StackFrame frame = stack.GetFrame(i);
+                    string filepath = frame.GetFileName();
+                    if (filepath != null) {
+                        filename = Path.GetFileName(filepath);
+                        errline = frame.GetFileLineNumber();
+                        break;
+                    }
+                }
 
                 string typename = (base.InnerException ?? this).GetType().FullName;
                 string message = base.InnerException == null ?
                     base.Message : base.InnerException.Message;
 
-                return string.Format("{2}\nLine {0} in {1}\n{3}", errline, filename, typename, message);
+                return string.Format("{2}\nLine {0} in {1}\n{3}"
+                    , errline, filename, typename, message);
             }
         }
 
