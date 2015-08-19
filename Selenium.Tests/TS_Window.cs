@@ -59,6 +59,7 @@ namespace Selenium.Tests {
 
         [TestCase]
         [IgnoreFixture(Browser.PhantomJS, "Not supported")]
+        [IgnoreFixture(Browser.Opera, "Issue #14")]
         public void ShouldCloseWindow() {
             var win1 = driver.Window;
             driver.FindElementByLinkText("Window2").Click();

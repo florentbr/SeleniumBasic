@@ -16,7 +16,17 @@ namespace Selenium.Tests {
         }
 
         [Test]
-        public void ShouldZipAndUnzipWithoutLose() {
+        public void ShouldZipAndUnzipNoCompression() {
+            ShouldZipAndUnzipWithoutLose(false);
+        }
+
+        [Test]
+        public void ShouldZipAndUnzipWithCompression() {
+            ShouldZipAndUnzipWithoutLose(true);
+        }
+
+        private void ShouldZipAndUnzipWithoutLose(bool compress){
+
             string testfolder = Path.Combine(System.IO.Path.GetTempPath(), DateTime.Now.Ticks.ToString());
             Directory.CreateDirectory(testfolder);
 
@@ -34,8 +44,8 @@ namespace Selenium.Tests {
             string path11 = Path.Combine(extractdir, "text1.txt");
             string path22 = Path.Combine(extractdir, "text2.txt");
 
-            try{
-                using (var zip = new ZipFile()) {
+            try {
+                using (var zip = new ZipFile(compress)) {
                     zip.AddFile(path1);
                     zip.AddFile(path2);
                     zip.SaveAs(zippath);

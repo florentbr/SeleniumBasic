@@ -23,8 +23,10 @@ namespace Selenium.Tests {
         }
 
         [TestCase]
+        [IgnoreFixture(Browser.Opera, "Issue #14")]
         public void ShouldSwitchToNextWindows() {
             driver.Get("/win1.html");
+            driver.Wait(100);
             A.AreEqual("Window1", driver.Title);
 
             driver.FindElementByLinkText("Window2").Click();
@@ -40,6 +42,7 @@ namespace Selenium.Tests {
         }
 
         [TestCase]
+        [IgnoreFixture(Browser.Opera, "Issue #14")]
         public void ShouldSwitchToWindows() {
             driver.Get("/win1.html");
             A.AreEqual("Window1", driver.Title);
@@ -61,10 +64,12 @@ namespace Selenium.Tests {
 
         [TestCase]
         [IgnoreFixture(Browser.IE, "Not supported")]
+        [IgnoreFixture(Browser.Opera, "Issue #14")]
         public void ShouldOpenLinkInNewWindow() {
             driver.Get("/links.html");
             driver.FindElementByLinkText("Win1", 5000).Click(Keys.Shift);
             driver.SwitchToNextWindow();
+            driver.Wait(5000);
             A.AreEqual("Window1", driver.Title);
         }
 
