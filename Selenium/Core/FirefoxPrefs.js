@@ -83,6 +83,8 @@ user_pref("webdriver_assume_untrusted_issuer", true);
 
 user_pref("devtools.chrome.enabled", true);
 user_pref("media.eme.enabled", false);
+user_pref("media.gmp-eme-adobe.enabled", false);
+user_pref("media.gmp-gmpopenh264.enabled", false);
 user_pref("media.gmp-provider.enabled", false);
 user_pref("plugin.default.state", 0);
 
