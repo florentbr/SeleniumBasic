@@ -43,7 +43,7 @@ class Tasks():
                 #open the xpi file as a zip
                 xpi_bytes = gzip.read(r'.*\webdriver.xpi')
                 zip_in = zipfile.ZipFile(xpi_bytes)
-                zip_out = zipfile.ZipFile('firefoxdriver.xpi', 'w')
+                zip_out = zipfile.ZipFile('firefoxdriver.xpi', mode='w', compression=0)
                 #copy all the files except the linux ones and remove their references from the manifest
                 for fileinfo in zip_in.infolist():
                     filename = fileinfo.filename
@@ -51,10 +51,10 @@ class Tasks():
                         manifest_txt = zip_in.read(filename)
                         manifest_txt = re.sub(r'^binary-component platform/Linux.*$\s*', \
                             '', manifest_txt, flags=re.MULTILINE)
-                        zip_out.writestr(fileinfo, manifest_txt)
+                        zip_out.writestr(fileinfo, manifest_txt, compress_type=0)
                     elif not filename.endswith('.so'): #skip linux files
                         bytes = zip_in.read(filename)
-                        zip_out.writestr(fileinfo, bytes)
+                        zip_out.writestr(fileinfo, bytes, compress_type=0)
                 zip_out.close()
                 zip_in.close()
             cfg.update({'version': version, 'url': url})
@@ -180,6 +180,18 @@ class Tasks():
                 zip.extract(r'operadriver.exe')
             cfg.update({'version': version, 'url': url})
             Log("Updated Opera driver to version " + version)
+            
+    def update_FirefoxWires(self):
+        page = r'https://api.github.com/repos/jgraham/wires/releases'
+        pattern = r'/([\d\.]+)/wires-[\d\.]+-windows.zip'
+        value, version = WebSource(page).findlastversion(pattern, group_value=0, group_version=1)
+        url = r'https://github.com/jgraham/wires/releases/download' + value
+        cfg = self.cfgs.get('FirefoxWiresDriver')
+        if cfg.get('version') != version or not file_exists('wires.exe'):
+            with WebZip(url) as zip:
+                zip.extract(r'wires.exe')
+            cfg.update({'version': version, 'url': url})
+            Log("Updated Firefox Wire driver to version " + version)
     
     def skip_PdfSharp(self):
         page1 = r'http://sourceforge.net/projects/pdfsharp/files/pdfsharp'
