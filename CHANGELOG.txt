@@ -15,6 +15,19 @@ Third party softwares:
  PhantomJs web stack - BSD license
  http://phantomjs.org/
 
+v2.0.3.0  (2015/08/19)
+===============================================================================
+ * Updated IE driver to version 2.47
+ * Updated Firefox driver to version 2.47.1
+ * Added new formats (gif, bmp, jpeg) to save an Image object
+ * Added the SetAuthenticationCredentials to handle alerts prompting for credentials
+ * Added the SetBinary option to the WebDriver class
+ * Added the ExecuteScipt and WaitForScript method to the WebElement
+ * Renamed FindElementByClassName and FindElementsByClassName to FindElementByClass and FindElementsByClass
+ * Renamed FindElementByCssSelector and FindElementsByCssSelector to FindElementByCss and FindElementsByCss
+ * Renamed FindElementByTagName and FindElementsByTagName to FindElementByTag and FindElementsByTag
+ * Fixed objects destruction and driver cleanup on exit
+ * Fixed AddExtension failing with some Firefox extensions
 
 v2.0.2.0  (2015/07/20)
 ===============================================================================

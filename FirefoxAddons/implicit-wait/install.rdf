@@ -3,7 +3,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>implicit-wait@florent.breheret</em:id>
     <em:name>Selenium IDE: Implicit Wait</em:name>
-    <em:version>2.0.2.0</em:version>
+    <em:version>2.0.3.0</em:version>
     <em:creator>Florent BREHERET</em:creator>
     <em:description>Implicit wait functions for Selenium IDE</em:description>
     <em:type>2</em:type>
