@@ -78,9 +78,11 @@ Source: "References\phantomjs.exe"; DestDir: "{app}"; Flags: ignoreversion; Comp
 
 Source: "FirefoxAddons\bin\selenium-ide.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ide;
                                                                                                                                                       
-Source: "Scripts\*.*" ; DestDir: "{app}\Scripts"; Flags: ignoreversion skipifsourcedoesntexist overwritereadonly recursesubdirs; Attribs:readonly; Components: pkg_core;
-Source: "Examples\*.*"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist overwritereadonly recursesubdirs; Attribs:readonly; Components: pkg_doc;
-Source: "Templates\*.*" ; DestDir: "{app}\Templates"; Flags: ignoreversion skipifsourcedoesntexist overwritereadonly recursesubdirs; Attribs:readonly; Components: pkg_doc;
+Source: "Scripts\*.*" ; DestDir: "{app}\Scripts"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_core;
+Source: "Templates\*.*" ; DestDir: "{app}\Templates"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Examples\VBScript\*.vbs"; DestDir: "{app}\VBScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Examples\JavaScript\*.js"; DestDir: "{app}\JavaScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Examples\Excel\*.xlsm"; DestDir: "{app}\Excel"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
 
 ;copy config file
 Source: "References\exe.config" ; DestDir: "{sys}"; DestName: "wscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
