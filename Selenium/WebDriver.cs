@@ -4,6 +4,7 @@ using Selenium.Serializer;
 using System;
 using System.Collections;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Selenium {
@@ -87,6 +88,10 @@ namespace Selenium {
         /// Release the resources.
         /// </summary>
         public void Dispose() {
+            if (_comRunningObj != null) {
+                _comRunningObj.Dispose();
+                _comRunningObj = null;
+            }
             if (_service != null) {
                 _service.Dispose();
                 _service = null;
@@ -94,10 +99,6 @@ namespace Selenium {
             if (_session != null) {
                 _session.Dispose();
                 _session = null;
-            }
-            if (_comRunningObj != null) {
-                _comRunningObj.Dispose();
-                _comRunningObj = null;
             }
         }
 
@@ -183,6 +184,8 @@ namespace Selenium {
         /// </summary>
         /// <param name="path">Full path</param>
         public void SetBinary(string path) {
+            if (!File.Exists(path))
+                throw new Errors.FileNotFoundError(path);
             this.Binary = path;
         }
 
@@ -581,7 +584,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Closes the Browser
+        /// Closes the current window.
         /// </summary>
         public void Close() {
             this.Window.Close();
@@ -732,7 +735,7 @@ namespace Selenium {
         /// <summary>
         /// Switch focus to the specified window by name.
         /// </summary>
-        /// <param name="name">The name of the window to switch to or one based index(-1 for the last one).</param>
+        /// <param name="name">The name of the window to activate</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
         /// <returns>Current web driver</returns>
@@ -749,7 +752,7 @@ namespace Selenium {
         /// <summary>
         /// Switch focus to the specified window by title.
         /// </summary>
-        /// <param name="title">The name of the window to switch to or one based index(-1 for the last one).</param>
+        /// <param name="title">The title of the window to activate</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
         /// <returns>Current web driver</returns>

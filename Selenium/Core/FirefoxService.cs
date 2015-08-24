@@ -47,26 +47,27 @@ namespace Selenium.Core {
         }
 
         public void Dispose() {
-            if (_firefox_process == null || _firefox_process.HasExited) {
-                if (!this.Persistant && Directory.Exists(_profile_dir)) {
-                    IOExt.DeleteDirectoryByShell(_profile_dir);
-                    _profile_dir = null;
+            _endpoint.Dispose();
+
+            if (_firefox_process != null) {
+                if (!_firefox_process.HasExited) {
+                    _firefox_process.Kill();
+                    _firefox_process.WaitForExit();
                 }
+                _firefox_process.Dispose();
+                _firefox_process = null;
             }
 
-            _endpoint.Dispose();
+            if (!this.Persistant && Directory.Exists(_profile_dir)) {
+                IOExt.DeleteDirectoryByShell(_profile_dir);
+                _profile_dir = null;
+            }
         }
 
         /// <summary>
         /// Stops the service.
         /// </summary>
         public void Quit() {
-            if (_firefox_process == null)
-                return;
-            _firefox_process.Kill();
-            _firefox_process.WaitForExit();
-            _firefox_process.Dispose();
-            _firefox_process = null;
             this.Dispose();
         }
 
@@ -220,7 +221,7 @@ namespace Selenium.Core {
                 path = IOExt.GetApplicationPath(APP_FILENAME);
 
             if (!File.Exists(path))
-                throw new FileNotFoundException(string.Format("File: {0}", path));
+                throw new Errors.FileNotFoundError(path);
 
             return path;
         }
