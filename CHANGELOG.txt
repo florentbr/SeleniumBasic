@@ -15,6 +15,16 @@ Third party softwares:
  PhantomJs web stack - BSD license
  http://phantomjs.org/
 
+
+v2.0.4.0  (2015/08/24)
+===============================================================================
+ * Fixed the process termination that was leaving Firefox opened
+ * Fixed the denied exception raised when the browser was launched
+ * Updated examples for Excel
+ * Removed the deprecated FindElementByClassName and FindElementsByClassName
+ * Removed the deprecated FindElementByCssSelector and FindElementsByCssSelector
+ * Removed the deprecated FindElementByTagName and FindElementsByTagName
+ 
 v2.0.3.0  (2015/08/19)
 ===============================================================================
  * Updated IE driver to version 2.47
