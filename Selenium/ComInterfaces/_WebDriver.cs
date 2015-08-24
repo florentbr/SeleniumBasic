@@ -217,30 +217,6 @@ namespace Selenium.ComInterfaces {
 
         [DispId(1260), Description("Waits for an element to disappear from the page")]
         void WaitNotElement([MarshalAs(UnmanagedType.Struct)]By by, int timeout = -1);
-
-
-        //TODO: remove in a later release
-        #region Deprecated
-        
-        [DispId(1179), Description("Deprecated, use FindElementByClass instead")]
-        WebElement FindElementByClassName(string classname, int timeout = -1, bool raise = true);
-        
-        [DispId(1181), Description("Deprecated, use FindElementByCss instead")]
-        WebElement FindElementByCssSelector(string cssselector, int timeout = -1, bool raise = true);
-        
-        [DispId(1192), Description("Deprecated, use FindElementByTag instead")]
-        WebElement FindElementByTagName(string tagname, int timeout = -1, bool raise = true);
-        
-        [DispId(1222), Description("Deprecated, use FindElementsByClass instead")]
-        WebElements FindElementsByClassName(string classname, int minimum = 0, int timeout = 0);
-
-        [DispId(1224), Description("Deprecated, use FindElementsByCss instead")]
-        WebElements FindElementsByCssSelector(string cssselector, int minimum = 0, int timeout = 0);
-        
-        [DispId(1236), Description("Deprecated, use FindElementsByTag instead")]
-        WebElements FindElementsByTagName(string tagname, int minimum = 0, int timeout = 0);
-        
-        #endregion
         
         #endregion
 
