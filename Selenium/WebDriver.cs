@@ -321,13 +321,15 @@ namespace Selenium {
         /// </summary>
         public virtual void Quit() {
             if (_session != null) {
-                if (_session.IsLocal) {
-                    if (_service.GetType() != typeof(FirefoxService))
+                try {
+                    if (_session.IsLocal) {
+                        if (_service.GetType() != typeof(FirefoxService))
+                            _session.Delete();
+                        _service.Quit();
+                    } else {
                         _session.Delete();
-                    _service.Quit();
-                } else {
-                    _session.Delete();
-                }
+                    }
+                } catch { }
             }
 
             this.Dispose();
