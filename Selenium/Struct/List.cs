@@ -1,6 +1,7 @@
 ﻿using Interop.Excel;
 using Selenium.Internal;
 using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -334,6 +335,37 @@ namespace Selenium {
         /// <param name="index">Target index</param>
         public void CopyTo(Array array, int index) {
             Array.Copy(_items, 0, array, index, _count);
+        }
+
+        /// <summary>
+        /// Sorts the elements
+        /// </summary>
+        /// <returns>Current list</returns>
+        public List Sort() {
+            Array.Sort(_items, 0, _count);
+            return this;
+        }
+
+        /// <summary>
+        /// Remove duplicates
+        /// </summary>
+        /// <param name="ignoreCase">Optional - Ignore case if true.</param>
+        /// <returns></returns>
+        public List Distinct(bool ignoreCase = false) {
+            System.Collections.Hashtable table;
+            if (ignoreCase) {
+                table = CollectionsUtil.CreateCaseInsensitiveHashtable(_count);
+            } else {
+                table = new System.Collections.Hashtable(_count);
+            }
+
+            for (int i = 0; i < _count; i++) {
+                table[_items[i]] = null;
+            }
+
+            table.Keys.CopyTo(_items, 0);
+            _count = table.Count;
+            return this;
         }
 
         /// <summary>

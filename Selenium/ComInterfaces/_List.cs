@@ -49,6 +49,12 @@ namespace Selenium.ComInterfaces {
         [DispId(550), Description("Copy the values to the target address, range or worksheet in Excel. Returns the range.")]
         IRange ToExcel(object target = null, string title = null, bool clear = false);
 
+        [DispId(600), Description("Sorts the elements.")]
+        List Sort();
+
+        [DispId(608), Description("Remove duplicates.")]
+        List Distinct(bool ignoreCase = false);
+
         [DispId(-4)]
         System.Collections.IEnumerator _NewEnum();  //Has to be declared last
 
