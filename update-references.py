@@ -131,7 +131,8 @@ class Tasks():
         url = page2 + value
         cfg = self.cfgs.get('SeleniumIDE')
         if cfg.get('version') != version or not file_exists('selenium-ide.xpi'):
-            WebFile(url).save('selenium-ide.xpi')
+            with WebZip(url) as zip:
+                zip.extract(r'selenium-ide.xpi')
             cfg.update({'version': version, 'url': url})
             Log("Updated Selenium IDE to version " + version)
     

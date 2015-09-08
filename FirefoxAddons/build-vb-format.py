@@ -31,7 +31,7 @@ def main(args):
     print 'Build formater xpi ...'
     make_dir(OUT_DIR)
     set_working_dir(SRC_DIR)
-    with ZipFile(OUT_DIR + r'\vb-format.xpi', 'w') as zip:
+    with ZipFile(OUT_DIR + r'\vb-formatters.xpi', 'w') as zip:
         zip.add(r'*')
     
     print '\nDone'

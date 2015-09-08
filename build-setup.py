@@ -51,14 +51,12 @@ def main():
     print 'Build implicit-wait addin ...'
     execute(APP_IRONPYTHON_PATH, __dir__ + r'\FirefoxAddons\build-implicit-wait.py', current_version)
     
-    print 'Extend SeleniumIDE ...'
-    out_xpi_path = __dir__ + r'\FirefoxAddons\bin\selenium-ide.xpi'
-    copy_file(__dir__ + r'\References\selenium-ide.xpi', out_xpi_path)
-    set_working_dir(__dir__ + r'\FirefoxAddons\bin')
-    with ZipFile(out_xpi_path, 'a') as zip:
-        zip.add(r'vb-format.xpi')
-        zip.add(r'implicit-wait.xpi')
-    set_working_dir(__dir__)
+    print 'Build extensions package ...'
+    with zipfile.ZipFile(__dir__ + r'\FirefoxAddons\bin\extensions.xpi', 'a') as zip:
+        zip.write(__dir__ + r'\FirefoxAddons\install.rdf', 'install.rdf')
+        zip.write(__dir__ + r'\References\selenium-ide.xpi', 'selenium-ide.xpi')
+        zip.write(__dir__ + r'\FirefoxAddons\bin\vb-formatters.xpi', 'vb-formatters.xpi')
+        zip.write(__dir__ + r'\FirefoxAddons\bin\implicit-wait.xpi', 'implicit-wait.xpi')
     
     print 'Build .Net library ...'
     execute(APP_MSBUILD_PATH, '/t:build', '/nologo', '/v:quiet',

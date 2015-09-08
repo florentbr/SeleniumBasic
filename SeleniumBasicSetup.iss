@@ -76,8 +76,9 @@ Source: "References\iedriver.exe"; DestDir: "{app}"; Flags: ignoreversion; Compo
 Source: "References\operadriver.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_op;
 Source: "References\phantomjs.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_pjs;
 
-Source: "FirefoxAddons\bin\selenium-ide.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ide;
-                                                                                                                                                      
+;Firefox extensions
+Source: "FirefoxAddons\bin\extensions.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ide;
+
 Source: "Scripts\*.*" ; DestDir: "{app}\Scripts"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_core;
 Source: "Templates\*.*" ; DestDir: "{app}\Templates"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
 Source: "Examples\VBScript\*.vbs"; DestDir: "{app}\VBScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
@@ -114,6 +115,10 @@ Name: "{group}\Start PhantomJS"; Filename: "{app}\Scripts\StartPhantomJS.vbs"; W
 
 [Registry]
 
+;Firefox plugins
+;Root: HKCU; Subkey: "Software\Mozilla\Firefox\Extensions"; ValueName: "{{a6fd85ed-e919-4a43-a5af-8da18bda539f}"; ValueType: string; ValueData:"{app}\selenium-ide.xpi"; Flags: uninsdeletevalue; Components: pkg_ide;
+;Root: HKCU; Subkey: "Software\Mozilla\Firefox\Extensions"; ValueName: "vbformatters@florent.breheret"; ValueType: string; ValueData:"{app}\vbformatters.xpi"; Flags: uninsdeletevalue; Components: pkg_ide;
+;Root: HKCU; Subkey: "Software\Mozilla\Firefox\Extensions"; ValueName: "implicit-wait@florent.breheret"; ValueType: string; ValueData:"{app}\implicit-wait.xpi"; Flags: uninsdeletevalue; Components: pkg_ide;
 ;Fix for KB948461 https://support.microsoft.com/en-us/kb/948461                            
 Root: HKCR; Subkey: "Interface\{{000C0601-0000-0000-C000-000000000046}"; ValueType: string; ValueName: "";  ValueData: "Office .NET Framework Lockback Bypass Key"; Check: HasPrivileges And HasExcel2003orInf;
 
@@ -203,7 +208,7 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows Script Host\Settings"; ValueName
 
 [Run]
 ;Filename: "{app}\RegNet.exe"; Parameters: "-r"; WorkingDir: {app}; Flags: waituntilterminated runascurrentuser runhidden; StatusMsg: "Register for COM interoperability";
-Filename: "{code:GetAppPath|firefox.exe}"; Parameters: "selenium-ide.xpi"; WorkingDir: {app}; Flags: shellexec postinstall skipifsilent runascurrentuser; Components: pkg_ide; Check: HasFirefox; Description: "Install the Selenium IDE Addon for Firefox";
+Filename: "{code:GetAppPath|firefox.exe}"; Parameters: "-url ""{app}\extensions.xpi"""; WorkingDir: {app}; Flags: shellexec postinstall skipifsilent runascurrentuser; Components: pkg_ide; Check: HasFirefox; Description: "Install the Selenium IDE Addon for Firefox";
 
 [UninstallRun]
 ;Filename: "{app}\RegNet.exe"; Parameters: "-u"; WorkingDir: {app}; Flags: waituntilterminated runascurrentuser runhidden; StatusMsg: "Unregister for COM interoperability"; 
