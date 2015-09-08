@@ -192,10 +192,15 @@ namespace Selenium {
         public Image TakeScreenshot(int delayms = 0) {
             if (delayms != 0)
                 SysWaiter.Wait(delayms);
-            Point location = this.Location();
-            Size size = this.Size();
+
+            var dict = (Dictionary)_session.javascript.Execute(
+                "return arguments[0].getBoundingClientRect()", new[] { this }, false);
+
+            var rect = new System.Drawing.Rectangle(
+                Convert.ToInt32(dict["left"]), Convert.ToInt32(dict["top"]),
+                Convert.ToInt32(dict["width"]), Convert.ToInt32(dict["height"]));
+
             using (Image image = (Image)_session.Send(RequestMethod.GET, "/screenshot")) {
-                var rect = new System.Drawing.Rectangle(location.X, location.Y, size.Width, size.Height);
                 var bitmap = image.GetBitmap();
                 var bmpCrop = bitmap.Clone(rect, bitmap.PixelFormat);
                 return new Image(bmpCrop);
