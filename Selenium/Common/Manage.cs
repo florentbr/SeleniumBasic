@@ -93,6 +93,9 @@ namespace Selenium {
 
         #endregion
 
+
+        #region Cookies
+
         /// <summary>
         /// Collection of cookies for the current page
         /// </summary>
@@ -129,7 +132,7 @@ namespace Selenium {
         /// Deletes the cookie with the specified name from the page.
         /// </summary>
         /// <param name="name">The name of the cookie to be deleted.</param>
-        public void DeleteCookieNamed(string name) {
+        public void DeleteCookieByName(string name) {
             Cookie.DeleteByName(_session, name);
         }
 
@@ -138,9 +141,11 @@ namespace Selenium {
         /// </summary>
         /// <param name="namePattern">The name of the cookie to retrieve.</param>
         /// <returns>The Cookie containing the name. Returns null if no cookie with the specified name is found.</returns>
-        public Cookie CookieNamed(string namePattern) {
+        public Cookie FindCookieByName(string namePattern) {
             return Cookie.GetOneByName(_session, namePattern);
         }
+
+        #endregion
 
     }
 

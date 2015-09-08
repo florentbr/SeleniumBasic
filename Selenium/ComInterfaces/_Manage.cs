@@ -1,5 +1,4 @@
-﻿using Selenium;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
@@ -32,11 +31,11 @@ namespace Selenium.ComInterfaces {
         void DeleteAllCookies();
 
         [DispId(79), Description("Deletes the cookie with the specified name from the page.")]
-        void DeleteCookieNamed(string name);
+        void DeleteCookieByName(string name);
 
         [DispId(82), Description("Gets a cookie with the specified name.")]
-        Cookie CookieNamed(string name);
-        
+        Cookie FindCookieByName(string name);
+
         //TODO : Include LOGS
         //[DispId(105), Description("")]
         //Logs Logs { get; }
