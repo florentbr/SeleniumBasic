@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Selenium.ComInterfaces;
 using Selenium.Tests.Internals;
 using A = NUnit.Framework.Assert;
 
@@ -7,8 +8,7 @@ namespace Selenium.Tests {
     [TestFixture]
     public class TS_Verify {
 
-        //Verify verify = (Verify)COM.CreateObject("Selenium.Verify");
-        Verify verify = new Verify();
+        _Verify verify = new Verify();
 
         [Test]
         public void ShouldVerifyTrueOK() {

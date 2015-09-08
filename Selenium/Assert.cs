@@ -1,4 +1,5 @@
-﻿using Selenium.Core;
+﻿using Selenium.ComInterfaces;
+using Selenium.Core;
 using Selenium.Internal;
 using System;
 using System.ComponentModel;
@@ -36,7 +37,97 @@ namespace Selenium {
     [Description("Testing functions. Throws an exception if the condition is not met")]
     [Guid("0277FC34-FD1B-4616-BB19-6AAF7EDD33D6")]
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
-    public class Assert : ComInterfaces._Assert {
+    public class Assert : _Assert {
+
+        #region Static API
+
+        /// <summary>
+        /// Raise an error if the value is true.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="failmessage"></param>
+        public static void True(bool input, string failmessage = null) {
+            if (input != true)
+                throw new AssertFailure(failmessage, "expected={0}\nwas={1}", true, input);
+        }
+
+        /// <summary>
+        /// Raise an error if the value is false.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="failmessage"></param>
+        public static void False(bool input, string failmessage = null) {
+            if (input != false)
+                throw new AssertFailure(failmessage, "expected={0}\nwas={1}", false, input);
+        }
+
+        /// <summary>
+        /// Test that two objects are equal and raise an exception if the result is false
+        /// </summary>
+        /// <param name="expected">expected object. Can be a string, number, array...</param>
+        /// <param name="input">current object. Can be a string, number, array...</param>
+        /// <param name="failmessage"></param>
+        public static void Equals(Object expected, Object input, string failmessage = null) {
+            if (!ObjExt.AreEqual(expected, input))
+                throw new AssertFailure(failmessage, "expected={0}\nwas={1}", expected, input);
+        }
+
+        /// <summary>
+        /// Test that two objects are not equal and raise an exception if the result is false
+        /// </summary>
+        /// <param name="notexpected">expected object. Can be a string, number, array...</param>
+        /// <param name="input">current object. Can be a string, number, array...</param>
+        /// <param name="failmessage"></param>
+        public static void NotEquals(Object notexpected, Object input, string failmessage = null) {
+            if (ObjExt.AreEqual(notexpected, input))
+                throw new AssertFailure(failmessage, "expected!={0}\nwas={1}", notexpected, input);
+        }
+
+        /// <summary>
+        /// Raise an error if the text matches the pattern.
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="input"></param>
+        /// <param name="failmessage"></param>
+        public static void Matches(string pattern, string input, string failmessage = null) {
+            if (!Regex.IsMatch(input, pattern))
+                throw new AssertFailure(failmessage, "pattern={0}\nwas={1}", pattern, input);
+        }
+
+        /// <summary>
+        /// Raise an error if the text does not match the pattern.
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="input"></param>
+        /// <param name="failmessage"></param>
+        public static void NotMatches(string pattern, string input, string failmessage = null) {
+            if (Regex.IsMatch(input, pattern))
+                throw new AssertFailure(failmessage, "pattern!={0}\nwas={1}", pattern, input);
+        }
+
+        /// <summary>
+        /// Raise an error if the text does not contain the value.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="value"></param>
+        /// <param name="failmessage"></param>
+        public static void Contains(string value, string input, string failmessage = null) {
+            if (!input.Contains(value))
+                throw new AssertFailure(failmessage, "contains={0}\nwas={1}", value, input);
+        }
+
+        /// <summary>
+        /// Raise an error.
+        /// </summary>
+        /// <param name="message"></param>
+        public static void Fail(string message = null) {
+            throw new AssertFailure(message);
+        }
+
+        #endregion
+
+
+        #region COM Interface
 
         /// <summary>
         /// Create an assert object.
@@ -50,9 +141,8 @@ namespace Selenium {
         /// </summary>
         /// <param name="input"></param>
         /// <param name="failmessage"></param>
-        public void True(bool input, string failmessage = null) {
-            if (input != true)
-                throw new AssertFailure(failmessage, "expected={0}\nwas={1}", true, input);
+        void _Assert.True(bool input, string failmessage) {
+            True(input, failmessage);
         }
 
         /// <summary>
@@ -60,9 +150,8 @@ namespace Selenium {
         /// </summary>
         /// <param name="input"></param>
         /// <param name="failmessage"></param>
-        public void False(bool input, string failmessage = null) {
-            if (input != false)
-                throw new AssertFailure(failmessage, "expected={0}\nwas={1}", false, input);
+        void _Assert.False(bool input, string failmessage) {
+            False(input, failmessage);
         }
 
         /// <summary>
@@ -71,9 +160,8 @@ namespace Selenium {
         /// <param name="expected">expected object. Can be a string, number, array...</param>
         /// <param name="input">current object. Can be a string, number, array...</param>
         /// <param name="failmessage"></param>
-        public void Equals(Object expected, Object input, string failmessage = null) {
-            if (!ObjExt.AreEqual(expected, input))
-                throw new AssertFailure(failmessage, "expected={0}\nwas={1}", expected, input);
+        void _Assert.Equals(Object expected, Object input, string failmessage) {
+            Equals(expected, input, failmessage);
         }
 
         /// <summary>
@@ -82,9 +170,8 @@ namespace Selenium {
         /// <param name="notexpected">expected object. Can be a string, number, array...</param>
         /// <param name="input">current object. Can be a string, number, array...</param>
         /// <param name="failmessage"></param>
-        public void NotEquals(Object notexpected, Object input, string failmessage = null) {
-            if (ObjExt.AreEqual(notexpected, input))
-                throw new AssertFailure(failmessage, "expected!={0}\nwas={1}", notexpected, input);
+        void _Assert.NotEquals(Object notexpected, Object input, string failmessage) {
+            NotEquals(notexpected, input, failmessage);
         }
 
         /// <summary>
@@ -93,9 +180,8 @@ namespace Selenium {
         /// <param name="pattern"></param>
         /// <param name="input"></param>
         /// <param name="failmessage"></param>
-        public void Matches(string pattern, string input, string failmessage = null) {
-            if (!Regex.IsMatch(input, pattern))
-                throw new AssertFailure(failmessage, "pattern={0}\nwas={1}", pattern, input);
+        void _Assert.Matches(string pattern, string input, string failmessage) {
+            Matches(pattern, input, failmessage);
         }
 
         /// <summary>
@@ -104,9 +190,8 @@ namespace Selenium {
         /// <param name="pattern"></param>
         /// <param name="input"></param>
         /// <param name="failmessage"></param>
-        public void NotMatches(string pattern, string input, string failmessage = null) {
-            if (Regex.IsMatch(input, pattern))
-                throw new AssertFailure(failmessage, "pattern!={0}\nwas={1}", pattern, input);
+        void _Assert.NotMatches(string pattern, string input, string failmessage) {
+            NotMatches(pattern, input, failmessage);
         }
 
         /// <summary>
@@ -115,21 +200,21 @@ namespace Selenium {
         /// <param name="input"></param>
         /// <param name="value"></param>
         /// <param name="failmessage"></param>
-        public void Contains(string value, string input, string failmessage = null) {
-            if (!input.Contains(value))
-                throw new AssertFailure(failmessage, "contains={0}\nwas={1}", value, input);
+        void _Assert.Contains(string value, string input, string failmessage) {
+            Contains(value, input, failmessage);
         }
 
         /// <summary>
         /// Raise an error.
         /// </summary>
         /// <param name="message"></param>
-        public void Fail(string message = null) {
-            throw new AssertFailure(message);
+        void _Assert.Fail(string message) {
+            Fail(message);
         }
 
+        #endregion
 
-
+        
         class AssertFailure : SeleniumException {
 
             const int HRESULT = -2146828288;

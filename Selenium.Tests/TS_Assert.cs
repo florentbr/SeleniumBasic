@@ -3,14 +3,14 @@ using System;
 using Selenium.Tests.Internals;
 using A = NUnit.Framework.Assert;
 using Assert = Selenium.Assert;
+using Selenium.ComInterfaces;
 
 namespace Selenium.Tests {
 
     [TestFixture]
     public class TS_Assert {
 
-        //Assert assert = (Assert)COM.CreateObject("Selenium.Assert");
-        Assert assert = new Assert();
+        _Assert assert = new Assert();
 
         [Test]
         public void ShouldAssertTrue() {
