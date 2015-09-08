@@ -43,11 +43,13 @@ namespace Selenium.Core {
             _this_assembly_dir = IOExt.GetAssemblyDirectory();
             _working_dir = DriverService.GetTempFolder();
             _profil_cache_path = Path.Combine(_working_dir, PROFILE_CACHE_FILENAME);
-            _endpoint = EndPointExt.Create(IPAddress.Loopback, false);
         }
 
         public void Dispose() {
-            _endpoint.Dispose();
+            if (_endpoint != null) {
+                _endpoint.Dispose();
+                _endpoint = null;
+            }
 
             if (_firefox_process != null) {
                 if (!_firefox_process.HasExited) {
@@ -58,7 +60,7 @@ namespace Selenium.Core {
                 _firefox_process = null;
             }
 
-            if (!this.Persistant && Directory.Exists(_profile_dir)) {
+            if (_profile_dir != null && !this.Persistant && Directory.Exists(_profile_dir)) {
                 IOExt.DeleteDirectoryByShell(_profile_dir);
                 _profile_dir = null;
             }
@@ -90,6 +92,14 @@ namespace Selenium.Core {
             this.Capabilities = capabilities;
             this.Profile = profile;
             this.Persistant = persistant;
+
+            string debugAddress;
+            if (capabilities.TryGetValue("debuggerAddress", out debugAddress)) {
+                _endpoint = EndPointExt.Parse(debugAddress);
+                return;
+            }
+
+            _endpoint = EndPointExt.Create(IPAddress.Loopback, false);
 
             Thread thread = new Thread(RunStart);
             thread.Start();
@@ -232,7 +242,7 @@ namespace Selenium.Core {
 
             string[] args = { "-CreateProfile", profile_name };
 
-            using(var p = ProcessExt.Start(binary_path, args, null, env, false, false)){
+            using (var p = ProcessExt.Start(binary_path, args, null, env, false, false)) {
                 if (!p.WaitForExit(10000))
                     throw new Errors.TimeoutError("Failed to create the profile. The process didn't exit within 10s.");
             }

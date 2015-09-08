@@ -27,6 +27,13 @@ namespace Selenium.Internal {
             return new EndPointExt(socket, (IPEndPoint)socket.LocalEndPoint);
         }
 
+        internal static EndPointExt Parse(string address) {
+            string[] parts = address.Split(':');
+            IPAddress ipAddress = IPAddress.Parse(parts[0]);
+            int ipPort = int.Parse(parts[1]);
+            IPEndPoint endPoint = new IPEndPoint(ipAddress, ipPort);
+            return new EndPointExt(null, endPoint);
+        }
 
         Socket _socket;
         IPEndPoint _ipEndPoint;
