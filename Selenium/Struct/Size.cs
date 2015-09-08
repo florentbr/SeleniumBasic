@@ -8,20 +8,12 @@ namespace Selenium {
     /// <summary>
     /// Size structure
     /// </summary>
-    [Guid("0277FC34-FD1B-4616-BB19-7E2EBB6C82E9")]
-    [ComVisible(true)]
-    [DebuggerDisplay("width = {Width} height = {Height}")]
-    public struct Size {
+    [Guid("0277FC34-FD1B-4616-BB19-2108C1FE2EE9")]
+    [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
+    [DebuggerDisplay("Width={Width} Height={Height}")]
+    public class Size : ComInterfaces._Size {
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public int Width;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public int Height;
+        private int _width, _height;
 
         /// <summary>
         /// Get the size
@@ -29,14 +21,14 @@ namespace Selenium {
         /// <param name="width"></param>
         /// <param name="height"></param>
         public Size(int width, int height) {
-            this.Width = width;
-            this.Height = height;
+            _width = width;
+            _height = height;
         }
 
         internal Size(Dictionary dict) {
             try {
-                this.Width = Convert.ToInt32(dict["width"]);
-                this.Height = Convert.ToInt32(dict["height"]);
+                _width = Convert.ToInt32(dict["width"]);
+                _height = Convert.ToInt32(dict["height"]);
             } catch (Errors.KeyNotFoundError ex) {
                 throw new DeserializeException(typeof(Size), ex);
             } catch (InvalidCastException ex) {
@@ -45,12 +37,27 @@ namespace Selenium {
         }
 
         /// <summary>
+        /// Width
+        /// </summary>
+        public int Width {
+            get { return _width; }
+        }
+
+        /// <summary>
+        /// Height
+        /// </summary>
+        public int Height {
+            get { return _height; }
+        }
+
+        /// <summary>
         /// Returns the text representaton of this instance.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return string.Format(@"{{width={0} height={1}}}", this.Width, this.Height);
+            return string.Format(@"{{width={0} height={1}}}", _width, _height);
         }
 
     }
+
 }

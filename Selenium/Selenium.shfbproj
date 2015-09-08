@@ -51,8 +51,14 @@
   <Filter entryType="Class" fullName="Selenium.DictionaryItem.DictionaryItemEnumerator" filterName="DictionaryItem.DictionaryItemEnumerator" isExposed="False" />
   <Filter entryType="Class" fullName="Selenium.List.ListEnumerator" filterName="List.ListEnumerator" isExposed="False" />
   <Filter entryType="Class" fullName="Selenium.Logs" filterName="Logs" isExposed="False" />
+  <Filter entryType="Structure" fullName="Selenium.Point" filterName="Point" isExposed="True">
+    <Filter entryType="Method" fullName="Selenium.Point.ToString" filterName="ToString" isExposed="False" />
+  </Filter>
   <Filter entryType="Class" fullName="Selenium.SeleniumError" filterName="SeleniumError" isExposed="False" />
   <Filter entryType="Class" fullName="Selenium.SeleniumException" filterName="SeleniumException" isExposed="False" />
+  <Filter entryType="Structure" fullName="Selenium.Size" filterName="Size" isExposed="True">
+    <Filter entryType="Method" fullName="Selenium.Size.ToString" filterName="ToString" isExposed="False" />
+  </Filter>
   <Filter entryType="Enumeration" fullName="Selenium.Strategy" filterName="Strategy" isExposed="False" />
 </Filter>
 <Filter entryType="Namespace" fullName="Selenium.ComInterfaces" isExposed="False" />

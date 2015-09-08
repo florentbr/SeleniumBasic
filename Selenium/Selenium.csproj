@@ -63,6 +63,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComInterfaces\_Point.cs" />
+    <Compile Include="ComInterfaces\_Size.cs" />
     <Compile Include="Errors\FileNotFoundError.cs" />
     <Compile Include="Internal\COMDisposable.cs" />
     <Compile Include="Internal\ProcessExt.cs" />

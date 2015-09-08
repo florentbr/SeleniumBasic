@@ -8,25 +8,17 @@ namespace Selenium {
     /// <summary>
     /// Point structure
     /// </summary>
-    [Guid("0277FC34-FD1B-4616-BB19-ACE280CD7780")]
-    [ComVisible(true)]
-    [DebuggerDisplay("x = {X} y = {Y}")]
-    public struct Point {
+    [Guid("0277FC34-FD1B-4616-BB19-E1305CCF61EC")]
+    [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
+    [DebuggerDisplay("X={X} Y={Y}")]
+    public class Point : ComInterfaces._Point {
 
-        /// <summary>
-        /// X value
-        /// </summary>
-        public int X;
-
-        /// <summary>
-        /// Y value
-        /// </summary>
-        public int Y;
+        private int _x, _y;
 
         internal Point(Dictionary dict) {
             try {
-                this.X = Convert.ToInt32(dict["x"]);
-                this.Y = Convert.ToInt32(dict["y"]);
+                _x = Convert.ToInt32(dict["x"]);
+                _y = Convert.ToInt32(dict["y"]);
             } catch (Errors.KeyNotFoundError ex) {
                 throw new DeserializeException(typeof(Point), ex);
             } catch (InvalidCastException ex) {
@@ -40,8 +32,22 @@ namespace Selenium {
         /// <param name="x"></param>
         /// <param name="y"></param>
         public Point(int x, int y) {
-            this.X = x;
-            this.Y = y;
+            _x = x;
+            _y = y;
+        }
+
+        /// <summary>
+        /// X
+        /// </summary>
+        public int X {
+            get { return _x; }
+        }
+
+        /// <summary>
+        /// Y
+        /// </summary>
+        public int Y {
+            get { return _y; }
         }
 
         /// <summary>
@@ -49,8 +55,9 @@ namespace Selenium {
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return string.Format(@"{{x={0} y={1}}}", this.X, this.Y);
+            return string.Format(@"{{x={0} y={1}}}", _x, _y);
         }
 
     }
+
 }

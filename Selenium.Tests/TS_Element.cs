@@ -80,7 +80,7 @@ namespace Selenium.Tests {
         public void ShouldReturnLocation() {
             var ele1 = driver.FindElementById("txt_div");
 
-            Point expected = new Point { X = 20, Y = 156 };
+            Point expected = new Point(20, 156);
             Point actual = ele1.Location();
 
             int diffX = Math.Abs(actual.X - expected.X);
