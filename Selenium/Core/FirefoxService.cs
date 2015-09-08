@@ -192,11 +192,11 @@ namespace Selenium.Core {
             //Install the WebDriver extention
             string ext_wd_path = Path.Combine(_this_assembly_dir, EXT_WEBDRIVER_FILENAME);
             InstallExtension(ext_wd_path, _profile_dir, EXT_WEBDRIVER_RID);
-            
+
             //Install the provided extensions
             if (this.Extensions != null && !this.Persistant) {
-                foreach (string ext_path in this.Extensions)
-                    InstallExtension(ext_path, _profile_dir);
+                foreach (DriverExtension extension in this.Extensions)
+                    InstallExtension(extension.Path, _profile_dir);
             }
 
             //delete logs

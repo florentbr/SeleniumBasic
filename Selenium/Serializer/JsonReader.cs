@@ -269,26 +269,24 @@ namespace Selenium.Serializer {
             int blocksCount = srcCount / 4;  //count blocks of 4chars/3bytes
             int remainCount = (((srcCount % 4) + 1) >> 1);  //remaining bytes
             byte[] dest = new byte[blocksCount * 3 + remainCount];
-            fixed (byte* pSrc0 = _buffer, pDest0 = dest, pMap0 = BASE64_TABLE) {
+            fixed (byte* pSrc0 = _buffer, pDest0 = dest) {
                 byte* pSrc = pSrc0 + srcIdxStart;
                 byte* pDest = pDest0;
-                unchecked {
-                    for (int i = blocksCount; i-- > 0; pSrc += 4, pDest += 3) {
-                        int v = pMap0[pSrc[0]] << 18
-                            | pMap0[pSrc[1]] << 12
-                            | pMap0[pSrc[2]] << 6
-                            | pMap0[pSrc[3]];
-                        pDest[0] = (byte)(v >> 16);
-                        pDest[1] = (byte)(v >> 8);
-                        pDest[2] = (byte)v;
-                    }
+                for (int i = blocksCount; i-- > 0; pSrc += 4, pDest += 3) {
+                    int v = BASE64_TABLE[pSrc[0]] << 18
+                        | BASE64_TABLE[pSrc[1]] << 12
+                        | BASE64_TABLE[pSrc[2]] << 6
+                        | BASE64_TABLE[pSrc[3]];
+                    pDest[0] = (byte)(v >> 16);
+                    pDest[1] = (byte)(v >> 8);
+                    pDest[2] = (byte)v;
                 }
                 if (remainCount > 0) {
-                    byte b0 = pMap0[pSrc[0]];
-                    byte b1 = pMap0[pSrc[1]];
+                    byte b0 = BASE64_TABLE[pSrc[0]];
+                    byte b1 = BASE64_TABLE[pSrc[1]];
                     pDest[0] = (byte)(b0 << 2 | b1 >> 4);
                     if (remainCount > 1) {
-                        byte b2 = pMap0[pSrc[2]];
+                        byte b2 = BASE64_TABLE[pSrc[2]];
                         pDest[1] = (byte)(b1 << 4 | b2 >> 2);
                     }
                 }

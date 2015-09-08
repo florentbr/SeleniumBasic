@@ -167,7 +167,7 @@ namespace Selenium {
         /// </summary>
         /// <param name="extensionPath">Path to the extension</param>
         public void AddExtension(string extensionPath) {
-            Extensions.Add(extensionPath);
+            Extensions.Add(new DriverExtension(extensionPath));
         }
 
         /// <summary>

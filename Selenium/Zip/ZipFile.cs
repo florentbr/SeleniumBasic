@@ -1,4 +1,5 @@
 ﻿using Selenium.Internal;
+using Selenium.Serializer;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -21,7 +22,7 @@ namespace Selenium.Zip {
     /// ZipFile.ExtractAll(@"c:\archive.zip", @"c:\archive");
     /// </code>
     /// </example>
-    class ZipFile : IDisposable {
+    class ZipFile : IDisposable, IJsonBinary {
 
         /* "https://en.wikipedia.org/wiki/Zip_(file_format)"
         

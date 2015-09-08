@@ -6,7 +6,6 @@ using System.IO;
 using JsonArray = Selenium.List;
 using JsonObject = Selenium.Dictionary;
 using JsonObjectItem = Selenium.DictionaryItem;
-using ZipFile = Selenium.Zip.ZipFile;
 
 namespace Selenium.Serializer {
 
@@ -141,18 +140,18 @@ namespace Selenium.Serializer {
                 SerializeEnumerable(objEnum, depth); return;
             }
 
-            ZipFile objZip = obj as ZipFile;
-            if (objZip != null) {
-                SerializeZip(objZip); return;
+            IJsonBinary objBinary = obj as IJsonBinary;
+            if (objBinary != null) {
+                SerializeBinary(objBinary); return;
             }
 
             throw new JsonException(string.Format(
                 "Object of type {0} is not serializable", obj.GetType().Name));
         }
 
-        private void SerializeZip(ZipFile zip) {
+        private void SerializeBinary(IJsonBinary binary) {
             MemoryStream stream = new MemoryStream();
-            zip.Save(stream);
+            binary.Save(stream);
 
             WriteByte((byte)'"');
             WriteBytesBase64(stream.GetBuffer(), (int)stream.Length);
@@ -273,26 +272,24 @@ namespace Selenium.Serializer {
             int destCount = countBlocks * 4 + ((countRemain == 0) ? 0 : 4);
             if (_length + destCount > _capacity)
                 IncreaseBufferSize(destCount);
-            fixed (byte* pSrc0 = source, pDest0 = _buffer, pMap0 = BASE64_TABLE) {
+            fixed (byte* pSrc0 = source, pDest0 = _buffer) {
                 byte* pSrc = pSrc0;
                 byte* pDest = pDest0 + _length;
-                unchecked {
-                    for (int i = countBlocks; i-- > 0; pSrc += 3, pDest += 4) {
-                        pDest[0] = pMap0[(pSrc[0] & 0xfc) >> 2];
-                        pDest[1] = pMap0[((pSrc[0] & 0x03) << 4) | ((pSrc[1] & 0xf0) >> 4)];
-                        pDest[2] = pMap0[((pSrc[1] & 0x0f) << 2) | ((pSrc[2] & 0xc0) >> 6)];
-                        pDest[3] = pMap0[(pSrc[2] & 0x3f)];
-                    }
+                for (int i = countBlocks; i-- > 0; pSrc += 3, pDest += 4) {
+                    pDest[0] = BASE64_TABLE[(pSrc[0] & 0xfc) >> 2];
+                    pDest[1] = BASE64_TABLE[((pSrc[0] & 0x03) << 4) | ((pSrc[1] & 0xf0) >> 4)];
+                    pDest[2] = BASE64_TABLE[((pSrc[1] & 0x0f) << 2) | ((pSrc[2] & 0xc0) >> 6)];
+                    pDest[3] = BASE64_TABLE[(pSrc[2] & 0x3f)];
                 }
                 if (countRemain == 1) {
-                    pDest[0] = pMap0[(pSrc[0] & 0xfc) >> 2];
-                    pDest[1] = pMap0[(pSrc[1] & 0x03) << 4];
+                    pDest[0] = BASE64_TABLE[(pSrc[0] & 0xfc) >> 2];
+                    pDest[1] = BASE64_TABLE[(pSrc[1] & 0x03) << 4];
                     pDest[2] = (byte)'=';
                     pDest[3] = (byte)'=';
                 } else if (countRemain == 2) {
-                    pDest[0] = pMap0[(pSrc[0] & 0xfc) >> 2];
-                    pDest[1] = pMap0[((pSrc[0] & 0x03) << 4) | ((pSrc[1] & 0xf0) >> 4)];
-                    pDest[2] = pMap0[(pSrc[1] & 0x0f) << 2];
+                    pDest[0] = BASE64_TABLE[(pSrc[0] & 0xfc) >> 2];
+                    pDest[1] = BASE64_TABLE[((pSrc[0] & 0x03) << 4) | ((pSrc[1] & 0xf0) >> 4)];
+                    pDest[2] = BASE64_TABLE[(pSrc[1] & 0x0f) << 2];
                     pDest[3] = (byte)'=';
                 }
             }

@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="ComInterfaces\_Point.cs" />
     <Compile Include="ComInterfaces\_Size.cs" />
+    <Compile Include="Core\DriverExtension.cs" />
     <Compile Include="Errors\FileNotFoundError.cs" />
     <Compile Include="Internal\COMDisposable.cs" />
     <Compile Include="Internal\ProcessExt.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="Pdf\PdfPages.cs" />
     <Compile Include="Pdf\PdfXRefs.cs" />
     <Compile Include="Application.cs" />
+    <Compile Include="Serializer\IJsonBinary.cs" />
     <Compile Include="Serializer\IJsonObject.cs" />
     <Compile Include="Serializer\JsonException.cs" />
     <Compile Include="Serializer\JsonReader.cs" />
