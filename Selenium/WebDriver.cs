@@ -97,7 +97,6 @@ namespace Selenium {
                 _service = null;
             }
             if (_session != null) {
-                _session.Dispose();
                 _session = null;
             }
         }

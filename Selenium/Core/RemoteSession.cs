@@ -2,7 +2,7 @@
 
 namespace Selenium.Core {
 
-    class RemoteSession : IDisposable {
+    class RemoteSession {
 
         public readonly bool IsLocal;
         public readonly RemoteServer server;
@@ -38,10 +38,6 @@ namespace Selenium.Core {
             this.frame = new FrameContext(this);
             this.manage = new Manage(this);
             this.touchscreen = new TouchScreen(this);
-        }
-
-        public void Dispose() {
-            this.server.Dispose();
         }
 
         public string Id {

@@ -3,7 +3,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Cache;
-using System.Threading;
 
 namespace Selenium.Core {
 
@@ -16,17 +15,9 @@ namespace Selenium.Core {
         private int _response_timeout = 30000;
         private readonly string _server_uri;
 
-        private HttpWebRequest _request;
         private RequestMethod _request_method;
         private string _request_uri;
         private JsonWriter _request_data;
-        private Dictionary _response_content;
-        private Exception _response_exception;
-
-        private EventWaitHandle _event_send;
-        private EventWaitHandle _event_received;
-        private Thread _thread;
-        private bool _disposed;
 
 
         internal RemoteServer(string serverAddress, bool isLocal) {
@@ -37,30 +28,6 @@ namespace Selenium.Core {
             if (isLocal)
                 HttpWebRequest.DefaultWebProxy = null;
             ServicePointManager.Expect100Continue = false;
-
-            _event_send = new EventWaitHandle(false, EventResetMode.ManualReset);
-            _event_received = new EventWaitHandle(false, EventResetMode.ManualReset);
-            _thread = new Thread(RunRequests);
-            _thread.IsBackground = true;
-            _thread.SetApartmentState(ApartmentState.STA);
-            _thread.Start();
-        }
-
-        ~RemoteServer() {
-            this.Dispose();
-        }
-
-        public void Dispose() {
-            _disposed = true;
-            if (_request != null) {
-                _request.Abort();
-                _request = null;
-            }
-            if (_thread != null) {
-                _thread.Interrupt();
-                _thread = null;
-            }
-            _event_send.Close();
         }
 
         /// <summary>
@@ -140,24 +107,45 @@ namespace Selenium.Core {
         }
 
         protected Dictionary SendRequest(RequestMethod method, string uri, JsonWriter data) {
-            //save the request for resend
             _request_method = method;
             _request_uri = uri;
             _request_data = data;
 
-            //Send the request
-            _event_received.Reset();
-            _event_send.Set();
-            _event_received.WaitOne();
-
-            //Evaluate exception
-            if (_response_exception != null)
-                throw _response_exception;
+            HttpWebRequest request = CreateHttpWebRequest(method, uri, data, _response_timeout);
+            SysWaiter.OnInterrupt = request.Abort;
+            HttpWebResponse response = null;
+            Dictionary responseDict = null;
+            try {
+                IAsyncResult asyncResult = request.BeginGetResponse(null, null);
+                asyncResult.AsyncWaitHandle.WaitOne();
+                response = (HttpWebResponse)request.EndGetResponse(asyncResult);
+                responseDict = GetHttpWebResponseContent(response);
+            } catch (WebException ex) {
+                if (ex.Status == WebExceptionStatus.RequestCanceled) {
+                    throw new Errors.KeyboardInterruptError();
+                } else if (ex.Status == WebExceptionStatus.Timeout) {
+                    throw new Errors.WebRequestTimeout(request);
+                } else if ((response = ex.Response as HttpWebResponse) != null) {
+                    try {
+                        responseDict = GetHttpWebResponseContent(response);
+                    } catch (Exception ex2) {
+                        throw new SeleniumException(ex2);
+                    }
+                } else {
+                    throw new Errors.WebRequestError(ex.Message);
+                }
+            } catch (Exception ex) {
+                throw new SeleniumException(ex);
+            } finally {
+                SysWaiter.OnInterrupt = null;
+                if (response != null)
+                    response.Close();
+            }
 
             //Evaluate the status and error
-            int statusCode = (int)_response_content["status"];
+            int statusCode = (int)responseDict["status"];
             if (statusCode != 0) {
-                var errorObject = _response_content["value"];
+                var errorObject = responseDict["value"];
                 var errorAsDict = errorObject as Dictionary;
                 string errorMessage;
                 if (errorAsDict != null) {
@@ -166,56 +154,11 @@ namespace Selenium.Core {
                     errorMessage = errorObject as string;
                 }
                 var error = Errors.WebRequestError.Select(statusCode, errorMessage);
-                error.ResponseData = _response_content;
+                error.ResponseData = responseDict;
                 throw error;
             }
-            return _response_content;
+            return responseDict;
         }
-
-        private void RunRequests() {
-            while (!_disposed) {
-                HttpWebResponse response = null;
-                try {
-                    _event_send.WaitOne();
-                    _event_send.Reset();
-                    if (_disposed)
-                        return;
-
-                    _response_exception = null;
-                    _response_content = null;
-                    _request = CreateHttpWebRequest(_request_method, _request_uri, _request_data, _response_timeout);
-                    SysWaiter.OnInterrupt = _request.Abort;
-                    response = (HttpWebResponse)_request.GetResponse();
-                    _response_content = GetHttpWebResponseContent(response);
-                } catch (ThreadInterruptedException) {
-                    return;
-                } catch (ThreadAbortException) {
-                    return;
-                } catch (WebException ex) {
-                    if (ex.Status == WebExceptionStatus.RequestCanceled) {
-                        _response_exception = new Errors.KeyboardInterruptError();
-                    } else if (ex.Status == WebExceptionStatus.Timeout) {
-                        _response_exception = new Errors.WebRequestTimeout(_request);
-                    } else if ((response = ex.Response as HttpWebResponse) != null) {
-                        try {
-                            _response_content = GetHttpWebResponseContent(response);
-                        } catch (Exception ex2) {
-                            _response_exception = new SeleniumException(ex2);
-                        }
-                    } else {
-                        _response_exception = new Errors.WebRequestError(ex.Message);
-                    }
-                } catch (Exception ex) {
-                    _response_exception = new SeleniumException(ex);
-                } finally {
-                    SysWaiter.OnInterrupt = null;
-                    _event_received.Set();
-                    if (response != null)
-                        response.Close();
-                }
-            }
-        }
-
 
         private static HttpWebRequest CreateHttpWebRequest(RequestMethod method, string url, JsonWriter data, int timeout) {
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.CreateDefault(new Uri(url));
