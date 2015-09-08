@@ -40,6 +40,7 @@ namespace Selenium.Internal {
             , string dir, Hashtable env, bool noWindow, bool createJob) {
 
             string cmd = ProcessExt.BuildCommandLine(filepath, args);
+            StringBuilder envVars = BuildEnvironmentVars(env);
 
             var si = new Native.STARTUPINFO();
             var pi = new Native.PROCESS_INFORMATION();
@@ -48,7 +49,23 @@ namespace Selenium.Internal {
             if (noWindow)
                 createFlags |= Native.CREATE_NO_WINDOW;
 
-            StringBuilder envVars = BuildEnvironmentVars(env);
+            if (createJob) {
+                createFlags |= Native.CREATE_SUSPENDED;
+
+                IntPtr curProc = Native.GetCurrentProcess();
+                try {
+                    bool isProcessInJob = false;
+                    if (!Native.IsProcessInJob(curProc, IntPtr.Zero, out isProcessInJob))
+                        throw new Win32Exception();
+
+                    if (isProcessInJob)
+                        createFlags |= Native.CREATE_BREAKAWAY_FROM_JOB;
+
+                } finally {
+                    Native.CloseHandle(curProc);
+                }
+            }
+
             bool success = Native.CreateProcess(null
                 , cmd
                 , IntPtr.Zero
@@ -61,11 +78,20 @@ namespace Selenium.Internal {
             if (!success)
                 throw new Win32Exception();
 
-            Native.CloseHandle(pi.hThread);
-
             IntPtr hJob = IntPtr.Zero;
-            if (createJob)
-                hJob = AssignProcessToNewJob(pi.hProcess, null);
+            try {
+                if (createJob) {
+                    hJob = AssignProcessToNewJob(pi.hProcess, null);
+                    if (-1 == Native.ResumeThread(pi.hThread))
+                        throw new Win32Exception();
+                }
+            } catch {
+                Native.CloseHandle(pi.hProcess);
+                Native.CloseHandle(hJob);
+                throw;
+            } finally {
+                Native.CloseHandle(pi.hThread);
+            }
 
             return new ProcessExt(pi.dwProcessId, pi.hProcess, hJob);
         }
@@ -275,10 +301,6 @@ namespace Selenium.Internal {
         /// <param name="name">Optional - Job name</param>
         /// <returns>Job handle or IntPtr.Zero if failed</returns>
         private static IntPtr AssignProcessToNewJob(IntPtr hProcess, string name) {
-            //Check the process is not already assigned to a Job
-            bool isProcessInJob;
-            if (!Native.IsProcessInJob(hProcess, IntPtr.Zero, out isProcessInJob) || isProcessInJob)
-                return IntPtr.Zero;
 
             //Create a new Job
             IntPtr hJob = Native.CreateJobObject(IntPtr.Zero, name);
@@ -287,11 +309,12 @@ namespace Selenium.Internal {
 
             var jeli = new Native.JOBOBJECT_EXTENDED_LIMIT_INFORMATION();
             jeli.BasicLimitInformation.LimitFlags = Native.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+            jeli.BasicLimitInformation.LimitFlags |= Native.JOB_OBJECT_LIMIT_BREAKAWAY_OK;
 
             bool success = Native.SetInformationJobObject(hJob
                 , Native.JOB_EXTENDED_LIMIT_INFORMATION
                 , ref jeli
-                , Marshal.SizeOf(typeof(Native.JOBOBJECT_EXTENDED_LIMIT_INFORMATION)));
+                , Native.JOBOBJECT_EXTENDED_LIMIT_INFORMATION.SIZE);
 
             //Assign the process to the Job
             if (!success || !Native.AssignProcessToJobObject(hJob, hProcess)) {
@@ -301,7 +324,6 @@ namespace Selenium.Internal {
 
             return hJob;
         }
-
 
         private static StringBuilder BuildEnvironmentVars(Hashtable dict) {
             if (dict == null)
@@ -361,6 +383,7 @@ namespace Selenium.Internal {
             public const int JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE = 0x00002000;
             public const int JOB_EXTENDED_LIMIT_INFORMATION = 9;
 
+            public const int CREATE_SUSPENDED = 0x00000004;
             public const int CREATE_NO_WINDOW = 0x08000000;
             public const int CREATE_UNICODE_ENVIRONMENT = 0x00000400;
             public const int CREATE_BREAKAWAY_FROM_JOB = 0x01000000;
@@ -445,6 +468,8 @@ namespace Selenium.Internal {
 
             [StructLayout(LayoutKind.Sequential)]
             public struct JOBOBJECT_EXTENDED_LIMIT_INFORMATION {
+                public static int SIZE = Marshal.SizeOf(typeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
+
                 public JOBOBJECT_BASIC_LIMIT_INFORMATION BasicLimitInformation;
                 public IO_COUNTERS IoInfo;
                 public UIntPtr ProcessMemoryLimit;
@@ -465,6 +490,9 @@ namespace Selenium.Internal {
                 public UInt32 PriorityClass;
                 public UInt32 SchedulingClass;
             }
+
+            [DllImport(KERNEL32, SetLastError = false)]
+            public static extern IntPtr GetCurrentProcess();
 
             [DllImport(KERNEL32, SetLastError = false)]
             public static extern bool IsProcessInJob(IntPtr Process, IntPtr Job, out bool Result);
@@ -489,6 +517,9 @@ namespace Selenium.Internal {
             [DllImport(KERNEL32)]
             public static extern bool TerminateProcess(IntPtr processHandle, int exitCode);
 
+
+            [DllImport(KERNEL32, SetLastError = true)]
+            public static extern int ResumeThread(IntPtr hObject);
 
             [DllImport(KERNEL32, SetLastError = true)]
             public static extern bool CloseHandle(IntPtr hObject);
