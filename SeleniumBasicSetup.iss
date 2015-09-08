@@ -119,12 +119,6 @@ Name: "{group}\Start PhantomJS"; Filename: "{app}\Scripts\StartPhantomJS.vbs"; W
 ;Root: HKCU; Subkey: "Software\Mozilla\Firefox\Extensions"; ValueName: "{{a6fd85ed-e919-4a43-a5af-8da18bda539f}"; ValueType: string; ValueData:"{app}\selenium-ide.xpi"; Flags: uninsdeletevalue; Components: pkg_ide;
 ;Root: HKCU; Subkey: "Software\Mozilla\Firefox\Extensions"; ValueName: "vbformatters@florent.breheret"; ValueType: string; ValueData:"{app}\vbformatters.xpi"; Flags: uninsdeletevalue; Components: pkg_ide;
 ;Root: HKCU; Subkey: "Software\Mozilla\Firefox\Extensions"; ValueName: "implicit-wait@florent.breheret"; ValueType: string; ValueData:"{app}\implicit-wait.xpi"; Flags: uninsdeletevalue; Components: pkg_ide;
-;Fix for KB948461 https://support.microsoft.com/en-us/kb/948461                            
-Root: HKCR; Subkey: "Interface\{{000C0601-0000-0000-C000-000000000046}"; ValueType: string; ValueName: "";  ValueData: "Office .NET Framework Lockback Bypass Key"; Check: HasPrivileges And HasExcel2003orInf;
-
-;Fix for KB907417 > delete key or add exe.config
-Root: HKLM; Subkey: "SOFTWARE\Microsoft\.NETFramework\Policy\AppPatch\v2.0.50727.00000\excel.exe"; Flags: deletekey noerror; Check: HasPrivileges And HasExcel2003orInf;
-Root: HKLM32; Subkey: "SOFTWARE\Microsoft\.NETFramework\Policy\AppPatch\v2.0.50727.00000\excel.exe"; Flags: deletekey noerror; Check: HasPrivileges And HasExcel2003orInf;
 
 ;IE tweaks: Maintain a connection to the instance (for IE11)
 Root: HKCU; Subkey: "SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BFCACHE"; ValueName: "iexplore.exe"; ValueType: dword; ValueData: 0; Components: pkg_ie;
@@ -268,9 +262,25 @@ Function HasWord(): Boolean;
     Result := RegKeyExists(HKCR, 'Word.Application');
   End;
 
-Function HasExcel2003orInf(): Boolean;
+Procedure _PatchOfficeFileVersion(Const subkey: String);
+  Var name, value: String;
   Begin
-    Result := StrToIntDef(GetOfficeVersion('Excel'), 0) < 12;
+    name := 'Maximum File Version Number';
+    If RegQueryStringValue(HKLM, subkey, name, value) Then Begin
+        RegWriteStringValue(HKLM, subkey, 'Maximum File Version', value);
+        RegDeleteValue(HKLM, subkey, name);
+    End
+  End;
+
+Procedure PatchOfficeFileVersion();
+  Begin
+    If Not HasPrivileges() Then Exit;
+    //Excel 11
+    _PatchOfficeFileVersion('SOFTWARE\Microsoft\.NETFramework\Policy\AppPatch\v4.0.30319.00000\excel.exe\{2CCAA9FE-6884-4AF2-99DD-5217B94115DF}'); 
+    _PatchOfficeFileVersion('SOFTWARE\Microsoft\.NETFramework\Policy\AppPatch\v2.0.50727.00000\excel.exe\{2CCAA9FE-6884-4AF2-99DD-5217B94115DF}');
+    //Word 11
+    _PatchOfficeFileVersion('SOFTWARE\Microsoft\.NETFramework\Policy\AppPatch\v4.0.30319.00000\winword.exe\{2CCAA9FE-6884-4AF2-99DD-5217B94115DF}'); 
+    _PatchOfficeFileVersion('SOFTWARE\Microsoft\.NETFramework\Policy\AppPatch\v2.0.50727.00000\winword.exe\{2CCAA9FE-6884-4AF2-99DD-5217B94115DF}'); 
   End;
 
 Procedure AssertFrameworkPresent(Const version: String);
@@ -497,6 +507,7 @@ Procedure CurStepChanged(CurStep: TSetupStep);
       UninstallPrevious('{#AppId}');
     End Else If CurStep = ssPostInstall Then Begin
       RegisterAssembly();
+      PatchOfficeFileVersion();
     End;
   End;
 
