@@ -70,6 +70,7 @@ Source: "CHANGELOG.txt"; DestDir: "{app}"; Flags: ignoreversion overwritereadonl
 
 Source: "VbsConsole\bin\Release\vbsc.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cons;
 
+;drivers
 Source: "References\firefoxdriver.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ff;
 Source: "References\chromedriver.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cr;
 Source: "References\iedriver.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;
@@ -79,11 +80,12 @@ Source: "References\phantomjs.exe"; DestDir: "{app}"; Flags: ignoreversion; Comp
 ;Firefox extensions
 Source: "FirefoxAddons\bin\extensions.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ide;
 
+;examples                                                                                                                                                     
 Source: "Scripts\*.*" ; DestDir: "{app}\Scripts"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_core;
 Source: "Templates\*.*" ; DestDir: "{app}\Templates"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Examples\VBScript\*.vbs"; DestDir: "{app}\VBScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Examples\JavaScript\*.js"; DestDir: "{app}\JavaScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Examples\Excel\*.xlsm"; DestDir: "{app}\Excel"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Examples\VBScript\*.vbs"; DestDir: "{app}\Examples\VBScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Examples\JavaScript\*.js"; DestDir: "{app}\Examples\JavaScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Examples\Excel\*.xls*"; DestDir: "{app}\Examples\Excel"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
 
 ;copy config file
 Source: "References\exe.config" ; DestDir: "{sys}"; DestName: "wscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
