@@ -47,72 +47,72 @@ MsgFileNotFound=File Not found: %1.
 MsgCOMInvokeFailed=Installation failed. The installer was unable to call the registered library. 
 
 [Components]
-Name: "pkg_core"; Description: ".Net core libraries"; Types: full compact custom; Flags: fixed;
-Name: "pkg_doc"; Description: "Templates and examples"; Types: full compact custom;
-Name: "pkg_cons"; Description: "Enhanced console runner for VBScript files"; Types: full compact custom;
-Name: "pkg_ff"; Description: "WebDriver for Firefox"; Types: full custom;
-Name: "pkg_cr"; Description: "WebDriver for Chrome"; Types: full custom;
-Name: "pkg_op"; Description: "WebDriver for Opera"; Types: full custom;
-Name: "pkg_ie"; Description: "WebDriver for Internet Explorer"; Types: full custom;
-Name: "pkg_pjs"; Description: "WebDriver for PhantomJS (headless browser)"; Types: full custom;
-Name: "pkg_ide"; Description: "SeleniumIDE plugin for Firefox"; Types: full custom;
+Name: "pkg_core"; Description: ".Net core libraries";                         Types: full compact custom; Flags: fixed;
+Name: "pkg_doc";  Description: "Templates and examples";                      Types: full compact custom;
+Name: "pkg_cons"; Description: "Enhanced console runner for VBScript files";  Types: full compact custom;
+Name: "pkg_ff";   Description: "WebDriver for Firefox";                       Types: full custom;
+Name: "pkg_cr";   Description: "WebDriver for Chrome";                        Types: full custom;
+Name: "pkg_op";   Description: "WebDriver for Opera";                         Types: full custom;
+Name: "pkg_ie";   Description: "WebDriver for Internet Explorer";             Types: full custom;
+Name: "pkg_pjs";  Description: "WebDriver for PhantomJS (headless browser)";  Types: full custom;
+Name: "pkg_ide";  Description: "SeleniumIDE plugin for Firefox";              Types: full custom;
 
 [Files]                                                                                             
-Source: "Selenium\bin\Release\Selenium.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_core;
-Source: "Selenium\bin\Release\Selenium.pdb"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_core;
+Source: "Selenium\bin\Release\Selenium.dll";   DestDir: "{app}"; Flags: ignoreversion; Components: pkg_core;
+Source: "Selenium\bin\Release\Selenium.pdb";   DestDir: "{app}"; Flags: ignoreversion; Components: pkg_core;
 Source: "Selenium\bin\Release\Selenium32.tlb"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_core;
-Source: "Selenium\bin\Release\Selenium64.tlb"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_core;
+Source: "Selenium\bin\Release\Selenium64.tlb"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_core; Check: IsWin64;
 
 Source: "Selenium\bin\Help\Selenium.chm"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_core;                                                                                                    
 
-Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion overwritereadonly ; Attribs:readonly;
+Source: "LICENSE.txt";   DestDir: "{app}"; Flags: ignoreversion overwritereadonly ; Attribs:readonly;
 Source: "CHANGELOG.txt"; DestDir: "{app}"; Flags: ignoreversion overwritereadonly ; Attribs:readonly;
 
 Source: "VbsConsole\bin\Release\vbsc.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cons;
 
 ;drivers
 Source: "References\firefoxdriver.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ff;
-Source: "References\chromedriver.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cr;
-Source: "References\iedriver.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;
-Source: "References\operadriver.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_op;
-Source: "References\phantomjs.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_pjs;
+Source: "References\chromedriver.exe";  DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cr;
+Source: "References\operadriver.exe";   DestDir: "{app}"; Flags: ignoreversion; Components: pkg_op;
+Source: "References\phantomjs.exe";     DestDir: "{app}"; Flags: ignoreversion; Components: pkg_pjs;
+Source: "References\iedriver.exe";      DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;
 
 ;Firefox extensions
 Source: "FirefoxAddons\bin\extensions.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ide;
 
 ;examples                                                                                                                                                     
-Source: "Scripts\*.*" ; DestDir: "{app}\Scripts"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_core;
-Source: "Templates\*.*" ; DestDir: "{app}\Templates"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Examples\VBScript\*.vbs"; DestDir: "{app}\Examples\VBScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Scripts\*.*" ;             DestDir: "{app}\Scripts";             Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_core;
+Source: "Templates\*.*" ;           DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Examples\VBScript\*.vbs";  DestDir: "{app}\Examples\VBScript";   Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
 Source: "Examples\JavaScript\*.js"; DestDir: "{app}\Examples\JavaScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Examples\Excel\*.xls*"; DestDir: "{app}\Examples\Excel"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Examples\Excel\*.xls*";    DestDir: "{app}\Examples\Excel";      Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
 
 ;copy config file
-Source: "References\exe.config" ; DestDir: "{sys}"; DestName: "wscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
-Source: "References\exe.config" ; DestDir: "{sys}"; DestName: "cscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
+Source: "References\exe.config" ; DestDir: "{sys}";      DestName: "wscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
+Source: "References\exe.config" ; DestDir: "{sys}";      DestName: "cscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
 Source: "References\exe.config" ; DestDir: "{syswow64}"; DestName: "wscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: IsWin64 And HasPrivileges;
 Source: "References\exe.config" ; DestDir: "{syswow64}"; DestName: "cscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: IsWin64 And HasPrivileges;
-Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|excel.exe}"; DestName: "EXCEL.EXE.CONFIG"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('excel.exe');
-Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|winword.exe}"; DestName: "WINWORD.EXE.CONFIG"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('winword.exe');
+Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|excel.exe}";    DestName: "EXCEL.EXE.CONFIG";    Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('excel.exe');
+Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|winword.exe}";  DestName: "WINWORD.EXE.CONFIG";  Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('winword.exe');
 Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|msaccess.exe}"; DestName: "MSACCESS.EXE.CONFIG"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('msaccess.exe');
-Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|outlook.exe}"; DestName: "OUTLOOK.EXE.CONFIG"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('outlook.exe');
+Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|outlook.exe}";  DestName: "OUTLOOK.EXE.CONFIG";  Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('outlook.exe');
 
 [Icons]
-Name: "{group}\Project Home Page"; Filename: {#AppURL}; WorkingDir: "{app}";
-Name: "{group}\Vbs Console"; Filename: "{app}\vbsc.exe"; WorkingDir: "{app}"; Components: pkg_cons;
-Name: "{group}\Examples"; Filename: "{app}\Examples"; WorkingDir: "{app}";
-Name: "{group}\Templates"; Filename: "{app}\Templates"; WorkingDir: "{app}";
-Name: "{group}\RunCleaner"; Filename: "{app}\Scripts\RunCleaner.vbs"; WorkingDir: "{app}";
-Name: "{group}\API documentation"; Filename: "{app}\Selenium.chm"; WorkingDir: "{app}";
-Name: "{group}\ChangeLog"; Filename: "{app}\CHANGELOG.txt"; WorkingDir: "{app}";
-Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
+Name: "{group}\Project Home Page";  Filename: {#AppURL};                      WorkingDir: "{app}";
+Name: "{group}\Vbs Console";        Filename: "{app}\vbsc.exe";               Components: pkg_cons;
+Name: "{group}\Examples";           Filename: "{app}\Examples";               
+Name: "{group}\Templates";          Filename: "{app}\Templates";              
+Name: "{group}\RunCleaner";         Filename: "{app}\Scripts\RunCleaner.vbs";
+Name: "{group}\API documentation";  Filename: "{app}\Selenium.chm";           
+Name: "{group}\ChangeLog";          Filename: "{app}\CHANGELOG.txt";    
+Name: "{group}\Uninstall";          Filename: "{uninstallexe}"
 
-Name: "{group}\Start Firefox"; Filename: "{app}\Scripts\StartFirefox.vbs"; WorkingDir: "{app}"; Components: pkg_ff;
-Name: "{group}\Start Chrome"; Filename: "{app}\Scripts\StartChrome.vbs"; WorkingDir: "{app}"; Components: pkg_cr;
-Name: "{group}\Start Chrome Debug"; Filename: "{app}\Scripts\StartChromeDebug.vbs"; WorkingDir: "{app}"; Components: pkg_cr;
-Name: "{group}\Start IE"; Filename: "{app}\Scripts\StartInternetExplorer.vbs"; WorkingDir: "{app}"; Components: pkg_ie;
-Name: "{group}\Start Opera"; Filename: "{app}\Scripts\StartOpera.vbs"; WorkingDir: "{app}"; Components: pkg_op;
-Name: "{group}\Start PhantomJS"; Filename: "{app}\Scripts\StartPhantomJS.vbs"; WorkingDir: "{app}"; Components: pkg_pjs;
+Name: "{group}\Start Firefox";      Filename: "{app}\Scripts\StartFirefox.vbs";          Components: pkg_ff;
+Name: "{group}\Start Chrome";       Filename: "{app}\Scripts\StartChrome.vbs";           Components: pkg_cr;
+Name: "{group}\Start Chrome Debug"; Filename: "{app}\Scripts\StartChromeDebug.vbs";      Components: pkg_cr;
+Name: "{group}\Start IE";           Filename: "{app}\Scripts\StartInternetExplorer.vbs"; Components: pkg_ie;
+Name: "{group}\Start Opera";        Filename: "{app}\Scripts\StartOpera.vbs";            Components: pkg_op;
+Name: "{group}\Start PhantomJS";    Filename: "{app}\Scripts\StartPhantomJS.vbs";        Components: pkg_pjs;
 
 
 [Registry]
@@ -130,18 +130,18 @@ Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Zoom"; ValueName: "Zoo
 
 ;IE tweaks: Disable enhanced protected mode
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Isolation"; Flags: dontcreatekey deletevalue; Components: pkg_ie;
-Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Isolation64Bit";  Flags: dontcreatekey deletevalue; Check: IsWin64; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Isolation64Bit"; Flags: dontcreatekey deletevalue; Components: pkg_ie;
 
 ;IE tweaks: Disable autocomplete
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoComplete"; ValueName: "AutoSuggest"; ValueType: string; ValueData: "no"; Components: pkg_ie;
-Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Use FormSuggest"; ValueType: string; ValueData: "no"; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Use FormSuggest";       ValueType: string; ValueData: "no"; Components: pkg_ie;
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "FormSuggest Passwords"; ValueType: string; ValueData: "no"; Components: pkg_ie;
-Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "FormSuggest PW Ask"; ValueType: string; ValueData: "no"; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "FormSuggest PW Ask";    ValueType: string; ValueData: "no"; Components: pkg_ie;
 
 ;IE tweaks: Disable warn
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings"; ValueName: "WarnonBadCertRecving"; ValueType: dword; ValueData: 0; Components: pkg_ie;
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings"; ValueName: "WarnonZoneCrossing"; ValueType: dword; ValueData: 0; Components: pkg_ie;
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings"; ValueName: "WarnOnPostRedirect"; ValueType: dword; ValueData: 0; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings"; ValueName: "WarnonZoneCrossing";   ValueType: dword; ValueData: 0; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings"; ValueName: "WarnOnPostRedirect";   ValueType: dword; ValueData: 0; Components: pkg_ie;
 
 ;IE tweaks: Disable Check for publisher's certificate revocation
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\WinTrust\Trust Providers\Software Publishing"; ValueName: "State"; ValueType: dword; ValueData: 146944; Components: pkg_ie;
@@ -156,7 +156,7 @@ Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Che
 ;IE tweaks: Disable accelerator button
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Activities"; ValueName: "NoActivities"; ValueType: dword; ValueData: 1; Components: pkg_ie;
 
-;IE tweaks: Disable protected mode for all zones  Disable=3 Enable=0
+;IE tweaks: Set the same protected mode for all zones  Disable=3 Enable=0
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "NoProtectedModeBanner"; ValueType: dword; ValueData: 1; Components: pkg_ie;
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\0"; ValueName: "2500"; ValueType: dword; ValueData: 3; Components: pkg_ie;
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\1"; ValueName: "2500"; ValueType: dword; ValueData: 3; Components: pkg_ie;
@@ -165,8 +165,8 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\4"; ValueName: "2500"; ValueType: dword; ValueData: 3; Components: pkg_ie;
 
 ;IE tweaks: Enable all cookies
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings"; ValueName: "PrivacyAdvanced"; ValueType: dword; ValueData: 1; Components: pkg_ie;
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3"; ValueName: "1A10"; ValueType: dword; ValueData: 1; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings";         ValueName: "PrivacyAdvanced"; ValueType: dword; ValueData: 1; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3"; ValueName: "1A10";            ValueType: dword; ValueData: 1; Components: pkg_ie;
 
 ;IE tweak: Allow HTTP Basic Authentication in url
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_HTTP_USERNAME_PASSWORD_DISABLE"; ValueName: "iexplore.exe"; ValueType: dword; ValueData: 0; Components: pkg_ie;
@@ -195,9 +195,9 @@ Root: HKCU; Subkey: "Software\Classes\Directory\shell\RunExt\Command"; ValueType
 
 ;Add excel trusted location for templates and examples
 Root: HKCU; Subkey: "Software\Microsoft\Office\{code:GetOfficeVersion|Excel}.0\Excel\Security\Trusted Locations\Selenium1"; ValueName: "Path"; ValueType: String; ValueData: "{app}\Templates"; Flags: uninsdeletekey; Check: HasExcel;
-Root: HKCU; Subkey: "Software\Microsoft\Office\{code:GetOfficeVersion|Excel}.0\Excel\Security\Trusted Locations\Selenium2"; ValueName: "Path"; ValueType: String; ValueData: "{app}\Examples"; Flags: uninsdeletekey; Check: HasExcel;
-Root: HKCU; Subkey: "Software\Microsoft\Office\{code:GetOfficeVersion|Word}.0\Word\Security\Trusted Locations\Selenium1"; ValueName: "Path"; ValueType: String; ValueData: "{app}\Templates"; Flags: uninsdeletekey; Check: HasWord;
-Root: HKCU; Subkey: "Software\Microsoft\Office\{code:GetOfficeVersion|Word}.0\Word\Security\Trusted Locations\Selenium2"; ValueName: "Path"; ValueType: String; ValueData: "{app}\Examples"; Flags: uninsdeletekey; Check: HasWord;
+Root: HKCU; Subkey: "Software\Microsoft\Office\{code:GetOfficeVersion|Excel}.0\Excel\Security\Trusted Locations\Selenium2"; ValueName: "Path"; ValueType: String; ValueData: "{app}\Examples";  Flags: uninsdeletekey; Check: HasExcel;
+Root: HKCU; Subkey: "Software\Microsoft\Office\{code:GetOfficeVersion|Word}.0\Word\Security\Trusted Locations\Selenium1";   ValueName: "Path"; ValueType: String; ValueData: "{app}\Templates"; Flags: uninsdeletekey; Check: HasWord;
+Root: HKCU; Subkey: "Software\Microsoft\Office\{code:GetOfficeVersion|Word}.0\Word\Security\Trusted Locations\Selenium2";   ValueName: "Path"; ValueType: String; ValueData: "{app}\Examples";  Flags: uninsdeletekey; Check: HasWord;
 
 ;Enable WScript host in case it's been disabled
 Root: HKCU; Subkey: "Software\Microsoft\Windows Script Host\Settings"; ValueName: "Enabled"; ValueType: dword; ValueData: 1; 
