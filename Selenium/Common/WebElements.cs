@@ -115,7 +115,7 @@ namespace Selenium {
         /// <code lang="vbs">
         /// Set driver = CreateObject("Selenium.FirefoxDriver")
         /// driver.Get "https://www.google.co.uk/search?q=Eiffel+tower"
-        /// Set links = driver.FindElementsByTagName("a").ExecuteScript("return element.getAttribute('href');")
+        /// Set links = driver.FindElementsByTagName("a").ExecuteScript("return this.getAttribute('href');")
         /// WScript.Echo "Count:" &amp; links.Count &amp; " Values:" &amp; vbCr &amp; Join(links.Values, vbCr)
         /// </code>
         /// </example>
@@ -124,10 +124,10 @@ namespace Selenium {
                 return null;
             var session = ((WebElement)base[0])._session;
             object[] args = new object[] { this };
-            string script2 = "var f=function(element){" + script + "};"
+            string script2 = "var f=function(){" + script + "};"
                 + @"var e=arguments[0],r=[];"
                 + "for(var i=0;i<e.length;i++){"
-                + (ignoreNulls ? "v=f(e[i]);if(v!=null)r.push(v);" : "r.push(f(e[i]));")
+                + (ignoreNulls ? "v=f.apply(e[i]);if(v!=null)r.push(v);" : "r.push(f.apply(e[i]));")
                 + "}return r;";
             var results = (List)session.javascript.Execute(script2, args, true);
             return results;
