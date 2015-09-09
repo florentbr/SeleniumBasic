@@ -360,7 +360,9 @@ namespace Selenium {
             }
 
             for (int i = 0; i < _count; i++) {
-                table[_items[i]] = null;
+                object item = _items[i];
+                if (item != null)
+                    table[item] = null;
             }
 
             table.Keys.CopyTo(_items, 0);
