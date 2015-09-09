@@ -16,6 +16,20 @@ Third party softwares:
  http://phantomjs.org/
 
 
+v2.0.5.0  (2015/09/08)
+===============================================================================
+ * Updated Chrome driver to version 2.17
+ * Updated examples for Excel
+ * Added static access for By, Verify, Assert and Keys (.Net API only)
+ * Added the Sort and Distinct method on a List
+ * Added the debugAddress capability for Firefox
+ * Changed CookieByName by FindCookieByName and DeleteCookieNamed by DeleteCookieByName
+ * Fixed Chrome crash on Windows 7 64bit
+ * Fixed Firefox session cleaning
+ * Fixed the Size and Point objects that were not accessible from VBScript
+ * Fixed AddExtension throwing base64 error with Chrome
+ * Fixed installation patch for Office 2003
+
 v2.0.4.0  (2015/08/24)
 ===============================================================================
  * Fixed the process termination that was leaving Firefox opened
