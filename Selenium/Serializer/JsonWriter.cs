@@ -136,7 +136,7 @@ namespace Selenium.Serializer {
             }
 
             IEnumerable objEnum = obj as IEnumerable;
-            if (objEnum != null) {
+            if (objEnum != null && t.IsSerializable) {
                 SerializeEnumerable(objEnum, depth); return;
             }
 
@@ -146,7 +146,8 @@ namespace Selenium.Serializer {
             }
 
             throw new JsonException(string.Format(
-                "Object of type {0} is not serializable", obj.GetType().Name));
+                "Object of type {0} is not serializable\n{1}{0}"
+                , t.Name, this.DebugValue));
         }
 
         private void SerializeBinary(IJsonBinary binary) {
