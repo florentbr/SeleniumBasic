@@ -39,10 +39,11 @@ namespace Selenium {
             var data = new Dictionary();
             if (element != null)
                 data.Add("element", element.Id);
-            if (xoffset != 0)
+
+            if (xoffset != 0 || yoffset != 0) {
                 data.Add("xoffset", xoffset);
-            if (yoffset != 0)
                 data.Add("yoffset", yoffset);
+            }
             _session.Send(RequestMethod.POST, "/moveto", data);
             return this;
         }
