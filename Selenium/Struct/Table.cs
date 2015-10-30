@@ -74,8 +74,15 @@ namespace Selenium {
         public Table From(object source, bool hasHeaders = true) {
             try {
                 IRange range = ExcelExt.GetRange(source);
-                if (range.Count == 1)
-                    range = range.CurrentRegion;
+                if (range.Count == 1) {
+                    IListObject listObject = range.ListObject;
+                    if (listObject != null) {
+                        IExcel excel = range.Application;
+                        range = excel[listObject.HeaderRowRange, listObject.DataBodyRange];
+                    } else {
+                        range = range.CurrentRegion;
+                    }
+                }
 
                 var values = (object[,])range.Value2 ?? new object[1, 1];
                 int clen = values.GetLength(1);
