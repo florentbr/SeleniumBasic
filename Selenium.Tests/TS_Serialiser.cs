@@ -108,6 +108,47 @@ namespace Selenium.Tests {
                 Directory.Delete(testfolder, true);
             }
         }
+        
+        [Test]
+        public void TC_ShouldDeserializePng_Pad0() {
+            string base64 =
+@"""iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAMAAACuX0YVAAAABlBMVEUAAAD/
+//+l2Z/dAAAADElEQVQI12NgZGAAAAAHAAI4McYTAAAAAElFTkSuQmCC""";
+            byte[] base64Bytes = System.Text.Encoding.ASCII.GetBytes(base64);
+            var output = (Image)JsonReader.Deserialize(base64Bytes, base64Bytes.Length);
+            A.AreEqual(1, output.Width);
+            A.AreEqual(2, output.Height);
+            A.AreEqual("2FC51328", output.CRC);
+            output.Dispose();
+        }
+        
+        [Test]
+        public void TC_ShouldDeserializePng_Pad1() {
+            string base64 =
+@"""iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAMAAACqqpYoAAAABlBMVEUAAAD/
+//+l2Z/dAAAADklEQVR4AWNgZGRkABIAAB0ABroxs5IAAAAASUVORK5CYII=""";
+            byte[] base64Bytes = System.Text.Encoding.ASCII.GetBytes(base64);
+            var output = (Image)JsonReader.Deserialize(base64Bytes, base64Bytes.Length);
+            A.AreEqual(3, output.Width);
+            A.AreEqual(2, output.Height);
+            A.AreEqual("909C5733", output.CRC);
+            output.Dispose();
+        }
+
+        [Test]
+        public void TC_ShouldDeserializePng_Pad2() {
+            string base64 =
+@"""iVBORw0KGgoAAAANSUhEUgAAAAMAAAAECAMAAAB883U1AAAACVBMVEUAAAD/
+AAD///9nGWQeAAAAE0lEQVR4AWNgYmICYkYGBjBmAgAArgATGVgZTQAAAABJ
+RU5ErkJggg==
+""";
+            byte[] base64Bytes = System.Text.Encoding.ASCII.GetBytes(base64);
+            var output = (Image)JsonReader.Deserialize(base64Bytes, base64Bytes.Length);
+            A.AreEqual(3, output.Width);
+            A.AreEqual(4, output.Height);
+            A.AreEqual("7286E2FE", output.CRC);
+            output.Dispose();
+        }
 
         [Test]
         public void TC_ShouldSerializeDeepStructure() {

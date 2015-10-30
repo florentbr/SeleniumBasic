@@ -215,7 +215,7 @@ namespace Selenium.Serializer {
         }
 
         private JsonImage DeserializePNGBase64() {
-            byte[] data = DeserializeBase64String();
+            MemoryStream data = DeserializeBase64String();
             JsonImage img = new JsonImage(data);
             return img;
         }
@@ -247,7 +247,7 @@ namespace Selenium.Serializer {
         /// Line breaks are not supported and data are not verified
         /// </summary>
         /// <returns></returns>
-        private unsafe byte[] DeserializeBase64String() {
+        private unsafe MemoryStream DeserializeBase64String() {
             int quoteChar = _current;
             byte[] src = _buffer;
             int srcIdxStart = _index + 1;
@@ -260,39 +260,55 @@ namespace Selenium.Serializer {
                 throw new JsonException("UnterminatedString", _length);
             }
 
-            //trim end padding char '='
+            //trim end of data
             int srcIdxEnd = srcIdxEndQuote - 1;
-            while (src[srcIdxEnd] == (int)'=')
-                srcIdxEnd--;
-
-            int srcCount = (srcIdxEnd - srcIdxStart + 1);
-            int blocksCount = srcCount / 4;  //count blocks of 4chars/3bytes
-            int remainCount = (((srcCount % 4) + 1) >> 1);  //remaining bytes
-            byte[] dest = new byte[blocksCount * 3 + remainCount];
-            fixed (byte* pSrc0 = _buffer, pDest0 = dest) {
-                byte* pSrc = pSrc0 + srcIdxStart;
-                byte* pDest = pDest0;
-                for (int i = blocksCount; i-- > 0; pSrc += 4, pDest += 3) {
-                    int v = BASE64_TABLE[pSrc[0]] << 18
-                        | BASE64_TABLE[pSrc[1]] << 12
-                        | BASE64_TABLE[pSrc[2]] << 6
-                        | BASE64_TABLE[pSrc[3]];
-                    pDest[0] = (byte)(v >> 16);
-                    pDest[1] = (byte)(v >> 8);
-                    pDest[2] = (byte)v;
-                }
-                if (remainCount > 0) {
-                    byte b0 = BASE64_TABLE[pSrc[0]];
-                    byte b1 = BASE64_TABLE[pSrc[1]];
-                    pDest[0] = (byte)(b0 << 2 | b1 >> 4);
-                    if (remainCount > 1) {
-                        byte b2 = BASE64_TABLE[pSrc[2]];
-                        pDest[1] = (byte)(b1 << 4 | b2 >> 2);
-                    }
+            while (srcIdxEnd > srcIdxStart) {
+                if (src[srcIdxEnd - 1] == '\\') {
+                    srcIdxEnd -= 1;
+                } else if (BASE64_TABLE[src[srcIdxEnd]] == 99) {
+                    srcIdxEnd -= 2;
+                } else {
+                    break;
                 }
             }
-            _index = srcIdxEndQuote;
-            return dest;
+
+            int srcCount = (srcIdxEnd - srcIdxStart + 1);
+            byte[] dest = new byte[(srcCount / 4) * 3 + 3];
+            fixed (byte* pSrc0 = _buffer, pDest0 = dest) {
+                byte* pSrc = pSrc0 + srcIdxStart;
+                byte* pSrcBreak = pSrc0 + srcIdxEnd - 3;
+                byte* pDest = pDest0;
+                while (pSrc < pSrcBreak) {
+                    int code0 = BASE64_TABLE[pSrc[0]];
+                    if (code0 != 99){
+                        int v = code0 << 18
+                            | BASE64_TABLE[pSrc[1]] << 12
+                            | BASE64_TABLE[pSrc[2]] << 6
+                            | BASE64_TABLE[pSrc[3]];
+                        pDest[0] = (byte)(v >> 16);
+                        pDest[1] = (byte)(v >> 8);
+                        pDest[2] = (byte)v;
+                        pSrc += 4;
+                        pDest += 3;
+                    } else {
+                        pSrc += *pSrc == '\\' ? 2 : 1;
+                    }
+                }
+                int remain = (int)(pSrc0 + srcIdxEnd - pSrc);
+                if (remain > 1) {
+                    byte b0 = BASE64_TABLE[pSrc[0]];
+                    byte b1 = BASE64_TABLE[pSrc[1]];
+                    *pDest++ = (byte)(b0 << 2 | b1 >> 4);
+                    if (remain > 2) {
+                        byte b2 = BASE64_TABLE[pSrc[2]];
+                        *pDest++ = (byte)(b1 << 4 | b2 >> 2);
+                    }
+                }
+                _index = srcIdxEndQuote;
+                if (pDest == pDest0)
+                    return new MemoryStream(0);
+                return new MemoryStream(dest, 0, (int)(pDest - pDest0));
+            }
         }
 
         private string DeserializeString() {

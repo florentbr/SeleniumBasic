@@ -33,13 +33,12 @@ namespace Selenium {
         /// <summary>
         /// Creates an image object from bytes.
         /// </summary>
-        /// <param name="bytes">Array of bytes</param>
-        public Image(byte[] bytes) {
-            if (bytes == null || bytes.Length == 0)
+        /// <param name="stream">Stream of bytes</param>
+        public Image(MemoryStream stream) {
+            if (stream == null || stream.Length == 0)
                 throw new Errors.NullImageError();
-            using (var stream = new MemoryStream(bytes)) {
-                _bitmap = (Bitmap)Bitmap.FromStream(stream, false, false);
-            }
+            _bitmap = (Bitmap)Bitmap.FromStream(stream, false, false);
+            stream.Dispose();
             COMDisposable.Subscribe(this, typeof(ComInterfaces._Image));
         }
 
