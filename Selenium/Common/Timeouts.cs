@@ -19,17 +19,10 @@ namespace Selenium {
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     public class Timeouts : ComInterfaces._Timeouts {
 
-        const string BASE_URI = "/timeouts";
-
-        private readonly RemoteSession _session;
-
         internal int timeout_implicitwait = 3000;
         internal int timeout_pageload = -1;
         internal int timeout_script = -1;
-
-        internal Timeouts(RemoteSession session) {
-            _session = session;
-        }
+        internal int timeout_server = 60000;
 
         /// <summary>
         /// Amount of time that Selenium will wait for waiting commands to complete
@@ -39,7 +32,6 @@ namespace Selenium {
                 return timeout_implicitwait;
             }
             set {
-                //_session.Send(RequestMethod.POST, BASE_URI, "type", "implicit", "ms", ms);
                 timeout_implicitwait = value;
             }
         }
@@ -52,7 +44,6 @@ namespace Selenium {
                 return timeout_pageload;
             }
             set {
-                _session.Send(RequestMethod.POST, BASE_URI, "type", "page load", "ms", value);
                 timeout_pageload = value;
             }
         }
@@ -62,11 +53,10 @@ namespace Selenium {
         /// </summary>
         public int Script {
             get {
-                return timeout_pageload;
+                return timeout_script;
             }
             set {
-                _session.Send(RequestMethod.POST, BASE_URI, "type", "script", "ms", value);
-                timeout_pageload = value;
+                timeout_script = value;
             }
         }
 
@@ -75,10 +65,10 @@ namespace Selenium {
         /// </summary>
         public int Server {
             get {
-                return _session.server.Timeout;
+                return timeout_server;
             }
             set {
-                _session.server.Timeout = value;
+                timeout_server = value;
             }
         }
 

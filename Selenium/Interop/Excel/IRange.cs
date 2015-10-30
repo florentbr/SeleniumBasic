@@ -11,9 +11,21 @@ namespace Interop.Excel {
     [Guid("00020846-0000-0000-C000-000000000046"), ComImport, InterfaceType(2), TypeLibType(4096)]
     public interface IRange {
 
+        [DispId(138)]
+        object Text {
+            [DispId(138), MethodImpl(MethodImplOptions.PreserveSig | MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+            get;
+        }
+
         [DispId(256), IndexerName("Resize")]
         IRange this[[MarshalAs(UnmanagedType.Struct), In, Optional] object RowSize, [MarshalAs(UnmanagedType.Struct), In, Optional] object ColumnSize] {
             [TypeLibFunc((short)1024), DispId(0), MethodImpl(MethodImplOptions.PreserveSig | MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+            get;
+        }
+
+        [DispId(148)]
+        IExcel Application {
+            [DispId(148), MethodImpl(MethodImplOptions.PreserveSig | MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
             get;
         }
 
@@ -51,6 +63,12 @@ namespace Interop.Excel {
         [DispId(257)]
         int Row {
             [DispId(257), MethodImpl(MethodImplOptions.PreserveSig | MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+            get;
+        }
+
+        [DispId(2257)]
+        IListObject ListObject {
+            [DispId(2257), MethodImpl(MethodImplOptions.PreserveSig | MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
             get;
         }
 

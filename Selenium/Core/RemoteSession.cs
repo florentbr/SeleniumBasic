@@ -15,29 +15,23 @@ namespace Selenium.Core {
         public readonly FrameContext frame;
         public readonly Manage manage;
         public readonly TouchScreen touchscreen;
+        public Dictionary capabilities;
 
-        private string _id;
-        private string _uri;
-        private Dictionary _capabilities;
+        private string _id = null;
+        private string _uri = null;
 
-        public RemoteSession(string address, Dictionary capabilities, bool islocal)
-            : this(new RemoteServer(address, islocal), null, capabilities) {
-            IsLocal = islocal;
-        }
-
-        public RemoteSession(RemoteServer server, string id, Dictionary capabilities) {
-            _id = id;
-            _capabilities = capabilities;
-            this.server = server;
+        public RemoteSession(string address, bool islocal, Timeouts timeouts) {
+            this.IsLocal = islocal;
             this.windows = new WindowContext(this);
             this.mouse = new Mouse(this);
             this.keyboard = new Keyboard(this);
             this.javascript = new JavascriptContext(this);
-            this.timeouts = new Timeouts(this);
+            this.timeouts = timeouts;
             this.logs = new Logs(this);
             this.frame = new FrameContext(this);
             this.manage = new Manage(this);
             this.touchscreen = new TouchScreen(this);
+            this.server = new RemoteServer(address, islocal, timeouts.Server);
         }
 
         public string Id {
@@ -45,25 +39,31 @@ namespace Selenium.Core {
         }
 
         /// <summary>
-        /// Create a new session.
+        /// Starts a new session.
         /// </summary>
+        /// <param name="desired_capabilities">An object describing the session's desired capabilities.</param>
         /// <param name="requiredCapabilities">An object describing the session's required capabilities (Optional).</param>
         /// <returns>{object} An object describing the session's capabilities.</returns>
-        public Dictionary Start(Dictionary requiredCapabilities = null) {
+        public void Start(Dictionary desired_capabilities, Dictionary requiredCapabilities = null) {
             var param = new Dictionary();
-            param.Add("desiredCapabilities", _capabilities);
-            if (requiredCapabilities == null)
+            param.Add("desiredCapabilities", desired_capabilities);
+            if (requiredCapabilities != null)
                 param.Add("requiredCapabilities", requiredCapabilities);
 
             var response = (Dictionary)server.Send(RequestMethod.POST, "/session", param);
             try {
                 _id = (string)response["sessionId"];
                 _uri = "/session/" + _id;
-                Dictionary value = (Dictionary)response["value"];
-                return value;
+                this.capabilities = (Dictionary)response["value"];
             } catch (Errors.KeyNotFoundError ex) {
                 throw new DeserializeException(typeof(RemoteSession), ex);
             }
+
+            if (this.timeouts.PageLoad != -1)
+                Send(RequestMethod.POST, "/timeouts", "type", "page load", "ms", this.timeouts.PageLoad);
+
+            if (this.timeouts.Script != -1)
+                Send(RequestMethod.POST, "/timeouts", "type", "script", "ms", this.timeouts.Script);
         }
 
         /// <summary>

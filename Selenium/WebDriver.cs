@@ -59,6 +59,7 @@ namespace Selenium {
         internal string Binary = null;
         internal bool Persistant = false;
 
+        private Timeouts timeouts = new Timeouts();
         private IDriverService _service = null;
         private RemoteSession _session = null;
         private string _baseUrl = null;
@@ -245,8 +246,8 @@ namespace Selenium {
 
                 RegisterRunningObject();
 
-                _session = new RemoteSession(_service.Uri, this.Capabilities, true);
-                _session.Start();
+                _session = new RemoteSession(_service.Uri, true, this.timeouts);
+                _session.Start(this.Capabilities);
 
                 if (!string.IsNullOrEmpty(baseUrl))
                     this.BaseUrl = baseUrl;
@@ -271,7 +272,7 @@ namespace Selenium {
         ///     driver.Get "/"
         /// </code>
         /// </example>
-        public void StartRemotely(string executorUri, string browser = null, string version = null, string platform = "ANY") {
+        public void StartRemotely(string executorUri, string browser = null, string version = null, string platform = null) {
             try {
                 browser = ExpendBrowserName(browser);
                 switch (browser) {
@@ -290,24 +291,17 @@ namespace Selenium {
                     case "opera":
                         OperaDriver.ExtendCapabilities(this, true);
                         break;
-                    default:
-                        if (browser != "htmlunit"
-                            && browser != "safari"
-                            && browser != "iPhone"
-                            && browser != "ipad"
-                            && browser != "android") {
-                            throw new Errors.ArgumentError("Invalid browser name: {0}", browser);
-                        }
-                        break;
                 }
+
+                this.Capabilities.Platform = platform;
                 this.Capabilities.BrowserName = browser;
-                this.Capabilities.BrowserVersion = version;
-                this.Capabilities.PlatformName = platform;
+                if (!string.IsNullOrEmpty(version))
+                    this.Capabilities.BrowserVersion = version;
+
+                _session = new RemoteSession(executorUri, false, this.timeouts);
+                _session.Start(this.Capabilities);
 
                 RegisterRunningObject();
-
-                _session = new RemoteSession(executorUri, this.Capabilities, false);
-                _session.Start();
 
             } catch (SeleniumException) {
                 throw;
@@ -377,7 +371,7 @@ namespace Selenium {
         /// </summary>
         public Timeouts Timeouts {
             get {
-                return this.session.timeouts;
+                return this.timeouts;
             }
         }
 

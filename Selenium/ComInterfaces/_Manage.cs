@@ -36,6 +36,9 @@ namespace Selenium.ComInterfaces {
         [DispId(82), Description("Gets a cookie with the specified name.")]
         Cookie FindCookieByName(string name);
 
+        [DispId(101), Description("Get the session capabilities.")]
+        Dictionary Capabilities { get; }
+
         //TODO : Include LOGS
         //[DispId(105), Description("")]
         //Logs Logs { get; }

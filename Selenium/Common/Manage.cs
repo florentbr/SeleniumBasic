@@ -61,6 +61,15 @@ namespace Selenium {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public Dictionary Capabilities {
+            get {
+                return _session.capabilities;
+            }
+        }
+
         /*
         public IME IME {
             get { 

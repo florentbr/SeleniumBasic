@@ -1,4 +1,5 @@
 ﻿using Selenium;
+using System.Runtime.InteropServices;
 
 namespace Selenium {
 
@@ -9,21 +10,38 @@ namespace Selenium {
 
         const string KEY_BROWSER_NAME = "browserName";
         const string KEY_BROWSER_VERSION = "browserVersion";
-        const string KEY_PLATFORM_NAME = "platformName";
-        const string KEY_PLATFORM_VERSION = "platformVersion";
+        const string KEY_PLATFORM = "platform";
         const string KEY_NATIVE_EVENTS = "nativeEvents";
         const string KEY_ACCEPT_SSL_CERTIFICATES = "acceptSslCerts";
         const string KEY_ALERT_BEHAVIOUR = "unexpectedAlertBehaviour";
+
+        public Capabilities(){
+            //base.Add("pageLoadStrategy", "normal");
+        }
+
+        public new object this[string key] {
+            get {
+                return base[key];
+            }
+            set {
+                var range = value as Interop.Excel.IRange;
+                if (range != null) {
+                    base.Set(key, range.Text);
+                } else {
+                    base.Set(key, value);
+                }
+            }
+        }
 
         /// <summary>
         /// Browser name
         /// </summary>
         public string BrowserName {
             get {
-                return (string)base.Get(KEY_BROWSER_NAME, null);
+                return base.GetValue(KEY_BROWSER_NAME, string.Empty);
             }
             set {
-                base[KEY_BROWSER_NAME] = value;
+                base[KEY_BROWSER_NAME] = string.IsNullOrEmpty(value) ? string.Empty : value;
             }
         }
 
@@ -32,34 +50,22 @@ namespace Selenium {
         /// </summary>
         public string BrowserVersion {
             get {
-                return (string)base.Get(KEY_BROWSER_VERSION, null);
+                return base.GetValue(KEY_BROWSER_VERSION, string.Empty);
             }
             set {
-                base[KEY_BROWSER_VERSION] = value;
+                base[KEY_BROWSER_VERSION] = string.IsNullOrEmpty(value) ? string.Empty : value;
             }
         }
 
         /// <summary>
         /// Platform name
         /// </summary>
-        public string PlatformName {
+        public string Platform {
             get {
-                return (string)base.Get(KEY_PLATFORM_NAME, "ANY");
+                return base.GetValue(KEY_PLATFORM, "ANY");
             }
             set {
-                base[KEY_PLATFORM_NAME] = value ?? "ANY";
-            }
-        }
-
-        /// <summary>
-        /// Platform version
-        /// </summary>
-        public string PlatformVersion {
-            get {
-                return (string)base.Get(KEY_PLATFORM_VERSION, null);
-            }
-            set {
-                base[KEY_PLATFORM_VERSION] = value;
+                base[KEY_PLATFORM] = string.IsNullOrEmpty(value) ? "ANY" : value;
             }
         }
 
@@ -68,7 +74,7 @@ namespace Selenium {
         /// </summary>
         public bool EnableNativeEvents {
             get {
-                return (bool)base.Get(KEY_NATIVE_EVENTS, false);
+                return base.GetValue(KEY_NATIVE_EVENTS, false);
             }
             set {
                 base[KEY_NATIVE_EVENTS] = value;
@@ -80,7 +86,7 @@ namespace Selenium {
         /// </summary>
         public bool AcceptUntrustedCertificates {
             get {
-                return (bool)base.Get(KEY_ACCEPT_SSL_CERTIFICATES, false);
+                return base.GetValue(KEY_ACCEPT_SSL_CERTIFICATES, false);
             }
             set {
                 base[KEY_ACCEPT_SSL_CERTIFICATES] = value;
@@ -92,7 +98,7 @@ namespace Selenium {
         /// </summary>
         public string UnexpectedAlertBehaviour {
             get {
-                return (string)base.Get(KEY_ALERT_BEHAVIOUR, false);
+                return base.GetValue(KEY_ALERT_BEHAVIOUR, string.Empty);
             }
             set {
                 base[KEY_ALERT_BEHAVIOUR] = value;

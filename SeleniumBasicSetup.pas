@@ -16,6 +16,7 @@ RegTypeLib(lib);
 
 RegClass(lib, '{0277FC34-FD1B-4616-BB19-0809389E78C4}', 'Selenium.PhantomJSDriver', 'Selenium.PhantomJSDriver');
 RegClass(lib, '{0277FC34-FD1B-4616-BB19-14DB1E4916D4}', 'Selenium.FirefoxDriver', 'Selenium.FirefoxDriver');
+RegClass(lib, '{0277FC34-FD1B-4616-BB19-44A424DB3F50}', 'Selenium.Timeouts', 'Selenium.Timeouts');
 RegClass(lib, '{0277FC34-FD1B-4616-BB19-5D556733E8C9}', 'Selenium.ChromeDriver', 'Selenium.ChromeDriver');
 RegClass(lib, '{0277FC34-FD1B-4616-BB19-5DB46A739EEA}', 'Selenium.List', 'Selenium.List');
 RegClass(lib, '{0277FC34-FD1B-4616-BB19-6AAF7EDD33D6}', 'Selenium.Assert', 'Selenium.Assert');

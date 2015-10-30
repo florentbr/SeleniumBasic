@@ -12,7 +12,7 @@ namespace Selenium.Core {
         const string HEADER_CONTENT_TYPE = "application/json;charset=utf-8";
         const string REQUEST_ACCEPT_HEADER = "application/json;, image/png";
 
-        private int _response_timeout = 30000;
+        private readonly int _response_timeout;
         private readonly string _server_uri;
 
         private RequestMethod _request_method;
@@ -20,26 +20,16 @@ namespace Selenium.Core {
         private JsonWriter _request_data;
 
 
-        internal RemoteServer(string serverAddress, bool isLocal) {
+        internal RemoteServer(string serverAddress, bool isLocal, int timeout) {
             _server_uri = serverAddress.TrimEnd('/');
+            _response_timeout = timeout;
+
             HttpWebRequest.DefaultCachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.NoCacheNoStore);
             HttpWebRequest.DefaultMaximumErrorResponseLength = -1;
             HttpWebRequest.DefaultMaximumResponseHeadersLength = -1;
             if (isLocal)
                 HttpWebRequest.DefaultWebProxy = null;
             ServicePointManager.Expect100Continue = false;
-        }
-
-        /// <summary>
-        /// Sets the server timeout.
-        /// </summary>
-        public int Timeout {
-            get {
-                return _response_timeout;
-            }
-            set {
-                _response_timeout = value;
-            }
         }
 
         /// <summary>
@@ -58,7 +48,6 @@ namespace Selenium.Core {
         public List GetSessions() {
             var response = Send(RequestMethod.GET, "/sessions");
             List sessions = (List)response["value"];
-            sessions.Convert((Dictionary d) => new RemoteSession(this, (string)d["id"], (Dictionary)d["capabilities"]));
             return sessions;
         }
 
