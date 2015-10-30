@@ -457,16 +457,17 @@ namespace Selenium {
             Rectangle rect = new Rectangle(System.Drawing.Point.Empty, bitmap.Size);
             BitmapData data = bitmap.LockBits(rect, ImageLockMode.ReadOnly, bitmap.PixelFormat);
             int height = bitmap.Height;
-            int scanWidth = Math.Abs(data.Stride);
-            int bytesWidth = bitmap.Width * (scanWidth / bitmap.Width);
+            int stride = data.Stride;
+            int length = (Bitmap.GetPixelFormatSize(bitmap.PixelFormat) / 8) * bitmap.Width;
             try {
                 byte* ptr = (byte*)data.Scan0;
                 fixed (uint* pTable = Crc32.CRCTABLE) {
-                    for (int r = height; r-- > 0; ptr += scanWidth) {
-                        for (int i = 0; i < bytesWidth; i++) {
+                    for (int r = 0; r < height; r++) {
+                        for (int i = 0; i < length; i++) {
                             crc32 = pTable[(crc32 ^ ptr[i]) & 0xFF] ^ (crc32 >> 8);
                         }
                     }
+                    ptr += stride;
                 }
             } finally {
                 bitmap.UnlockBits(data);
