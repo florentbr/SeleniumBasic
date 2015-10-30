@@ -14,10 +14,14 @@ namespace Selenium {
             : base() { }
 
         internal SeleniumException(Exception exception)
-            : base(exception.Message, exception) { }
+            : base(exception.Message, exception) {
+            EventLog.WriteEntry("SeleniumBasic", this.Message, EventLogEntryType.Error);
+        }
 
         internal SeleniumException(string message, params object[] args)
-            : base(args.Length > 0 ? string.Format(message, args) : message) { }
+            : base(args.Length > 0 ? string.Format(message, args) : message) {
+            EventLog.WriteEntry("SeleniumBasic", this.Message, EventLogEntryType.Error);
+        }
 
         /// <summary>
         /// Exception message
