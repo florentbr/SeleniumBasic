@@ -24,8 +24,9 @@ AppPublisherURL={#AppURL}
 AppSupportURL={#AppURL}
 AppUpdatesURL={#AppURL}
 DisableDirPage=yes
-DefaultDirName={localappdata}\{#AppFolder}
-UsePreviousAppDir=yes
+DefaultDirName={code:GetRootDir}
+UsePreviousAppDir=no
+UsePreviousSetupType=yes
 DefaultGroupName={#AppLongName}
 DisableProgramGroupPage=yes
 LicenseFile=.\LICENSE.txt
@@ -229,10 +230,33 @@ Type: filesandordirs; Name: "{app}"
 Type: filesandordirs; Name: "{localappdata}\Temp\Selenium"
 
 [Code]
+var
+  ALL_USERS : Boolean;
+  HK : Integer;
+  HK32 : Integer;
 
 Function HasPrivileges(): Boolean;
   Begin
     Result := IsAdminLoggedOn Or IsPowerUserLoggedOn
+  End;
+
+Function GetRootDir(Param: String): String;
+  Begin
+    If ALL_USERS Then
+      Result := ExpandConstant('{pf}\{#AppFolder}')
+    Else
+      Result := ExpandConstant('{localappdata}\{#AppFolder}');
+  End;
+
+Procedure InitRootKeys();
+  Begin
+    If ALL_USERS Then Begin
+      HK := HKLM;
+      HK32 := HKLM32;
+    End Else Begin
+      HK := HKCU;
+      HK32 := HKCU32;
+    End
   End;
 
 Function GetAppPath(app: String): string;
@@ -314,13 +338,18 @@ Function UninstallPrevious(const appid: String): Boolean;
   Begin
     key := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ExpandConstant(appid) + '_is1';
     name := 'UninstallString';
-    If Not RegQueryStringValue(HKCU, key, name, out_cmd) Then
-      If Not RegQueryStringValue(HKLM, key, name, out_cmd) Then
-         If Not RegQueryStringValue(HKCU32, key, name, out_cmd) Then
-            RegQueryStringValue(HKLM32, key, name, out_cmd);
+    If Not RegQueryStringValue(HKLM, key, name, out_cmd) Then
+      If Not RegQueryStringValue(HKLM32, key, name, out_cmd) Then
+        If Not RegQueryStringValue(HKCU, key, name, out_cmd) Then
+          RegQueryStringValue(HKCU32, key, name, out_cmd);
     If out_cmd <> '' Then
-        Exec(RemoveQuotes(out_cmd), '/SILENT /NORESTART /SUPPRESSMSGBOXES', '', SW_SHOW, ewWaitUntilTerminated, retcode);
+        Exec('>', out_cmd + ' /SILENT /NORESTART /SUPPRESSMSGBOXES', '', SW_SHOW, ewWaitUntilTerminated, retcode);
     Result := retcode = 0;
+  End;
+
+Function BoolToStr(const value: Boolean): String;
+  Begin
+    If value Then Result := '1' Else Result := '0';
   End;
 
 //---------------------------------------------------------------------------------------
@@ -342,7 +371,7 @@ type
 
 Procedure RegString(Const root: Integer; Const subkey, name, value: String);
   Begin
-      Log('reg [' + subkey + '] "' + name + '"="' + value + '"');
+      //Log('REG [' + subkey + '] "' + name + '"="' + value + '"');
       If Not RegWriteStringValue(root, subkey, name, value) Then
          RaiseException(ExpandConstant('{cm:MsgRegistryWriteFailure}')); 
   End;
@@ -373,9 +402,9 @@ Procedure RegInterface_(Const lib : TNetLib; Const root: Integer; Const guid, ty
 
 Procedure RegInterface(Const lib : TNetLib; Const guid, name, proxystub: String);
   Begin        
-    RegInterface_(lib, HKCU, guid, name, proxystub);
+    RegInterface_(lib, HK, guid, name, proxystub);
     If IsWin64 Then
-      RegInterface_(lib, HKCU32, guid, name, proxystub);
+      RegInterface_(lib, HK32, guid, name, proxystub);
   End;
 
 // Enumeration registration (32/64bits Shared) :
@@ -391,12 +420,12 @@ Procedure RegRecord(Const lib : TNetLib; Const guid, typename: String);
   Var key: String;
   Begin
     key := 'Software\Classes\Record\' + guid;
-    RegDeleteKeyIncludingSubkeys(HKCU, key);
+    RegDeleteKeyIncludingSubkeys(HK, key);
     If Not IsUninstaller Then Begin
-      RegString(HKCU, key, 'Class'           , typename     );
-      RegString(HKCU, key, 'Assembly'        , lib.FullName );
-      RegString(HKCU, key, 'RuntimeVersion'  , lib.Runtime  ); 
-      RegString(HKCU, key, 'CodeBase'        , lib.PathDll  );
+      RegString(HK, key, 'Class'           , typename     );
+      RegString(HK, key, 'Assembly'        , lib.FullName );
+      RegString(HK, key, 'RuntimeVersion'  , lib.Runtime  ); 
+      RegString(HK, key, 'CodeBase'        , lib.PathDll  );
     End
   End;
 
@@ -456,15 +485,15 @@ Procedure RegClass(Const lib : TNetLib; Const guid, progid, typename: String);
   Var key, sysdir: String;
   Begin
     key := 'Software\Classes\' + progid;
-    RegDeleteKeyIncludingSubkeys(HKCU, key);
+    RegDeleteKeyIncludingSubkeys(HK, key);
     If Not IsUninstaller Then Begin
-      RegString(HKCU, key, '', progid);
-      RegString(HKCU, key + '\CLSID', '', guid);
+      RegString(HK, key, '', progid);
+      RegString(HK, key + '\CLSID', '', guid);
     End
 
-    RegClsid(lib, HKCU, guid, progid, typename, '{sys}');
+    RegClsid(lib, HK, guid, progid, typename, '{sys}');
     If IsWin64 Then
-      RegClsid(lib, HKCU32, guid, progid, typename, '{syswow64}');
+      RegClsid(lib, HK32, guid, progid, typename, '{syswow64}');
   End;
 
 // TypeLib registration (32/64bits Shared) :
@@ -485,15 +514,15 @@ Procedure RegTypeLib(Const lib : TNetLib);
   Var key, skey : String;
   Begin
     key := 'Software\Classes\TypeLib\' + lib.Guid;
-    RegDeleteKeyIncludingSubkeys(HKCU, key);
+    RegDeleteKeyIncludingSubkeys(HK, key);
     If Not IsUninstaller Then Begin
       skey := key + '\' + lib.TypeVersion;
-      RegString(HKCU, skey, '', lib.Description); 
-      RegString(HKCU, skey + '\FLAGS'   , ''  , '0'           ); 
-      RegString(HKCU, skey + '\HELPDIR' , ''  , lib.Directory );
-      RegString(HKCU, skey + '\0\win32' , ''  , lib.PathTlb32 );
+      RegString(HK, skey, '', lib.Description); 
+      RegString(HK, skey + '\FLAGS'   , ''  , '0'           ); 
+      RegString(HK, skey + '\HELPDIR' , ''  , lib.Directory );
+      RegString(HK, skey + '\0\win32' , ''  , lib.PathTlb32 );
       If IsWin64 Then
-        RegString(HKCU, skey + '\0\win64', '' , lib.PathTlb64 );
+        RegString(HK, skey + '\0\win64', '' , lib.PathTlb64 );
     End
   End;
 
@@ -510,8 +539,32 @@ Procedure RegisterAssembly();
                    
 Function InitializeSetup() : Boolean;
   Begin
-      AssertFrameworkPresent('3.5');
-      Result := True;
+    ALL_USERS := HasPrivileges();
+    InitRootKeys();
+    //AssertFrameworkPresent('3.5');
+    Result := True;
+  End;
+      
+Function InitializeUninstall() : Boolean;
+  var p : string;
+  Begin
+    ALL_USERS := GetPreviousData('AllUsers', '') = '1';
+    InitRootKeys();
+    Result := True;
+  End;
+
+Procedure RegisterPreviousData(PreviousDataKey: Integer);
+  Begin
+    SetPreviousData(PreviousDataKey, 'AllUsers', BoolToStr(ALL_USERS));
+  End;
+
+Procedure CurPageChanged(CurPageID: Integer);
+  Begin
+    If CurPageID = wpReady Then Begin
+     Wizardform.ReadyMemo.Lines.Insert(0, 'Install folder:');
+     Wizardform.ReadyMemo.Lines.Insert(1, ExpandConstant('{app}'));
+     Wizardform.ReadyMemo.Lines.Insert(2, '');
+    End;
   End;
 
 Procedure CurStepChanged(CurStep: TSetupStep);
