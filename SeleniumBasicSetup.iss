@@ -54,6 +54,7 @@ Name: "pkg_ff";   Description: "WebDriver for Firefox";                       Ty
 Name: "pkg_cr";   Description: "WebDriver for Chrome";                        Types: full custom;
 Name: "pkg_op";   Description: "WebDriver for Opera";                         Types: full custom;
 Name: "pkg_ie";   Description: "WebDriver for Internet Explorer";             Types: full custom;
+Name: "pkg_edg";  Description: "WebDriver for Microsoft Edge";                Types: full custom;
 Name: "pkg_pjs";  Description: "WebDriver for PhantomJS (headless browser)";  Types: full custom;
 Name: "pkg_ide";  Description: "SeleniumIDE plugin for Firefox";              Types: full custom;
 
@@ -76,6 +77,8 @@ Source: "References\chromedriver.exe";  DestDir: "{app}"; Flags: ignoreversion; 
 Source: "References\operadriver.exe";   DestDir: "{app}"; Flags: ignoreversion; Components: pkg_op;
 Source: "References\phantomjs.exe";     DestDir: "{app}"; Flags: ignoreversion; Components: pkg_pjs;
 Source: "References\iedriver.exe";      DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;
+Source: "References\iedriver64.exe";    DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;  Check: IsWin64;
+Source: "References\edgedriver.exe";    DestDir: "{app}"; Flags: ignoreversion; Components: pkg_edg;
 
 ;Firefox extensions
 Source: "FirefoxAddons\bin\extensions.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ide;
@@ -122,6 +125,9 @@ Name: "{group}\Start PhantomJS";    Filename: "{app}\Scripts\StartPhantomJS.vbs"
 ;Root: HKCU; Subkey: "Software\Mozilla\Firefox\Extensions"; ValueName: "vbformatters@florent.breheret"; ValueType: string; ValueData:"{app}\vbformatters.xpi"; Flags: uninsdeletevalue; Components: pkg_ide;
 ;Root: HKCU; Subkey: "Software\Mozilla\Firefox\Extensions"; ValueName: "implicit-wait@florent.breheret"; ValueType: string; ValueData:"{app}\implicit-wait.xpi"; Flags: uninsdeletevalue; Components: pkg_ide;
 
+;IE tweaks: Force the tabs to run in the same process as the manager process
+;Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "TabProcGrowth"; ValueType: dword; ValueData: 0; Flags: uninsdeletevalue; Components: pkg_ie;
+
 ;IE tweaks: Maintain a connection to the instance (for IE11)
 Root: HKCU; Subkey: "SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BFCACHE"; ValueName: "iexplore.exe"; ValueType: dword; ValueData: 0; Components: pkg_ie;
 
@@ -129,7 +135,7 @@ Root: HKCU; Subkey: "SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FE
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Zoom"; ValueName: "ZoomFactor"; Flags: dontcreatekey deletevalue; Components: pkg_ie;
 
 ;IE tweaks: Disable enhanced protected mode
-Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Isolation"; Flags: dontcreatekey deletevalue; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Isolation";      Flags: dontcreatekey deletevalue; Components: pkg_ie;
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Isolation64Bit"; Flags: dontcreatekey deletevalue; Components: pkg_ie;
 
 ;IE tweaks: Disable autocomplete
@@ -177,6 +183,12 @@ Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\New Windows"; ValueNam
 ;IE tweak: Delete browsing history on exit
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Privacy"; ValueName: "ClearBrowsingHistoryOnExit"; ValueType: dword; ValueData: 1; Components: pkg_ie;
 
+;IE tweak: Disable cache
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\CACHE";             ValueName: "Persistent";  ValueType: dword; ValueData: 0;    Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings";                   ValueName: "SyncMode5";   ValueType: dword; ValueData: 3;    Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\Url History";       ValueName: "DaysToKeep";  ValueType: dword; ValueData: 0;    Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\5.0\Cache\Content"; ValueName: "CacheLimit";  ValueType: dword; ValueData: 2000; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Internet Settings\Cache\Content";     ValueName: "CacheLimit";  ValueType: dword; ValueData: 2000; Components: pkg_ie;
 
 ;File association for the console
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\App Paths\vbsc.exe"; ValueType: string; ValueData: "{app}\vbsc.exe"; Flags: deletekey uninsdeletekey; Components: pkg_cons;

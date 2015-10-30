@@ -236,12 +236,16 @@ namespace Selenium {
                     case "internet explorer":
                         _service = IEDriver.StartService(this);
                         break;
+                    case "MicrosoftEdge":
+                        _service = EdgeDriver.StartService(this);
+                        break;
                     case "opera":
                         _service = OperaDriver.StartService(this);
                         break;
                     default:
                         throw new Errors.ArgumentError("Invalid browser name: {0}", browser);
                 }
+
                 this.Capabilities.BrowserName = browser;
 
                 RegisterRunningObject();
@@ -288,6 +292,9 @@ namespace Selenium {
                     case "internet explorer":
                         IEDriver.ExtendCapabilities(this, true);
                         break;
+                    case "MicrosoftEdge":
+                        EdgeDriver.ExtendCapabilities(this, true);
+                        break;
                     case "opera":
                         OperaDriver.ExtendCapabilities(this, true);
                         break;
@@ -317,9 +324,9 @@ namespace Selenium {
             if (_session != null) {
                 try {
                     if (_session.IsLocal) {
-                        if (_service.GetType() != typeof(FirefoxService))
+                        if (!(_service is FirefoxService))
                             _session.Delete();
-                        _service.Quit();
+                        _service.Quit(_session.server);
                     } else {
                         _session.Delete();
                     }
@@ -331,33 +338,35 @@ namespace Selenium {
 
         private string ExpendBrowserName(string browser) {
             if (string.IsNullOrEmpty(browser)) {
-                string browserName = this.Capabilities.BrowserName;
-                if (string.IsNullOrEmpty(browserName))
+                browser = this.Capabilities.BrowserName;
+                if (string.IsNullOrEmpty(browser))
                     throw new Errors.ArgumentError("Browser not defined");
-                return browserName;
-            } else {
-                string browserName = browser.ToLower().Replace("*", "");
-                switch (browserName) {
-                    case "firefox":
-                    case "ff":
-                        return "firefox";
-                    case "chrome":
-                    case "cr":
-                        return "chrome";
-                    case "phantomjs":
-                    case "pjs":
-                        return "phantomjs";
-                    case "internet explorer":
-                    case "internetexplorer":
-                    case "iexplore":
-                    case "ie":
-                        return "internet explorer";
-                    case "opera":
-                    case "op":
-                        return "opera";
-                    default:
-                        return browserName;
-                }
+            }
+            string browserName = browser.ToLower();
+            switch (browserName) {
+                case "firefox":
+                case "ff":
+                    return "firefox";
+                case "chrome":
+                case "cr":
+                    return "chrome";
+                case "phantomjs":
+                case "pjs":
+                    return "phantomjs";
+                case "internet explorer":
+                case "internetexplorer":
+                case "iexplore":
+                case "ie":
+                    return "internet explorer";
+                case "microsoft edge":
+                case "microsoftedge":
+                case "edge":
+                    return "MicrosoftEdge";
+                case "opera":
+                case "op":
+                    return "opera";
+                default:
+                    return browserName;
             }
         }
 

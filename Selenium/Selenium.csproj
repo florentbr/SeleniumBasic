@@ -11,6 +11,7 @@
     <AssemblyName>Selenium</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -66,10 +67,12 @@
     <Compile Include="ComInterfaces\_Point.cs" />
     <Compile Include="ComInterfaces\_Size.cs" />
     <Compile Include="Core\DriverExtension.cs" />
+    <Compile Include="Drivers\EdgeDriver.cs" />
     <Compile Include="Errors\FileNotFoundError.cs" />
     <Compile Include="Internal\COMDisposable.cs" />
     <Compile Include="Internal\ProcessExt.cs" />
     <Compile Include="Interop\Excel\Excel.cs" />
+    <Compile Include="Interop\Excel\IListObject.cs" />
     <Compile Include="Interop\IStdPicture.cs" />
     <Compile Include="ComInterfaces\_Actions.cs" />
     <Compile Include="ComInterfaces\_Assert.cs" />
@@ -234,6 +237,7 @@
 xcopy /D /Y "$(ProjectDir)\..\References\chromedriver.exe" .
 xcopy /D /Y "$(ProjectDir)\..\References\operadriver.exe" .
 xcopy /D /Y "$(ProjectDir)\..\References\iedriver.exe" .
+xcopy /D /Y "$(ProjectDir)\..\References\iedriver64.exe" .
 xcopy /D /Y "$(ProjectDir)\..\References\phantomjs.exe" .</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

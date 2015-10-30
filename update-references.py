@@ -107,13 +107,13 @@ class Tasks():
             cfg.update({'version': version, 'url': url})
             Log("Updated IE32 driver to version " + version)
     
-    def skip_IE64(self):
+    def update_IE64(self):
         page = r"http://selenium-release.storage.googleapis.com/"
         pattern = r'<Key>([\d\.]+/IEDriverServer_x64_([\d\.]+).zip)'
         value, version = WebSource(page).findlastversion(pattern, group_value=1, group_version=2)
         url = page + value
         cfg = self.cfgs.get('IE64Driver')
-        if cfg.get('version') != version or not file_exists('IEDriverServer64.exe'):
+        if cfg.get('version') != version or not file_exists('iedriver64.exe'):
             with WebZip(url) as zip:
                 zip.extract(r'IEDriverServer.exe', 'iedriver64.exe')
             cfg.update({'version': version, 'url': url})
