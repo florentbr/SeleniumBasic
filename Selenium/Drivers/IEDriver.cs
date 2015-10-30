@@ -77,8 +77,15 @@ namespace Selenium {
             capa["initialBrowserUrl"] = "about:blank";
             //capa["ignoreProtectedModeSettings"] = true;
             //capa["requireWindowFocus"] = true;
-            if (wd.Arguments.Count > 0)
-                capa["ie.browserCommandLineSwitches"] = wd.Arguments;
+
+            if (wd.Arguments.Count > 0) {
+                StringBuilder cmd_args = new StringBuilder();
+                foreach (string arg in wd.Arguments)
+                    cmd_args.Append(arg).Append(' ');
+
+                capa["ie.browserCommandLineSwitches"] = cmd_args.ToString();
+                capa["ie.forceCreateProcessApi"] = true;
+            }
         }
 
     }
