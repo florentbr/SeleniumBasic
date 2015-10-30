@@ -149,6 +149,15 @@ namespace Selenium {
             return defaultValue;
         }
 
+        internal T GetValue<T>(string key, T defaultValue) {
+            int hash = key.GetHashCode();
+            for (DictionaryItem node = _head; node != null; node = node.next) {
+                if (hash == node.hash && key.Equals(node.key))
+                    return (T)node.value;
+            }
+            return defaultValue;
+        }
+
         internal bool TryGetValue<T>(string key, out T value) {
             int hash = key.GetHashCode();
             for (DictionaryItem node = _head; node != null; node = node.next) {

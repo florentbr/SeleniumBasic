@@ -142,7 +142,7 @@ namespace Selenium {
         /// <param name="namePattern">The name of the cookie to retrieve.</param>
         /// <returns>The Cookie containing the name. Returns null if no cookie with the specified name is found.</returns>
         public Cookie FindCookieByName(string namePattern) {
-            return Cookie.GetOneByName(_session, namePattern);
+            return Cookie.FindByName(_session, namePattern);
         }
 
         #endregion

@@ -1,5 +1,4 @@
 ﻿using Selenium.Core;
-using Selenium;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -67,8 +66,9 @@ namespace Selenium {
         #endregion
 
 
-        internal Cookies(RemoteSession session, List rawCookies) :
-            base(rawCookies.Count) {
+        internal Cookies(RemoteSession session, List rawCookies)
+            : base(rawCookies.Count) {
+
             _count = _items.Length;
             for (int i = 0; i < _count; i++) {
                 _items[i] = new Cookie(session, (Dictionary)rawCookies[i]);

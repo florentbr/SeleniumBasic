@@ -1,5 +1,4 @@
 ﻿using Selenium.Core;
-using Selenium;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -17,14 +16,14 @@ namespace Selenium {
     public class Cookie : ComInterfaces._Cookie {
 
         #region Static
+
         /// <summary>
         /// Get a cookie matching a name from the current page.
         /// </summary>
-        internal static Cookie GetOneByName(RemoteSession session, string namePattern) {
+        internal static Cookie FindByName(RemoteSession session, string namePattern) {
             List cookies = Cookies.GetAll(session);
             Regex re = new Regex(namePattern, RegexOptions.IgnoreCase);
-            for (int i = 0, cnt = cookies.Count; i < cnt; i++) {
-                Dictionary cookie = (Dictionary)cookies[i];
+            foreach (Dictionary cookie in cookies) {
                 if (re.IsMatch((string)cookie["name"]))
                     return new Cookie(session, cookie);
             }
@@ -39,7 +38,7 @@ namespace Selenium {
             session.Send(RequestMethod.DELETE, "/cookie/" + name);
         }
 
-        internal static DateTime BASE_TIME = new DateTime(1970, 1, 1, 0, 0, 0);
+        internal static readonly DateTime BASE_TIME = new DateTime(1970, 1, 1, 0, 0, 0);
 
         #endregion
 
@@ -49,20 +48,22 @@ namespace Selenium {
         string _value;
         string _path;
         string _domain;
-        int? _expiry;
+        double _expiry;
         bool _secure;
 
         internal Cookie(RemoteSession session, Dictionary dict) {
             _session = session;
             try {
-                _name = (string)dict["name"];
-                _value = (string)dict["value"];
-                _path = (string)dict.Get("path", null);
-                _domain = (string)dict.Get("domain", null);
-                _expiry = (int?)dict.Get("expiry", null);
-                _secure = (bool)dict.Get("secure", false);
+                _name = dict.GetValue("name", string.Empty);
+                _value = dict.GetValue("value", string.Empty);
+                _path = dict.GetValue("path", string.Empty);
+                _domain = dict.GetValue("domain", string.Empty);
+                _secure = Convert.ToBoolean(dict.Get("secure", false));
+                _expiry = Convert.ToDouble(dict.Get("expiry", 0));
             } catch (Errors.KeyNotFoundError ex) {
                 throw new DeserializeException(typeof(Cookie), ex);
+            } catch (Exception ex) {
+                throw new SeleniumException(ex);
             }
         }
 
@@ -96,9 +97,9 @@ namespace Selenium {
         /// </summary>
         public string Expiry {
             get {
-                if (_expiry == null)
-                    return null;
-                return BASE_TIME.AddSeconds((int)_expiry).ToString("s");
+                if (_expiry == 0)
+                    return string.Empty;
+                return BASE_TIME.AddSeconds(_expiry).ToString("s");
             }
         }
 
