@@ -190,12 +190,14 @@ namespace Selenium.Core {
         public object Send(RequestMethod method, string relativeUri, Dictionary data) {
             string uri = relativeUri == null ? _uri : (_uri + relativeUri);
             Dictionary result = server.Send(method, uri, data);
-            return result["value"];
+            if (result == null)
+                return null;
+            return result.Get("value", null);
         }
 
         public object SendAgain() {
             Dictionary result = server.SendAgain();
-            return result["value"];
+            return result.Get("value", null);
         }
 
         /// <summary>

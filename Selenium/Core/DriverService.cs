@@ -21,14 +21,14 @@ namespace Selenium.Core {
         private string _library_dir;
         private ProcessExt _process;
         private List<string> _arguments;
-        private EndPointExt _endpoint;
+        protected EndPointExt _endpoint;
         private string _temp_folder;
 
-        public DriverService(IPAddress address) {
+        public DriverService() {
             _library_dir = IOExt.GetAssemblyDirectory();
             _arguments = new List<string>();
-            _temp_folder = DriverService.GetTempFolder();
-            _endpoint = EndPointExt.Create(address, false);
+            _temp_folder = GetTempFolder();
+            _endpoint = EndPointExt.Create(IPAddress.Loopback, false);
         }
 
         /// <summary>
@@ -49,15 +49,11 @@ namespace Selenium.Core {
         /// <summary>
         /// Stops the service.
         /// </summary>
-        public void Quit() {
+        public void Quit(RemoteServer server) {
             if (_process == null || _process.HasExited)
                 return;
-            try {
-                var request = (HttpWebRequest)WebRequest.Create(this.Uri + @"/shutdown");
-                request.KeepAlive = false;
-                WebResponse resp = request.GetResponse();
-                resp.Close();
-            } catch (WebException) { }
+
+            server.ShutDown();
 
             if (_process.WaitForExit(5000)) {
                 _process.Dispose();
@@ -65,9 +61,9 @@ namespace Selenium.Core {
             }
         }
 
-        public string Uri {
+        public virtual string Uri {
             get {
-                return "http://" + _endpoint.ToString();
+                return "http://localhost:" + _endpoint.IPEndPoint.Port.ToString();
             }
         }
 

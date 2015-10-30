@@ -52,7 +52,7 @@ namespace Selenium {
         internal static IDriverService StartService(WebDriver wd) {
             ExtendCapabilities(wd, false);
 
-            var svc = new DriverService(IPAddress.Loopback);
+            var svc = new DriverService();
             svc.AddArgument("--webdriver=" + svc.IPEndPoint.ToString());
             svc.AddArgument("--webdriver-loglevel=ERROR");
             svc.AddArgument("--ignore-ssl-errors=true");

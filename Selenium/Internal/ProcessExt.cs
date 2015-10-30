@@ -49,48 +49,58 @@ namespace Selenium.Internal {
             if (noWindow)
                 createFlags |= Native.CREATE_NO_WINDOW;
 
+            IntPtr hJob = IntPtr.Zero;
+            bool success = false;
             if (createJob) {
-                createFlags |= Native.CREATE_SUSPENDED;
 
                 IntPtr curProc = Native.GetCurrentProcess();
-                try {
-                    bool isProcessInJob = false;
-                    if (!Native.IsProcessInJob(curProc, IntPtr.Zero, out isProcessInJob))
-                        throw new Win32Exception();
 
+                bool isProcessInJob = false;
+                success = Native.IsProcessInJob(curProc, IntPtr.Zero, out isProcessInJob);
+
+                Native.CloseHandle(curProc);
+                if (success) {
+                    int createFlagsJob = createFlags | Native.CREATE_SUSPENDED;
                     if (isProcessInJob)
-                        createFlags |= Native.CREATE_BREAKAWAY_FROM_JOB;
+                        createFlagsJob |= Native.CREATE_BREAKAWAY_FROM_JOB;
 
-                } finally {
-                    Native.CloseHandle(curProc);
+                    success = Native.CreateProcess(null
+                        , cmd
+                        , IntPtr.Zero
+                        , IntPtr.Zero
+                        , false
+                        , createFlagsJob
+                        , envVars
+                        , dir, si, pi);
+
+                    if (success) {
+                        success = AssignProcessToNewJob(pi.hProcess, null, out hJob);
+                        if (success) {
+                            if (-1 == Native.ResumeThread(pi.hThread))
+                                throw new Win32Exception();
+                        } else {
+                            Native.TerminateProcess(pi.hProcess, -1);
+                            Native.CloseHandle(pi.hProcess);
+                            Native.CloseHandle(pi.hThread);
+                            Native.CloseHandle(hJob);
+                            hJob = IntPtr.Zero;
+                        }
+                    }
                 }
             }
 
-            bool success = Native.CreateProcess(null
-                , cmd
-                , IntPtr.Zero
-                , IntPtr.Zero
-                , false
-                , createFlags
-                , envVars
-                , dir, si, pi);
+            if (!success) {
+                success = Native.CreateProcess(null
+                    , cmd
+                    , IntPtr.Zero
+                    , IntPtr.Zero
+                    , false
+                    , createFlags
+                    , envVars
+                    , dir, si, pi);
 
-            if (!success)
-                throw new Win32Exception();
-
-            IntPtr hJob = IntPtr.Zero;
-            try {
-                if (createJob) {
-                    hJob = AssignProcessToNewJob(pi.hProcess, null);
-                    if (-1 == Native.ResumeThread(pi.hThread))
-                        throw new Win32Exception();
-                }
-            } catch {
-                Native.CloseHandle(pi.hProcess);
-                Native.CloseHandle(hJob);
-                throw;
-            } finally {
-                Native.CloseHandle(pi.hThread);
+                if (!success)
+                    throw new Win32Exception();
             }
 
             return new ProcessExt(pi.dwProcessId, pi.hProcess, hJob);
@@ -300,12 +310,12 @@ namespace Selenium.Internal {
         /// <param name="hProcess">Process handle</param>
         /// <param name="name">Optional - Job name</param>
         /// <returns>Job handle or IntPtr.Zero if failed</returns>
-        private static IntPtr AssignProcessToNewJob(IntPtr hProcess, string name) {
+        private static bool AssignProcessToNewJob(IntPtr hProcess, string name, out IntPtr hJob) {
 
             //Create a new Job
-            IntPtr hJob = Native.CreateJobObject(IntPtr.Zero, name);
+            hJob = Native.CreateJobObject(IntPtr.Zero, name);
             if (hJob == IntPtr.Zero)
-                return IntPtr.Zero;
+                return false;
 
             var jeli = new Native.JOBOBJECT_EXTENDED_LIMIT_INFORMATION();
             jeli.BasicLimitInformation.LimitFlags = Native.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
@@ -319,10 +329,11 @@ namespace Selenium.Internal {
             //Assign the process to the Job
             if (!success || !Native.AssignProcessToJobObject(hJob, hProcess)) {
                 Native.CloseHandle(hJob);
-                return IntPtr.Zero;
+                hJob = IntPtr.Zero;
+                return false;
             }
 
-            return hJob;
+            return true;
         }
 
         private static StringBuilder BuildEnvironmentVars(Hashtable dict) {

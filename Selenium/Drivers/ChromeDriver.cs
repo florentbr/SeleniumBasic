@@ -55,7 +55,7 @@ namespace Selenium {
         internal static IDriverService StartService(WebDriver wd) {
             ExtendCapabilities(wd, false);
 
-            var svc = new DriverService(IPAddress.Loopback);
+            var svc = new DriverService();
             svc.AddArgument("--port=" + svc.IPEndPoint.Port.ToString());
             svc.AddArgument("--silent");
             svc.Start("chromedriver.exe");
@@ -75,16 +75,16 @@ namespace Selenium {
                 wd.Arguments.Add("user-data-dir=" + ExpandProfile(wd.Profile, remote));
 
             if (wd.Arguments.Count != 0)
-                opts.Add("args", wd.Arguments);
+                opts["args"] = wd.Arguments;
 
             if (wd.Extensions.Count != 0)
-                opts.Add("extensions", wd.Extensions);
+                opts["extensions"] = wd.Extensions;
 
             if (wd.Preferences.Count != 0)
-                opts.Add("prefs", wd.Preferences);
+                opts["prefs"] = wd.Preferences;
 
             if (wd.Binary != null)
-                opts.Add("binary", wd.Binary);
+                opts["binary"] = wd.Binary;
         }
 
         private static string ExpandProfile(string profile, bool remote) {

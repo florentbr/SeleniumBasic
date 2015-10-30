@@ -786,9 +786,9 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Switch focus to the specified frame, by index, name or WebElement.
+        /// Switch focus to the specified frame, by index(zero based), name or WebElement.
         /// </summary>
-        /// <param name="identifier">The name, index or WebElement</param>
+        /// <param name="identifier">The name, index(zero based) or WebElement</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
         /// <returns>Current web driver</returns>

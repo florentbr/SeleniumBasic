@@ -9,7 +9,7 @@ namespace Selenium.Core {
 
         string Uri { get; }
 
-        void Quit();
+        void Quit(RemoteServer server);
 
         void Dispose();
 

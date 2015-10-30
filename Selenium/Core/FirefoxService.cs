@@ -69,7 +69,7 @@ namespace Selenium.Core {
         /// <summary>
         /// Stops the service.
         /// </summary>
-        public void Quit() {
+        public void Quit(RemoteServer server) {
             this.Dispose();
         }
 

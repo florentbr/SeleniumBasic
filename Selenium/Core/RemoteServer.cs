@@ -2,15 +2,14 @@
 using System;
 using System.IO;
 using System.Net;
-using System.Net.Cache;
 
 namespace Selenium.Core {
 
     class RemoteServer {
 
         const string JSON_MIME_TYPE = "application/json";
-        const string HEADER_CONTENT_TYPE = "application/json;charset=utf-8";
-        const string REQUEST_ACCEPT_HEADER = "application/json;, image/png";
+        const string HEADER_CONTENT_TYPE = "application/json;charset=UTF-8";
+        const string HEADER_ACCEPT = "application/json";
 
         private readonly int _response_timeout;
         private readonly string _server_uri;
@@ -24,7 +23,6 @@ namespace Selenium.Core {
             _server_uri = serverAddress.TrimEnd('/');
             _response_timeout = timeout;
 
-            HttpWebRequest.DefaultCachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.NoCacheNoStore);
             HttpWebRequest.DefaultMaximumErrorResponseLength = -1;
             HttpWebRequest.DefaultMaximumResponseHeadersLength = -1;
             if (isLocal)
@@ -49,6 +47,10 @@ namespace Selenium.Core {
             var response = Send(RequestMethod.GET, "/sessions");
             List sessions = (List)response["value"];
             return sessions;
+        }
+
+        public void ShutDown() {
+            Send(RequestMethod.GET, @"/shutdown", null);
         }
 
         /// <summary>
@@ -131,31 +133,34 @@ namespace Selenium.Core {
                     response.Close();
             }
 
-            //Evaluate the status and error
-            int statusCode = (int)responseDict["status"];
-            if (statusCode != 0) {
-                var errorObject = responseDict["value"];
-                var errorAsDict = errorObject as Dictionary;
-                string errorMessage;
-                if (errorAsDict != null) {
-                    errorMessage = errorAsDict["message"] as string;
-                } else {
-                    errorMessage = errorObject as string;
+            if (responseDict != null) {
+                //Evaluate the status and error
+                int statusCode = (int)responseDict["status"];
+                if (statusCode != 0) {
+                    object errorObject = responseDict["value"];
+                    Dictionary errorAsDict = errorObject as Dictionary;
+                    string errorMessage;
+                    if (errorAsDict != null) {
+                        errorMessage = errorAsDict["message"] as string;
+                    } else {
+                        errorMessage = errorObject as string;
+                    }
+                    SeleniumError error = Errors.WebRequestError.Select(statusCode, errorMessage);
+                    error.ResponseData = responseDict;
+                    throw error;
                 }
-                var error = Errors.WebRequestError.Select(statusCode, errorMessage);
-                error.ResponseData = responseDict;
-                throw error;
             }
             return responseDict;
         }
 
-        private static HttpWebRequest CreateHttpWebRequest(RequestMethod method, string url, JsonWriter data, int timeout) {
+        private HttpWebRequest CreateHttpWebRequest(RequestMethod method
+            , string url, JsonWriter data, int timeout) {
+
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.CreateDefault(new Uri(url));
             request.Method = FormatRequestMethod(method);
             request.Timeout = timeout;
-            request.Accept = REQUEST_ACCEPT_HEADER;
+            request.Accept = HEADER_ACCEPT;
             request.KeepAlive = true;
-            request.ServicePoint.ConnectionLimit = 100;
             if (method == RequestMethod.POST && data != null && data.Length != 0) {
                 request.ContentType = HEADER_CONTENT_TYPE;
                 request.ContentLength = data.Length;
@@ -169,6 +174,8 @@ namespace Selenium.Core {
         }
 
         private static Dictionary GetHttpWebResponseContent(HttpWebResponse response) {
+            if (response.StatusCode == HttpStatusCode.NoContent)
+                return null;
             using (Stream stream = response.GetResponseStream()) {
                 if (IsJsonResponse(response)) {
                     Dictionary dict = (Dictionary)JsonReader.Deserialize(stream);
@@ -198,8 +205,10 @@ namespace Selenium.Core {
 
         private static bool IsJsonResponse(WebResponse response) {
             var contentType = response.ContentType;
-            if (contentType != null && contentType.StartsWith(JSON_MIME_TYPE, StringComparison.OrdinalIgnoreCase))
+            if (contentType != null && contentType.StartsWith(JSON_MIME_TYPE
+                , StringComparison.OrdinalIgnoreCase)) {
                 return true;
+            }
             return false;
         }
 

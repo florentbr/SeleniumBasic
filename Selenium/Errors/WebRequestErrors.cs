@@ -56,7 +56,7 @@ namespace Selenium.Errors {
     /// </summary>
     public class WebRequestTimeout : WebRequestError {
         internal WebRequestTimeout(WebRequest request)
-            : base(101, "No response from the server within {0} seconds ({1}).", request.Timeout, request.RequestUri) { }
+            : base(101, "No response from the server within {0} seconds ({1}).", request.Timeout / 1000, request.RequestUri) { }
     }
 
     /// <summary>

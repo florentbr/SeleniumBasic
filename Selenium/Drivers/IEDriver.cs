@@ -1,7 +1,7 @@
 ﻿using Selenium.Core;
 using System;
-using System.Net;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Selenium {
 
@@ -54,12 +54,19 @@ namespace Selenium {
         internal static IDriverService StartService(WebDriver wd) {
             ExtendCapabilities(wd, false);
 
-            var svc = new DriverService(IPAddress.Loopback);
+            var svc = new DriverService();
             svc.AddArgument("/host=" + svc.IPEndPoint.Address.ToString());
             svc.AddArgument("/port=" + svc.IPEndPoint.Port.ToString());
             svc.AddArgument("/log-level=ERROR");
             svc.AddArgument("/silent");
-            svc.Start("iedriver.exe", true);
+
+            string serverName;
+            if (wd.Capabilities.TryGetValue("ie.serverBinary", out serverName)) {
+                wd.Capabilities.Remove("ie.serverBinary");
+            } else {
+                serverName = "iedriver.exe";
+            }
+            svc.Start(serverName, true);
             return svc;
         }
 
@@ -67,6 +74,8 @@ namespace Selenium {
             var capa = wd.Capabilities;
             capa["silent"] = true;
             capa["nativeEvents"] = true;
+            capa["initialBrowserUrl"] = "about:blank";
+            //capa["ignoreProtectedModeSettings"] = true;
             //capa["requireWindowFocus"] = true;
             if (wd.Arguments.Count > 0)
                 capa["ie.browserCommandLineSwitches"] = wd.Arguments;
