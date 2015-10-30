@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Selenium.Core {
 
@@ -17,6 +18,7 @@ namespace Selenium.Core {
         private RequestMethod _request_method;
         private string _request_uri;
         private JsonWriter _request_data;
+        private NetworkCredential _credentials = null;
 
 
         internal RemoteServer(string serverAddress, bool isLocal, int timeout) {
@@ -25,8 +27,16 @@ namespace Selenium.Core {
 
             HttpWebRequest.DefaultMaximumErrorResponseLength = -1;
             HttpWebRequest.DefaultMaximumResponseHeadersLength = -1;
-            if (isLocal)
+            if (isLocal) {
                 HttpWebRequest.DefaultWebProxy = null;
+            } else {
+                // Handle credentials for Basic authentication
+                var creds = Regex.Match(_server_uri, @"://([^:/@]+):([^:/@]+)@");
+                if (creds.Success) {
+                    _credentials = new NetworkCredential(creds.Groups[1].Value, creds.Groups[2].Value);
+                    _server_uri = _server_uri.Remove(creds.Index + 3, creds.Length - 3);
+                }
+            }
             ServicePointManager.Expect100Continue = false;
         }
 
@@ -106,6 +116,7 @@ namespace Selenium.Core {
             SysWaiter.OnInterrupt = request.Abort;
             HttpWebResponse response = null;
             Dictionary responseDict = null;
+
             try {
                 IAsyncResult asyncResult = request.BeginGetResponse(null, null);
                 asyncResult.AsyncWaitHandle.WaitOne();
@@ -161,6 +172,12 @@ namespace Selenium.Core {
             request.Timeout = timeout;
             request.Accept = HEADER_ACCEPT;
             request.KeepAlive = true;
+
+            if (_credentials != null) {
+                request.Credentials = _credentials;
+                _credentials = null;
+            }
+
             if (method == RequestMethod.POST && data != null && data.Length != 0) {
                 request.ContentType = HEADER_CONTENT_TYPE;
                 request.ContentLength = data.Length;
