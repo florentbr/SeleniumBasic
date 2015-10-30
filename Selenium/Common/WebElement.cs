@@ -193,6 +193,10 @@ namespace Selenium {
             if (delayms != 0)
                 SysWaiter.Wait(delayms);
 
+            if(_session.capabilities.GetValue("takesElementScreenshot", false)){
+                return (Image)Send(RequestMethod.GET, "/screenshot");
+            }
+
             var dict = (Dictionary)_session.javascript.Execute(
                 "return arguments[0].getBoundingClientRect()", new[] { this }, false);
 
@@ -202,6 +206,9 @@ namespace Selenium {
 
             using (Image image = (Image)_session.Send(RequestMethod.GET, "/screenshot")) {
                 var bitmap = image.GetBitmap();
+                if (rect.Right > bitmap.Width || rect.Bottom > bitmap.Height)
+                    throw new SeleniumError("Element outside of the screenshot.");
+
                 var bmpCrop = bitmap.Clone(rect, bitmap.PixelFormat);
                 return new Image(bmpCrop);
             }
