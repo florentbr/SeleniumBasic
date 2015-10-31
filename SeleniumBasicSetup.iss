@@ -78,18 +78,23 @@ Source: "References\chromedriver.exe";  DestDir: "{app}"; Flags: ignoreversion; 
 Source: "References\operadriver.exe";   DestDir: "{app}"; Flags: ignoreversion; Components: pkg_op;
 Source: "References\phantomjs.exe";     DestDir: "{app}"; Flags: ignoreversion; Components: pkg_pjs;
 Source: "References\iedriver.exe";      DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;
-Source: "References\iedriver64.exe";    DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;  Check: IsWin64;
+;Source: "References\iedriver64.exe";    DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;  Check: IsWin64;
 Source: "References\edgedriver.exe";    DestDir: "{app}"; Flags: ignoreversion; Components: pkg_edg;
 
 ;Firefox extensions
 Source: "FirefoxAddons\bin\extensions.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ide;
 
 ;examples                                                                                                                                                     
-Source: "Scripts\*.*" ;             DestDir: "{app}\Scripts";             Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_core;
-Source: "Templates\*.*" ;           DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Examples\VBScript\*.vbs";  DestDir: "{app}\Examples\VBScript";   Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Examples\JavaScript\*.js"; DestDir: "{app}\Examples\JavaScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Examples\Excel\*.xls*";    DestDir: "{app}\Examples\Excel";      Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Scripts\*.*" ;               DestDir: "{app}\Scripts";             Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_core;
+Source: "Templates\*.vbs" ;           DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Templates\Xlbin\*.xlt";      DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
+Source: "Templates\*.xltm" ;          DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasNewExcel
+Source: "Templates\*.au3" ;           DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasAutoIt
+Source: "Examples\VBScript\*.vbs";    DestDir: "{app}\Examples\VBScript";   Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; 
+Source: "Examples\JavaScript\*.js";   DestDir: "{app}\Examples\JavaScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
+Source: "Examples\Excel\Xlbin\*.xls"; DestDir: "{app}\Examples\Excel";      Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
+Source: "Examples\Excel\*.xlsm";      DestDir: "{app}\Examples\Excel";      Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasNewExcel
+Source: "Examples\AutoIt\*.au3";      DestDir: "{app}\Examples\AutoIt";     Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasAutoIt
 
 ;copy config file
 Source: "References\exe.config" ; DestDir: "{sys}";      DestName: "wscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
@@ -298,6 +303,21 @@ Function HasExcel(): Boolean;
 Function HasWord(): Boolean;
   Begin
     Result := RegKeyExists(HKCR, 'Word.Application');
+  End;
+
+Function HasNewExcel(): Boolean;
+  Begin
+    Result := RegKeyExists(HKCR, '.xlsm');
+  End;
+
+Function HasOldExcel(): Boolean;
+  Begin
+    Result := RegKeyExists(HKCR, '.xls') And Not RegKeyExists(HKCR, '.xlsm');
+  End;
+
+Function HasAutoIt(): Boolean;
+  Begin
+    Result := RegKeyExists(HKCR, '.au3');
   End;
 
 Procedure _PatchOfficeFileVersion(Const subkey: String);
@@ -559,11 +579,17 @@ Procedure RegisterPreviousData(PreviousDataKey: Integer);
   End;
 
 Procedure CurPageChanged(CurPageID: Integer);
+  var lines : TStrings;
   Begin
     If CurPageID = wpReady Then Begin
-     Wizardform.ReadyMemo.Lines.Insert(0, 'Install folder:');
-     Wizardform.ReadyMemo.Lines.Insert(1, ExpandConstant('{app}'));
-     Wizardform.ReadyMemo.Lines.Insert(2, '');
+      lines := Wizardform.ReadyMemo.Lines;
+      If ALL_USERS Then
+        lines.Insert(0, 'Install folder / All Users :')
+      Else
+        lines.Insert(0, 'Install folder / Current User :');
+        
+     lines.Insert(1, ExpandConstant('{app}'));
+     lines.Insert(2, '');
     End;
   End;
 

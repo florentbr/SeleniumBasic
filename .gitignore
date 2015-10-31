@@ -1,6 +1,7 @@
 References
 bin
 obj
+Xlbin
 *.exe
 *.log
 *.bak
@@ -8,3 +9,5 @@ obj
 *.lnk
 *.pyc
 *.user
+*.xlt
+*.xls
