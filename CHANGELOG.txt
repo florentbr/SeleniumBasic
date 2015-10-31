@@ -15,6 +15,28 @@ Third party softwares:
  PhantomJs web stack - BSD license
  http://phantomjs.org/
 
+v2.0.6.0  (2015/10/31)
+===============================================================================
+ * Updated Chrome driver to version 2.20
+ * Updated IE driver to version 2.48
+ * Updated Firefox driver to version 2.48
+ * Updated Firefox default preferences
+ * Added Microsoft Edge Driver
+ * Added usage example for AutoIt
+ * Added remote usage examples with BrowserStack and SauceLab cloud services
+ * Added support of credentials in URI for cloud usage
+ * Added support for an "All users" installation
+ * Added the logging of an exception in Windows events
+ * Refactored the capabilities and timeouts
+ * Improved error handling and the launching of servers
+ * Implemented the screenshot native api on a web element
+ * Fixed screenshot failing in some cases
+ * Fixed access denied when launching the driver (#28)
+ * Fixed cammand line arguments failing with IEDriver
+ * Fixed DragAndDropByOffset method failing when one offset is zero (#27)
+ * Fixed incorrect range returned by the Table object on a ListObject
+ * Fixed error while accessing cookies with chrome (#21)
+ * Fixed the exception not properly raised when an object is added as capability
 
 v2.0.5.0  (2015/09/08)
 ===============================================================================
