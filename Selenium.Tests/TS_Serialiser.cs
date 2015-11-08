@@ -113,7 +113,7 @@ namespace Selenium.Tests {
         public void TC_ShouldDeserializePng_Pad0() {
             string base64 =
 @"""iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAMAAACuX0YVAAAABlBMVEUAAAD/
-//+l2Z/dAAAADElEQVQI12NgZGAAAAAHAAI4McYTAAAAAElFTkSuQmCC""";
+    //+l2Z/dAAAADElEQVQI12NgZGAAAAAHAAI4McYTAAAAAElFTkSuQmCC   """;
             byte[] base64Bytes = System.Text.Encoding.ASCII.GetBytes(base64);
             var output = (Image)JsonReader.Deserialize(base64Bytes, base64Bytes.Length);
             A.AreEqual(1, output.Width);
@@ -126,7 +126,7 @@ namespace Selenium.Tests {
         public void TC_ShouldDeserializePng_Pad1() {
             string base64 =
 @"""iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAMAAACqqpYoAAAABlBMVEUAAAD/
-//+l2Z/dAAAADklEQVR4AWNgZGRkABIAAB0ABroxs5IAAAAASUVORK5CYII=""";
+    //+l2Z/dAAAADklEQVR4AWNgZGRkABIAAB0ABroxs5IAAAAASUVORK5CYII=""";
             byte[] base64Bytes = System.Text.Encoding.ASCII.GetBytes(base64);
             var output = (Image)JsonReader.Deserialize(base64Bytes, base64Bytes.Length);
             A.AreEqual(3, output.Width);
@@ -139,9 +139,8 @@ namespace Selenium.Tests {
         public void TC_ShouldDeserializePng_Pad2() {
             string base64 =
 @"""iVBORw0KGgoAAAANSUhEUgAAAAMAAAAECAMAAAB883U1AAAACVBMVEUAAAD/
-AAD///9nGWQeAAAAE0lEQVR4AWNgYmICYkYGBjBmAgAArgATGVgZTQAAAABJ
-RU5ErkJggg==
-""";
+    AAD///9nGWQeAAAAE0lEQVR4AWNgYmICYkYGBjBmAgAArgATGVgZTQAAAABJ
+    RU5ErkJggg==                                                """;
             byte[] base64Bytes = System.Text.Encoding.ASCII.GetBytes(base64);
             var output = (Image)JsonReader.Deserialize(base64Bytes, base64Bytes.Length);
             A.AreEqual(3, output.Width);

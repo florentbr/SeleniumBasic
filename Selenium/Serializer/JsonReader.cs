@@ -264,9 +264,9 @@ namespace Selenium.Serializer {
             int srcIdxEnd = srcIdxEndQuote - 1;
             while (srcIdxEnd > srcIdxStart) {
                 if (src[srcIdxEnd - 1] == '\\') {
-                    srcIdxEnd -= 1;
-                } else if (BASE64_TABLE[src[srcIdxEnd]] == 99) {
                     srcIdxEnd -= 2;
+                } else if (BASE64_TABLE[src[srcIdxEnd]] == 99) {
+                    srcIdxEnd -= 1;
                 } else {
                     break;
                 }
