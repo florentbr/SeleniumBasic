@@ -14,9 +14,11 @@ namespace Selenium {
         const string KEY_NATIVE_EVENTS = "nativeEvents";
         const string KEY_ACCEPT_SSL_CERTIFICATES = "acceptSslCerts";
         const string KEY_ALERT_BEHAVIOUR = "unexpectedAlertBehaviour";
+        const string KEY_PAGE_LOAD_STRATEGY = "pageLoadStrategy";
 
         public Capabilities(){
-            //base.Add("pageLoadStrategy", "normal");
+            base.Add(KEY_PAGE_LOAD_STRATEGY, "normal");
+            base.Add(KEY_ALERT_BEHAVIOUR, "ignore");
         }
 
         public new object this[string key] {
