@@ -134,11 +134,17 @@ Name: "{group}\Start PhantomJS";    Filename: "{app}\Scripts\StartPhantomJS.vbs"
 ;IE tweaks: Force the tabs to run in the same process as the manager process
 ;Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "TabProcGrowth"; ValueType: dword; ValueData: 0; Flags: uninsdeletevalue; Components: pkg_ie;
 
+;IE tweaks: Allow file navigation
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_LOCALMACHINE_LOCKDOWN"; ValueName: "iexplore.exe"; ValueType: dword; ValueData: 0; Components: pkg_ie;
+
 ;IE tweaks: Maintain a connection to the instance (for IE11)
 Root: HKCU; Subkey: "SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BFCACHE"; ValueName: "iexplore.exe"; ValueType: dword; ValueData: 0; Components: pkg_ie;
 
 ;IE tweaks: Restore default zoom level
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Zoom"; ValueName: "ZoomFactor"; Flags: dontcreatekey deletevalue; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Zoom"; ValueName: "ResetTextSizeOnStartup"; ValueType: dword; ValueData: 1       ; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Zoom"; ValueName: "ResetZoomOnStartup";     ValueType: dword; ValueData: 1       ; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Zoom"; ValueName: "ResetZoomOnStartup2";    ValueType: dword; ValueData: 1       ; Components: pkg_ie;
 
 ;IE tweaks: Disable enhanced protected mode
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main"; ValueName: "Isolation";      Flags: dontcreatekey deletevalue; Components: pkg_ie;
