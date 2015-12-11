@@ -1,5 +1,6 @@
 ﻿using Selenium.Internal;
 using System;
+using System.Security.AccessControl;
 using System.Threading;
 
 namespace Selenium.Core {
@@ -27,13 +28,30 @@ namespace Selenium.Core {
         public static Action OnInterrupt;
 
         static SysWaiter() {
-            _signal_interrupt = new EventWaitHandle(false, EventResetMode.ManualReset);
+            string user = Environment.UserDomainName + "\\" + Environment.UserName;
+            var rule = new EventWaitHandleAccessRule(user,
+                                                     EventWaitHandleRights.FullControl,
+                                                     AccessControlType.Allow);
+            var security = new EventWaitHandleSecurity();
+            security.AddAccessRule(rule);
+
+            bool createdNew;
+            _signal_interrupt = new EventWaitHandle(false,
+                                                    EventResetMode.ManualReset,
+                                                    @"Global\InterruptKey",
+                                                    out createdNew,
+                                                    security);
+
             HotKeyGlobal.Subscribe(MOD_NONE, VK_ESCAPE, Interrupt);
             HotKeyGlobal.Subscribe(MOD_NONE, VK_PAUSE, Interrupt);
         }
 
         public static void Initialize() {
             HotKeyGlobal.SubscribeAgain();
+        }
+
+        public static void Terminate() {
+            HotKeyGlobal.UnsubscribeAll();
         }
 
         private static void Interrupt() {
