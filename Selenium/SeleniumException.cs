@@ -11,7 +11,7 @@ namespace Selenium {
     public class SeleniumException : Exception {
 
         internal SeleniumException()
-            : base() { }
+            : base() {}
 
         internal SeleniumException(Exception exception)
             : base(exception.Message, exception) {

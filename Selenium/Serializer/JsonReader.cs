@@ -243,7 +243,7 @@ namespace Selenium.Serializer {
         #endregion
 
         /// <summary>
-        /// Deserialise a base64 string.
+        /// Deserialize a base64 string.
         /// Line breaks are not supported and data are not verified
         /// </summary>
         /// <returns></returns>
@@ -397,9 +397,9 @@ namespace Selenium.Serializer {
             if (_index + 5 >= _length)
                 throw new JsonException("UnexpectedTermination", _index);
             int code = (BASE16_TABLE[_buffer[_index + 1] & 0x1F] << 12)
-                | (BASE16_TABLE[_buffer[_index + 2] & 0x1F] << 8)
-                | (BASE16_TABLE[_buffer[_index + 3] & 0x1F] << 4)
-                | (BASE16_TABLE[_buffer[_index + 4] & 0x1F]);
+                     | (BASE16_TABLE[_buffer[_index + 2] & 0x1F] << 8)
+                     | (BASE16_TABLE[_buffer[_index + 3] & 0x1F] << 4)
+                     | (BASE16_TABLE[_buffer[_index + 4] & 0x1F]);
             _index += 4;
             return (char)code;
         }

@@ -275,7 +275,7 @@ namespace Selenium.Errors {
     /// </summary>
     public class BrowserNotStartedError : WebRequestError {
         internal BrowserNotStartedError()
-            : base(57, "Browser not started. Use Start or StartRemotely.") { }
+            : base(57, "Browser not started. Call Get, Start or StartRemotely first.") { }
     }
 
     /// <summary>
