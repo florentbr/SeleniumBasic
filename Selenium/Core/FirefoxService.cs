@@ -182,6 +182,11 @@ namespace Selenium.Core {
             if (this.Capabilities.TryGetValue("proxy", out proxy) && proxy.Count > 0)
                 CopyProxyPrefs(proxy, ref prefs);
 
+            //set download dir
+            string download_dir = _profile_dir + @"\downloads";
+            Directory.CreateDirectory(download_dir);
+            prefs["browser.download.dir"] = download_dir;
+
             //adds custom prefs if any
             foreach (DictionaryItem item in this.Preferences)
                 prefs[item.Key] = item.Value;
@@ -215,10 +220,9 @@ namespace Selenium.Core {
 
             //start the process
             _firefox_process = ProcessExt.Start(firefoxPath, arguments, null, env, false, true);
-            Thread.Sleep(500);
 
             //Waits for the port to be listening
-            SysWaiter.Wait(100);
+            SysWaiter.Wait(200);
             if (!_endpoint.WaitForListening(15000, 100))
                 throw new Errors.TimeoutError("Firefox failed to open the listening port {0} within 15s", _endpoint);
         }

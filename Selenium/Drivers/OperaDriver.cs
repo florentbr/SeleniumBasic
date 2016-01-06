@@ -85,6 +85,9 @@ namespace Selenium {
 
             if (wd.Binary != null)
                 opts["binary"] = wd.Binary;
+
+            capa.SetDefault("download.directory_upgrade", true);
+            capa.SetDefault("download.prompt_for_download", false);
         }
 
         private static string ExpandProfile(string profile, bool remote) {

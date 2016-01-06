@@ -134,6 +134,25 @@ namespace Selenium {
             _count++;
         }
 
+        internal void SetDefault(string key, bool value) {
+            int hash = key.GetHashCode();
+
+            DictionaryItem last = null, node;
+            for (node = _head; node != null; node = node.next) {
+                if (hash == node.hash && key.Equals(node.key))
+                    return;
+                last = node;
+            }
+
+            DictionaryItem newNode = new DictionaryItem(hash, key, value);
+            if (last == null) {
+                _head = newNode;
+            } else {
+                last.next = newNode;
+            }
+            _count++;
+        }
+
         /// <summary>
         /// Returns the value associated with the specified key or the default value if the key doesn't exist.
         /// </summary>
