@@ -22,7 +22,7 @@ namespace Selenium.ComInterfaces {
         string Text { get; }
 
         [DispId(54), Description("Sets the user name and password in an alert prompting for credentials.")]
-        void SetCredentials(string user, string password);
+        Alert SetCredentials(string user, string password);
 
     }
 

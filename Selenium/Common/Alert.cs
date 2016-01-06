@@ -90,8 +90,9 @@ namespace Selenium {
         /// </summary>
         /// <param name="user">User name</param>
         /// <param name="password">Password</param>
-        public void SetCredentials(string user, string password){
+        public Alert SetCredentials(string user, string password) {
             _session.Send(RequestMethod.POST, "/alert/credentials", "username", user, "password", password);
+            return this;
         }
 
     }
