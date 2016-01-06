@@ -269,7 +269,7 @@ namespace Selenium {
         /// <param name="version">Browser version</param>
         /// <param name="platform">Platform: WINDOWS, LINUX, MAC, ANDROID...</param>
         /// <example>
-        /// <code lang="vbs">	
+        /// <code lang="vbs">
         ///     Dim driver As New WebDriver()
         ///     driver.StartRemotely "http://localhost:4444/wd/hub", "ie", 11
         ///     driver.Get "/"
@@ -368,6 +368,59 @@ namespace Selenium {
                     return browserName;
             }
         }
+
+        /// <summary>
+        /// Sends a customized command
+        /// </summary>
+        /// <param name="method">POST, GET or DELETE</param>
+        /// <param name="relativeUri">Relative URI. Ex: "/screenshot"</param>
+        /// <param name="param1">Optional</param>
+        /// <param name="value1"></param>
+        /// <param name="param2">Optional</param>
+        /// <param name="value2"></param>
+        /// <param name="param3">Optional</param>
+        /// <param name="value3"></param>
+        /// <param name="param4">Optional</param>
+        /// <param name="value4"></param>
+        /// <returns>Result</returns>
+        /// <example>
+        /// <code lang="vbs">
+        ///     Set links = driver.Send("POST", "/elements", "using", "css selector", "value", "a")
+        /// </code>
+        /// </example>
+        public object Send(string method, string relativeUri,
+                                 string param1 = null, string value1 = null,
+                                 string param2 = null, string value2 = null,
+                                 string param3 = null, string value3 = null,
+                                 string param4 = null, string value4 = null) {
+
+            RequestMethod mth = 0;
+            switch (method.ToUpper()) {
+                case "POST": mth = RequestMethod.POST; break;
+                case "GET": mth = RequestMethod.GET; break;
+                case "DELETE": mth = RequestMethod.DELETE; break;
+                default:
+                    throw new Errors.ArgumentError("Unhandled method: " + method);
+            }
+
+            Dictionary data = null;
+            if (param1 != null) {
+                data = new Dictionary();
+                data.Add(param1, value1);
+                if (param2 != null) {
+                    data.Add(param2, value2);
+                    if (param3 != null) {
+                        data.Add(param3, value3);
+                        if (param4 != null) {
+                            data.Add(param4, value3);
+                        }
+                    }
+                }
+            }
+            object result = session.Send(mth, relativeUri, data);
+            return result;
+        }
+
 
         #endregion
 

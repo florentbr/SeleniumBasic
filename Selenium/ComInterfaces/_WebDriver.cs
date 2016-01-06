@@ -46,6 +46,13 @@ namespace Selenium.ComInterfaces {
         [DispId(20), Description("Quits this driver, closing every associated window. Same as stop.")]
         void Quit();
 
+        [DispId(31), Description("Sends a customized command.")]
+        object Send(string method, string relativeUri,
+                    string param1 = null, string value1 = null,
+                    string param2 = null, string value2 = null,
+                    string param3 = null, string value3 = null,
+                    string param4 = null, string value4 = null);
+
         #endregion
 
 
