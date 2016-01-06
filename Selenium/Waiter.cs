@@ -2,6 +2,7 @@
 using Selenium.Internal;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Selenium {
@@ -263,6 +264,25 @@ namespace Selenium {
 
         private static bool IsNotNullOrFalse<T>(T value) {
             return !(value == null || value is bool && (bool)(object)value == false);
+        }
+
+
+
+        /// <summary>
+        /// Waits for a file to be ready.
+        /// </summary>
+        /// <param name="path">File path</param>
+        /// <param name="timeout">Timeout in milliseonds</param>
+        public void WaitForFile(string path, int timeout = -1) {
+            Waiter.WaitUntil(() => {
+                if (File.Exists(path)) {
+                    try {
+                        File.Move(path, path);
+                        return true;
+                    } catch (System.IO.IOException) { }
+                }
+                return false;
+            }, timeout, 100);
         }
 
     }
