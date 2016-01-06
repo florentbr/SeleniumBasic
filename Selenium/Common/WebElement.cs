@@ -132,7 +132,7 @@ namespace Selenium {
         /// <summary>
         /// Gets the location of an element relative to the origin of the view port.
         /// </summary>
-        public Point LocationInViewport() {
+        public Point LocationInView() {
             var dict = (Dictionary)Send(RequestMethod.GET, "/location_in_view");
             return new Point(dict);
         }
@@ -165,6 +165,20 @@ namespace Selenium {
         }
 
         /// <summary>
+        /// Whether the element is present
+        /// </summary>
+        public bool IsPresent {
+            get {
+                try{
+                    Send(RequestMethod.GET, "/name");
+                    return true;
+                } catch (Errors.StaleElementReferenceError) {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the attribute value.
         /// </summary>
         /// <param name="attribute">Attribute name</param>
@@ -185,6 +199,15 @@ namespace Selenium {
         }
 
         /// <summary>
+        /// Returns the value attribute
+        /// </summary>
+        /// <returns></returns>
+        public object Value() {
+            var value = Send(RequestMethod.GET, "/attribute/value");
+            return value;
+        }
+
+        /// <summary>
         /// Gets the screenshot of the current element
         /// </summary>
         /// <param name="delayms"></param>
@@ -198,11 +221,13 @@ namespace Selenium {
             }
 
             var dict = (Dictionary)_session.javascript.Execute(
-                "return arguments[0].getBoundingClientRect()", new[] { this }, false);
+                "return arguments[0].getBoundingClientRect();", new[] { this }, false);
 
-            var rect = new System.Drawing.Rectangle(
-                Convert.ToInt32(dict["left"]), Convert.ToInt32(dict["top"]),
-                Convert.ToInt32(dict["width"]), Convert.ToInt32(dict["height"]));
+            int left = Convert.ToInt32(dict["left"]);
+            int top = Convert.ToInt32(dict["top"]);
+            int width = Convert.ToInt32(dict["width"]);
+            int height = Convert.ToInt32(dict["height"]);
+            var rect = new System.Drawing.Rectangle(left, top, width, height);
 
             using (Image image = (Image)_session.Send(RequestMethod.GET, "/screenshot")) {
                 var bitmap = image.GetBitmap();
@@ -321,11 +346,13 @@ namespace Selenium {
             _session.keyboard.KeyUp(modifiers);
         }
 
+
         /// <summary>
         /// Simulates typing into the element.
         /// </summary>
         /// <param name="keysOrModifier">Sequence of keys or a modifier key(Control,Shift...) if the sequence is in keysToSendEx</param>
         /// <param name="keys">Optional - Sequence of keys if keysToSend contains modifier key(Control,Shift...)</param>
+        /// <returns></returns>
         /// <example>
         /// To Send mobile to an element :
         /// <code lang="vbs">
@@ -365,6 +392,17 @@ namespace Selenium {
             Send(RequestMethod.POST, "/click");
             if (keys != null)
                 _session.keyboard.SendKeys(keys);
+        }
+
+        /// <summary>
+        /// Scrolls the current element into the visible area of the browser window.
+        /// </summary>
+        public WebElement ScrollIntoView(bool alignTop = false) {
+            string script = "arguments[0].scrollIntoView("
+                          + (alignTop ? "true);" : "false);");
+            object[] arguments = { this };
+            _session.javascript.Execute(script, arguments, false);
+            return this;
         }
 
         #endregion
@@ -576,6 +614,14 @@ namespace Selenium {
             return this;
         }
 
+        /// <summary>
+        /// Wait for the web element to be removed from the DOM.
+        /// </summary>
+        /// <param name="timeout"></param>
+        public void WaitRemoval(int timeout = -1) {
+            _session.SendUntil(timeout, () => this.IsPresent, (r) => r);
+        }
+
         #endregion
 
 
@@ -606,6 +652,12 @@ namespace Selenium {
         /// <param name="script">The JavaScript code to execute.</param>
         /// <param name="arguments">The arguments to the script.</param>
         /// <returns>The value returned by the script.</returns>
+        /// <example>
+        /// <code lang="vbs">
+        ///   Set element = driver.FindElementById("id")
+        ///   Debug.Print element.ExecuteScript("return [this.tagName, this.scrollLeft, this.scrollTop];")
+        /// </code>
+        /// </example>
         public object ExecuteScript(string script, object arguments = null) {
             string newscript = "return (function(){" + script + "}).apply(arguments[0],arguments[1]);";
             object[] newargs = FormatArguments(this, arguments);

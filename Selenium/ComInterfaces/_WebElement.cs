@@ -36,8 +36,17 @@ namespace Selenium.ComInterfaces {
         [DispId(943), Description("Returns the location of the element in the renderable canvas")]
         Point Location();
 
+        [DispId(944), Description("Gets the location of an element relative to the origin of the view port.")]
+        Point LocationInView();
+
         [DispId(947), Description("Returns the size of the element")]
         Size Size();
+
+        [DispId(957), Description("Whether the element is still attached to the DOM.")]
+        bool IsPresent { get; }
+
+        [DispId(965), Description("Returns the value attribute")]
+        object Value();
 
         #endregion
 
@@ -82,6 +91,9 @@ namespace Selenium.ComInterfaces {
 
         [DispId(949), Description("Submits a form.")]
         void Submit();
+
+        [DispId(951), Description("Scrolls the current element into the visible area of the browser window.")]
+        WebElement ScrollIntoView(bool alignTop = false);
 
         #endregion
 
@@ -210,6 +222,9 @@ namespace Selenium.ComInterfaces {
 
         [DispId(1060), Description("Wait for text")]
         WebElement WaitText(string pattern, int timeout = -1);
+
+        [DispId(1065), Description("Wait for the web element to be removed from the DOM.")]
+        void WaitRemoval(int timeout = -1);
 
         #endregion
 
