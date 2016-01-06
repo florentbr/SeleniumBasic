@@ -3,6 +3,7 @@
 """
 
 import sys, os, time, types, re, traceback, threading, io, datetime, csv, json, urllib, requests, zipfile, tarfile
+from win32api import GetFileVersionInfo, LOWORD, HIWORD
 
 __dir__ = os.path.dirname(os.path.realpath(__file__))
 
@@ -96,16 +97,14 @@ class Tasks():
             Log("Updated Selenium .Net to version " + version)
     
     def update_IE32(self):
-        page = r"http://selenium-release.storage.googleapis.com/"
-        value, version = WebSource(page).findlastversion( \
-            r'<Key>([\d\.]+/IEDriverServer_Win32_([\d\.]+).zip)', group_value=1, group_version=2)
-        url = page + value
+        url = r"https://github.com/SeleniumHQ/selenium/raw/master/cpp/prebuilt/Win32/Release/IEDriverServer.exe"
+        version = WebSource(url).getEtag()
         cfg = self.cfgs.get('IEDriver')
         if cfg.get('version') != version or not file_exists('iedriver.exe'):
-            with WebZip(url) as zip:
-                zip.extract(r'IEDriverServer.exe', 'iedriver.exe')
+            WebFile(url).save('iedriver.exe')
             cfg.update({'version': version, 'url': url})
-            Log("Updated IE32 driver to version " + version)
+            file_version = get_version_number(r'iedriver.exe')
+            Log("Updated IE32 driver to version " + file_version)
     
     def update_IE64(self):
         page = r"http://selenium-release.storage.googleapis.com/"
@@ -243,6 +242,14 @@ def format_ex(e_type, e_value, e_trace):
             lines.append('  ' + line.strip() + '\n')
     return '\n#%s:\n%s\n\n%s' %  (e_type.__name__, str(e_value), ''.join(lines))
 
+def get_version_number(filename):
+    try:
+    	info = GetFileVersionInfo(os.path.realpath(filename), "\\")
+    	ms = info['FileVersionMS']
+    	ls = info['FileVersionLS']
+    	return '.'.join([str(v) for v in (HIWORD(ms), LOWORD(ms), HIWORD(ls), LOWORD(ls))])
+    except:
+    	return '0.0.0.0'
 
 class ConfigFile(dict):
 
