@@ -7,6 +7,8 @@ namespace Selenium {
     /// </summary>
     public class SeleniumError : SeleniumException {
 
+        protected const int FACILITY_CONTROL_ERROR = unchecked((int)0xA00A0000);
+
         /// <summary></summary>
         public Dictionary ResponseData { get; internal set; }
         private string _message;
@@ -21,7 +23,7 @@ namespace Selenium {
 
         internal SeleniumError(string message, int code = 0) {
             _message = message;
-            base.HResult = -2146828288 + code;
+            base.HResult = FACILITY_CONTROL_ERROR | code;
         }
 
         /// <summary>

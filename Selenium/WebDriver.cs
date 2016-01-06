@@ -71,7 +71,6 @@ namespace Selenium {
         /// </summary>
         public WebDriver() {
             UnhandledException.Initialize();
-            SysWaiter.Initialize();
             RegisterRunningObject();
             COMDisposable.Subscribe(this, typeof(ComInterfaces._WebDriver));
         }

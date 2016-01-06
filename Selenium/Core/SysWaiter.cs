@@ -25,7 +25,7 @@ namespace Selenium.Core {
 
         static readonly EventWaitHandle _signal_interrupt = null;
 
-        public static Action OnInterrupt;
+        static Action _interrupt_delegate;
 
         static SysWaiter() {
             string user = Environment.UserDomainName + "\\" + Environment.UserName;
@@ -42,22 +42,27 @@ namespace Selenium.Core {
                                                     out createdNew,
                                                     security);
 
-            HotKeyGlobal.Subscribe(MOD_NONE, VK_ESCAPE, Interrupt);
-            HotKeyGlobal.Subscribe(MOD_NONE, VK_PAUSE, Interrupt);
+            HotKeyGlobal.DefineHotKey(MOD_NONE, VK_ESCAPE, ProcInterrupt);
         }
 
-        public static void Initialize() {
-            HotKeyGlobal.SubscribeAgain();
+        public static Action OnInterrupt {
+            set {
+                if (value == null && _interrupt_delegate != null) {
+                    HotKeyGlobal.UnsubscribeAll();
+                } else {
+                    HotKeyGlobal.SubscribeAll();
+                }
+                _interrupt_delegate = value;
+            }
         }
 
-        public static void Terminate() {
-            HotKeyGlobal.UnsubscribeAll();
-        }
-
-        private static void Interrupt() {
+        private static void ProcInterrupt() {
             _signal_interrupt.Set();
-            if (OnInterrupt != null)
-                OnInterrupt();
+            if (_interrupt_delegate != null){
+                _interrupt_delegate();
+                _interrupt_delegate = null;
+            }
+            HotKeyGlobal.UnsubscribeAll();
         }
 
         public static EventWaitHandle WaitHandle {
@@ -75,9 +80,12 @@ namespace Selenium.Core {
         }
 
         public static void Wait(int timems) {
+            HotKeyGlobal.SubscribeAll();
             _signal_interrupt.Reset();
-            if (_signal_interrupt.WaitOne(timems, true))
+            bool signaled = _signal_interrupt.WaitOne(timems, true);
+            if (signaled)
                 throw new Errors.KeyboardInterruptError();
+            HotKeyGlobal.UnsubscribeAll();
         }
 
     }

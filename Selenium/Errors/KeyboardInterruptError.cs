@@ -8,9 +8,15 @@ namespace Selenium.Errors {
     public class KeyboardInterruptError : SeleniumError {
 
         internal KeyboardInterruptError()
-            : base("Code execution has been interrupted.") {
+            : base(null) {
             base.Source = "Selenium";
-            base.HResult = unchecked((int)0x80000007);
+            base.HResult = FACILITY_CONTROL_ERROR | 0x4004;
+        }
+
+        public override string Message {
+            get {
+                return "Code execution has been interrupted.";
+            }
         }
 
     }

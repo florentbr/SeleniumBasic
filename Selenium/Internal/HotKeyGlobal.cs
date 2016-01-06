@@ -16,34 +16,30 @@ namespace Selenium.Internal {
 
         static Thread _thread_;
         static uint _threadId_;
-        static int _baseId_;
         static List<int> _hotKeys_ = new List<int>(5);
         static List<Action> _actions_ = new List<Action>(5);
-        static int _registeredCount_ = 0;
 
-        public static void Subscribe(int modifier, int virtualKey, Action action) {
+        public static void DefineHotKey(int modifier, int virtualKey, Action action) {
             if (_thread_ == null) {
                 _thread_ = new Thread(RunMessagePump);
-                _thread_.SetApartmentState(ApartmentState.STA);
                 _thread_.IsBackground = true;
+                _thread_.Start();
                 lock (_thread_) {
-                    _thread_.Start();
                     Monitor.Wait(_thread_);
                 }
             }
 
-            int hotKey = (virtualKey << 16) | modifier;
+            int hotKey = (virtualKey << 16) | (modifier & 0xFFFF);
             _hotKeys_.Add(hotKey);
             _actions_.Add(action);
 
             PostThreadMessage(WM_USER_HOTKEY_REGISTER, modifier, virtualKey);
         }
 
-        public static void SubscribeAgain() {
-            _registeredCount_ = 0;
-            for (int i = _actions_.Count; i-- > 0; ) {
-                int modifierCode = _hotKeys_[i] & 0xFFFF;
-                int virtualKeyCode = _hotKeys_[i] >> 16;
+        public static void SubscribeAll() {
+            foreach(int hotkey in _hotKeys_){
+                int modifierCode = hotkey & 0xFFFF;
+                int virtualKeyCode = hotkey >> 16;
                 PostThreadMessage(WM_USER_HOTKEY_REGISTER, modifierCode, virtualKeyCode);
             }
         }
@@ -62,11 +58,12 @@ namespace Selenium.Internal {
 
         static void RunMessagePump() {
             _threadId_ = Native.GetCurrentThreadId();
-            _baseId_ = (int)(_threadId_ & 0x0FFF);
-            //signal the message pump is up and running
+
+            // signal that the message pump is up and running
             lock (_thread_) {
                 Monitor.Pulse(_thread_);
             }
+
             //run message pump
             try {
                 DispatchThreadMessages();
@@ -74,26 +71,28 @@ namespace Selenium.Internal {
         }
 
         static void DispatchThreadMessages() {
+            uint atom = ((_threadId_ ^ (_threadId_ >> 16)) & 0x0ffff) - 25;
+            uint count = 0;
             var msg = new Native.Message();
             while (Native.GetMessage(ref msg, (IntPtr)0, 0, 0) > 0) {
-                switch (msg.Msg) {
-                    case WM_HOTKEY:
-                        EvalHotKey((uint)msg.LParam); // lword=modifiers, hword=virtualKey
-                        break;
+                switch(msg.Msg){
                     case WM_USER_HOTKEY_REGISTER:
                         bool rhk = Native.RegisterHotKey(IntPtr.Zero,
-                                                         _baseId_ + _registeredCount_ + 1,
+                                                         atom + count,
                                                          (uint)msg.WParam,
                                                          (uint)msg.LParam);
                         if (rhk) {
-                            _registeredCount_++;
+                            count++;
                         }
                         break;
                     case WM_USER_HOTKEY_UNREGISTER_ALL:
-                        while (_registeredCount_ > 0) {
-                            Native.UnregisterHotKey(IntPtr.Zero, _baseId_ + _registeredCount_);
-                            _registeredCount_--;
+                        while (count > 0) {
+                            count--;
+                            Native.UnregisterHotKey(IntPtr.Zero, atom + count);
                         }
+                        break;
+                    case WM_HOTKEY:
+                        EvalHotKey((uint)msg.LParam); // lword=modifiers, hword=virtualKey
                         break;
                 }
             }
@@ -112,10 +111,10 @@ namespace Selenium.Internal {
             public const string USER32 = "user32.dll";
 
             [DllImport(USER32)]
-            public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+            public static extern bool RegisterHotKey(IntPtr hWnd, uint id, uint fsModifiers, uint vk);
 
             [DllImport(USER32)]
-            public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+            public static extern bool UnregisterHotKey(IntPtr hWnd, uint id);
 
             [DllImport(KERNEL32, SetLastError = false)]
             public static extern uint GetCurrentThreadId();
