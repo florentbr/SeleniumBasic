@@ -23,9 +23,11 @@ namespace Selenium {
     /// driver.stop
     /// </code>
     /// 
-    /// <code lang="vbs">	
+    /// <code lang="vbs">
+    /// Private Verify As New Selenium.Verify
+    /// 
     /// Public Sub TestCase()
-    ///   Dim driver As New FirefoxDriver, Verify as New Verify
+    ///   Dim driver As New FirefoxDriver
     ///   driver.Get "http://www.google.com"
     ///   Range("A1") = Verify.Equals("Google", driver.Title)
     ///   driver.Quit

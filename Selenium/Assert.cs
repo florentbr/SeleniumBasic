@@ -23,9 +23,11 @@ namespace Selenium {
     /// driver.stop
     /// </code>
     /// 
-    /// <code lang="vbs">	
+    /// <code lang="vbs">
+    /// Private Assert As New Selenium.Assert
+    /// 
     /// Public Sub TestCase()
-    ///   Dim driver As New Selenium.FirefoxDriver, Assert as New Selenium.Assert
+    ///   Dim driver As New Selenium.FirefoxDriver
     ///   driver.get "http://www.google.com"
     ///   Assert.Equals "Google", driver.Title
     ///   driver.stop
