@@ -119,19 +119,12 @@ class Tasks():
             Log("Updated IE64 driver to version " + version)
     
     def update_SeleniumIDE(self):
-        page1 = r'http://release.seleniumhq.org/selenium-ide/'
-        pattern = r'href="((\d[\d\.]+)/)"'
-        value, version = WebSource(page1).findlastversion(pattern, group_value=1, group_version=2)
-        
-        page2 = page1 + value
-        pattern = r'selenium-ide-([\d\.]+)\.xpi'
-        value, version = WebSource(page2).findlastversion(pattern, group_value=0, group_version=1)
-        
-        url = page2 + value
+        page = r'https://addons.mozilla.org/en-US/firefox/addon/selenium-ide/'
+        pattern = r'https://addons.mozilla.org/firefox/downloads/file/\d+/selenium_ide-(\d\.\d\.\d)[^?"]+'
+        url, version = WebSource(page).findlastversion(pattern, group_value=0, group_version=1)
         cfg = self.cfgs.get('SeleniumIDE')
         if cfg.get('version') != version or not file_exists('selenium-ide.xpi'):
-            with WebZip(url) as zip:
-                zip.extract(r'selenium-ide.xpi')
+            WebFile(url).save('selenium-ide.xpi')
             cfg.update({'version': version, 'url': url})
             Log("Updated Selenium IDE to version " + version)
     
