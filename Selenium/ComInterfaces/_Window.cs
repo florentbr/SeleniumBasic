@@ -49,6 +49,9 @@ namespace Selenium.ComInterfaces {
         [DispId(574), Description("Closes the current window")]
         void Close();
 
+        [DispId(899), Description("Evaluate equality")]
+        bool Equals(object obj);
+
     }
 
 }

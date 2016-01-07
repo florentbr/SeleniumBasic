@@ -249,6 +249,10 @@ namespace Selenium.ComInterfaces {
         object WaitForScript(string script, object arguments, int timeout = -1);
 
         #endregion
+
+
+        [DispId(899), Description("Evaluate equality")]
+        bool Equals(object obj);
     }
 
 }

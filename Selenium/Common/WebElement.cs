@@ -695,13 +695,11 @@ namespace Selenium {
         #region Protected support methods
 
         /// <summary>
-        ///
+        /// Determines whether the specified instances are considered equal.
         /// </summary>
         /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <returns>True if equal, false otherwise.</returns>
         public override bool Equals(object obj) {
-            if (obj == null)
-                return false;
             WebElement element = obj as WebElement;
             if (element == null)
                 return false;

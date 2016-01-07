@@ -71,10 +71,10 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Determines whether the specified System.Object instances are considered equal.
+        /// Determines whether the specified instances are considered equal.
         /// </summary>
         /// <param name="obj">Object to compare.</param>
-        /// <returns>true if the instances are equal; otherwise false.</returns>
+        /// <returns>True if equal, false otherwise.</returns>
         public override bool Equals(object obj) {
             Window win = obj as Window;
             if (win == null)
@@ -184,7 +184,7 @@ namespace Selenium {
         /// Set the current window full screen.
         /// </summary>
         public void FullScreen() {
-            throw new NotImplementedException();
+            _session.Send(RequestMethod.POST, uri() + "/fullscreen");
         }
 
         /// <summary>
