@@ -521,7 +521,7 @@ namespace Selenium {
                 return _baseUrl;
             }
             set {
-                _baseUrl = value.TrimEnd('/') + '/';
+                _baseUrl = value.TrimEnd('/');
             }
         }
 
@@ -540,25 +540,24 @@ namespace Selenium {
             if (string.IsNullOrEmpty(url))
                 throw new Errors.ArgumentError("Argument 'url' cannot be null.");
 
-            if (timeout > 0)
+            if (timeout > 0){
                 session.timeouts.PageLoad = timeout;
+                session.Send(RequestMethod.POST, "/timeouts", "type", "page load", "ms", timeout);
+            }
 
-            int idx = url.IndexOf(":");
-            if (idx == -1) {
+            int idx = url.IndexOf("/");
+            if (idx == 0) {
                 //relative url
                 if (_baseUrl == null)
                     throw new Errors.ArgumentError("Base URL not defined. Define a base URL or use a full URL.");
-                url = string.Concat(_baseUrl, url.TrimStart('/'));
+                url = string.Concat(_baseUrl, url);
             } else {
                 //absolute url
-                idx = url.IndexOf("://");
+                idx = url.IndexOf('/', idx + 3);
                 if (idx != -1) {
-                    idx = url.IndexOf('/', idx + 3);
-                    if (idx != -1) {
-                        _baseUrl = url.Substring(0, idx).TrimEnd('/') + '/';
-                    } else {
-                        _baseUrl = url.TrimEnd('/') + '/';
-                    }
+                    _baseUrl = url.Substring(0, idx - 1);
+                } else {
+                    _baseUrl = url;
                 }
             }
 
