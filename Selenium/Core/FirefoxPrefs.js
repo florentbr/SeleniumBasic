@@ -56,6 +56,7 @@ user_pref("dom.disable_open_during_load", false);
 user_pref("dom.mozApps.used", true);
 user_pref("extensions.autoDisableScopes", 10);
 user_pref("extensions.blocklist.enabled", false);
+user_pref("extensions.checkCompatibility.nightly", false);
 user_pref("extensions.logging.enabled", true);
 user_pref("extensions.update.enabled", false);
 user_pref("extensions.update.notifyUser", false);
@@ -90,8 +91,10 @@ user_pref("toolkit.telemetry.enabled", false);
 user_pref("toolkit.telemetry.prompted", 2);
 user_pref("toolkit.telemetry.rejected", true);
 user_pref("xpinstall.signatures.required", false);
+user_pref("xpinstall.whitelist.required", false);
 
 user_pref("browser.dom.window.dump.enabled", true);
+user_pref("browser.laterrun.enabled", false);
 user_pref("browser.newtab.preload", false);
 user_pref("browser.newtab.url", "about:blank");
 user_pref("browser.newtabpage.enabled", false);
