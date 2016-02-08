@@ -760,8 +760,10 @@ namespace Selenium {
         /// <param name="group">Optional - Group number (Zero based)</param>
         /// <returns>String</returns>
         public string PageSourceMatch(string pattern, short group = 0) {
-            var result = this.PageSource().Match(pattern, group);
-            return result;
+            const string JS = "return document.body.innerHTML.match(/{0}/)[{1}]";
+            string code = string.Format(JS, pattern, group);
+            object result = session.javascript.Execute(code, null, false);
+            return (string)result;
         }
 
         /// <summary>
@@ -771,8 +773,11 @@ namespace Selenium {
         /// <param name="group">Optional - Group number (Zero based)</param>
         /// <returns>Array of strings or null</returns>
         public List PageSourceMatches(string pattern, short group = 0) {
-            var result = this.PageSource().Matches(pattern, group);
-            return result;
+            const string JS = "var r=/{0}/g,s=document.body.innerHTML,a=[],m;"
+                            + "while(m=r.exec(s))a.push(m[{1}]);return a;";
+            string code = string.Format(JS, pattern, group);
+            object result = session.javascript.Execute(code, null, false);
+            return (List)result;
         }
 
         #endregion
