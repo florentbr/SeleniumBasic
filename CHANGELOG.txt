@@ -15,6 +15,16 @@ Third party softwares:
  PhantomJs web stack - BSD license
  http://phantomjs.org/
 
+v2.0.8.0  (2016/02/08)
+===============================================================================
+ * Updated examples
+ * Updated Firefox driver to version 2.51.1
+ * Updated IE driver to version 2.51.0
+ * Updated Chrome driver to version 2.21
+ * Updated PhantomJS driver to version 2.1.1
+ * Added the Equals method to the Window and Element objects
+ * Fixed SetLocation not accurate enough (#65)
+
 v2.0.7.0  (2016/01/06)
 ===============================================================================
  * Updated examples
