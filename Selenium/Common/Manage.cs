@@ -92,7 +92,7 @@ namespace Selenium {
         /// <summary>
         /// Set the current geo location.
         /// </summary>
-        public void SetLocation(int latitude, int longitude, int altitude) {
+        public void SetLocation(double latitude, double longitude, double altitude) {
             Dictionary location = new Dictionary();
             location.Add("latitude", latitude);
             location.Add("longitude", longitude);

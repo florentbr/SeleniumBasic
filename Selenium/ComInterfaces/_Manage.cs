@@ -19,7 +19,7 @@ namespace Selenium.ComInterfaces {
         Dictionary Location();
 
         [DispId(56), Description("Get the current geo location.")]
-        void SetLocation(int latitude, int longitude, int altitude);
+        void SetLocation(double latitude, double longitude, double altitude);
 
         [DispId(69), Description("Collection of cookies for the current page")]
         Cookies Cookies { get; }
