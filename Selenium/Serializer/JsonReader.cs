@@ -92,7 +92,7 @@ namespace Selenium.Serializer {
         }
 
         private object DeserializeNext(int depth) {
-            if (depth++ < DEPTH_MAX)
+            if (depth-- < 1)
                 throw new JsonException("DepthLimitExceeded", _index);
 
             _index--;
@@ -410,7 +410,7 @@ namespace Selenium.Serializer {
         /// </summary>
         /// <returns>True if not end of bytes, false otherwise</returns>
         private bool MoveNextNonEmptyChar() {
-            while (++_index < _length) {
+            for (_index = _index + 1; _index < _length; _index++) {
                 int b0 = _buffer[_index];
                 if (b0 > 0x7F) {
                     if (++_index >= _length)
