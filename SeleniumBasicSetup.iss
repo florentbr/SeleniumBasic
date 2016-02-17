@@ -136,6 +136,7 @@ Name: "{group}\Start PhantomJS";    Filename: "{app}\Scripts\StartPhantomJS.vbs"
 
 ;IE tweaks: Allow file navigation
 Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_LOCALMACHINE_LOCKDOWN"; ValueName: "iexplore.exe"; ValueType: dword; ValueData: 0; Components: pkg_ie;
+Root: HKCU; Subkey: "Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_RESTRICT_FILEDOWNLOAD"; ValueName: "iexplore.exe"; ValueType: dword; ValueData: 0; Components: pkg_ie;
 
 ;IE tweaks: Maintain a connection to the instance (for IE11)
 Root: HKCU; Subkey: "SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BFCACHE"; ValueName: "iexplore.exe"; ValueType: dword; ValueData: 0; Components: pkg_ie;
