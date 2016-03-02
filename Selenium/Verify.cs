@@ -44,7 +44,7 @@ namespace Selenium {
     public class Verify : _Verify {
 
         const string MSG_OK = "OK";
-        const string MSG_KO = "KO";
+        const string MSG_KO = "NOK";
 
         private static string format(string message, string template, object arg1, object arg2) {
             if (message == null)
