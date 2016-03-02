@@ -41,7 +41,7 @@ namespace Selenium {
         /// </summary>
         /// <param name="strategy">The mechanism by which to find the elements.</param>
         /// <param name="value">The value to use to search for the elements.</param>
-        /// <param name="timeout"></param>
+        /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <param name="raise"></param>
         /// <returns>WebElement</returns>
         public WebElement FindElementBy(Strategy strategy, string value, int timeout = -1, bool raise = true) {

@@ -9,7 +9,7 @@ namespace Selenium {
     /// </summary>
     /// <example>
     /// Sets the implicit timout to 1 second
-    /// <code lang="vbs">	
+    /// <code lang="vb">
     /// driver.Timeouts.ImplicitWait = 1000
     /// </code>
     /// </example>
@@ -19,10 +19,25 @@ namespace Selenium {
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     public class Timeouts : ComInterfaces._Timeouts {
 
-        internal int timeout_implicitwait = 3000;
-        internal int timeout_pageload = -1;
-        internal int timeout_script = -1;
-        internal int timeout_server = 60000;
+        private static void SendTimeoutScript(RemoteSession session, int timeout) {
+            session.Send(RequestMethod.POST, "/timeouts", "type", "script", "ms", timeout);
+        }
+
+        private static void SendTimeoutPageLoad(RemoteSession session, int timeout) {
+            session.Send(RequestMethod.POST, "/timeouts", "type", "page load", "ms", timeout);
+        }
+
+        private static void SendTimeoutImplicit(RemoteSession session, int timeout) {
+            session.Send(RequestMethod.POST, "/timeouts", "type", "implicit", "ms", timeout);
+        }
+
+
+        private RemoteSession _session;
+
+        internal int timeout_server = 90000;       // 90 seconds
+        internal int timeout_pageload = 60000;     // 60 seconds
+        internal int timeout_implicitwait = 3000;  // 3  seconds
+        internal int timeout_script = 15000;       // 15 seconds
 
         /// <summary>
         /// Amount of time that Selenium will wait for waiting commands to complete
@@ -32,6 +47,7 @@ namespace Selenium {
                 return timeout_implicitwait;
             }
             set {
+                if (value == timeout_implicitwait) return;
                 timeout_implicitwait = value;
             }
         }
@@ -44,18 +60,24 @@ namespace Selenium {
                 return timeout_pageload;
             }
             set {
+                if (value == timeout_pageload) return;
+                if (_session != null)
+                    SendTimeoutPageLoad(_session, value);
                 timeout_pageload = value;
             }
         }
 
         /// <summary>
-        /// Amount of time the driver should wait while executing a script before throwing an exception.
+        /// Amount of time the driver should wait while executing an asynchronous script before throwing an error.
         /// </summary>
         public int Script {
             get {
                 return timeout_script;
             }
             set {
+                if (value == timeout_script) return;
+                if (_session != null)
+                    SendTimeoutScript(_session, value);
                 timeout_script = value;
             }
         }
@@ -68,8 +90,15 @@ namespace Selenium {
                 return timeout_server;
             }
             set {
+                if (value == timeout_server) return;
                 timeout_server = value;
             }
+        }
+
+        internal void SetSession(RemoteSession session) {
+            _session = session;
+            SendTimeoutPageLoad(_session, timeout_pageload);
+            SendTimeoutScript(_session, timeout_pageload);
         }
 
     }

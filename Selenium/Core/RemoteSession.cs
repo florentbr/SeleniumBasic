@@ -59,11 +59,7 @@ namespace Selenium.Core {
                 throw new DeserializeException(typeof(RemoteSession), ex);
             }
 
-            if (this.timeouts.PageLoad != -1)
-                Send(RequestMethod.POST, "/timeouts", "type", "page load", "ms", this.timeouts.PageLoad);
-
-            if (this.timeouts.Script != -1)
-                Send(RequestMethod.POST, "/timeouts", "type", "script", "ms", this.timeouts.Script);
+            this.timeouts.SetSession(this);
         }
 
         /// <summary>
