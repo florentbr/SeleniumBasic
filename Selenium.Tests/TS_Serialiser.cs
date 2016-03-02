@@ -115,7 +115,7 @@ namespace Selenium.Tests {
 @"""iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAMAAACuX0YVAAAABlBMVEUAAAD/
     //+l2Z/dAAAADElEQVQI12NgZGAAAAAHAAI4McYTAAAAAElFTkSuQmCC   """;
             byte[] base64Bytes = System.Text.Encoding.ASCII.GetBytes(base64);
-            var output = (Image)JsonReader.Deserialize(base64Bytes, base64Bytes.Length);
+            var output = (Image)JSON.Parse(base64Bytes, base64Bytes.Length);
             A.AreEqual(1, output.Width);
             A.AreEqual(2, output.Height);
             A.AreEqual("2FC51328", output.CRC);
@@ -128,7 +128,7 @@ namespace Selenium.Tests {
 @"""iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAMAAACqqpYoAAAABlBMVEUAAAD/
     //+l2Z/dAAAADklEQVR4AWNgZGRkABIAAB0ABroxs5IAAAAASUVORK5CYII=""";
             byte[] base64Bytes = System.Text.Encoding.ASCII.GetBytes(base64);
-            var output = (Image)JsonReader.Deserialize(base64Bytes, base64Bytes.Length);
+            var output = (Image)JSON.Parse(base64Bytes, base64Bytes.Length);
             A.AreEqual(3, output.Width);
             A.AreEqual(2, output.Height);
             A.AreEqual("909C5733", output.CRC);
@@ -142,7 +142,7 @@ namespace Selenium.Tests {
     AAD///9nGWQeAAAAE0lEQVR4AWNgYmICYkYGBjBmAgAArgATGVgZTQAAAABJ
     RU5ErkJggg==                                                """;
             byte[] base64Bytes = System.Text.Encoding.ASCII.GetBytes(base64);
-            var output = (Image)JsonReader.Deserialize(base64Bytes, base64Bytes.Length);
+            var output = (Image)JSON.Parse(base64Bytes, base64Bytes.Length);
             A.AreEqual(3, output.Width);
             A.AreEqual(4, output.Height);
             A.AreEqual("7286E2FE", output.CRC);
@@ -187,8 +187,8 @@ namespace Selenium.Tests {
         }
 
         private static object SerializeAndDeserialize(object input) {
-            var writer = JsonWriter.Serialize(input);
-            object result = JsonReader.Deserialize(writer.GetBuffer(), writer.Length);
+            var writer = JSON.Serialize(input);
+            object result = JSON.Parse(writer.GetBuffer(), (int)writer.Length);
             return result;
         }
 

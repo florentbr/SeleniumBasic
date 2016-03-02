@@ -17,7 +17,7 @@ namespace Selenium.Core {
 
         private RequestMethod _request_method;
         private string _request_uri;
-        private JsonWriter _request_data;
+        private JSON _request_data;
         private NetworkCredential _credentials = null;
 
 
@@ -84,10 +84,10 @@ namespace Selenium.Core {
         /// <returns></returns>
         public Dictionary Send(RequestMethod method, string relativeUri, Dictionary param) {
             //Serialise the parameters
-            JsonWriter data = null;
+            JSON data = null;
             if (method == RequestMethod.POST) {
                 if (param != null) {
-                    data = JsonWriter.Serialize(param);
+                    data = JSON.Serialize(param);
                 }
             }
 
@@ -107,12 +107,12 @@ namespace Selenium.Core {
             return SendRequest(_request_method, _request_uri, _request_data);
         }
 
-        protected Dictionary SendRequest(RequestMethod method, string uri, JsonWriter data) {
+        protected Dictionary SendRequest(RequestMethod method, string uri, JSON data) {
             _request_method = method;
             _request_uri = uri;
             _request_data = data;
 
-            HttpWebRequest request = CreateHttpWebRequest(method, uri, data, _response_timeout);
+            HttpWebRequest request = CreateHttpWebRequest(method, uri, data);
             SysWaiter.OnInterrupt = request.Abort;
             HttpWebResponse response = null;
             Dictionary responseDict = null;
@@ -164,12 +164,10 @@ namespace Selenium.Core {
             return responseDict;
         }
 
-        private HttpWebRequest CreateHttpWebRequest(RequestMethod method
-            , string url, JsonWriter data, int timeout) {
+        private HttpWebRequest CreateHttpWebRequest(RequestMethod method, string url, JSON data) {
 
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.CreateDefault(new Uri(url));
             request.Method = FormatRequestMethod(method);
-            request.Timeout = timeout;
             request.Accept = HEADER_ACCEPT;
             request.KeepAlive = true;
 
@@ -182,7 +180,7 @@ namespace Selenium.Core {
                 request.ContentType = HEADER_CONTENT_TYPE;
                 request.ContentLength = data.Length;
                 using (Stream rstream = request.GetRequestStream()) {
-                    data.CopyTo(rstream);
+                    rstream.Write(data.GetBuffer(), 0, (int)data.Length);
                 }
             } else {
                 request.ContentLength = 0;
@@ -195,7 +193,7 @@ namespace Selenium.Core {
                 return null;
             using (Stream stream = response.GetResponseStream()) {
                 if (IsJsonResponse(response)) {
-                    Dictionary dict = (Dictionary)JsonReader.Deserialize(stream);
+                    Dictionary dict = (Dictionary)JSON.Parse(stream);
                     return dict;
                 } else {
                     string bodyText = new StreamReader(stream).ReadToEnd();

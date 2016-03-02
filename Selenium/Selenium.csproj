@@ -148,9 +148,8 @@
     <Compile Include="Application.cs" />
     <Compile Include="Serializer\IJsonBinary.cs" />
     <Compile Include="Serializer\IJsonObject.cs" />
+    <Compile Include="Serializer\JSON.cs" />
     <Compile Include="Serializer\JsonException.cs" />
-    <Compile Include="Serializer\JsonReader.cs" />
-    <Compile Include="Serializer\JsonWriter.cs" />
     <Compile Include="NamespaceDoc.cs" />
     <Compile Include="Pdf\PdfFont.cs" />
     <Compile Include="Pdf\PdfPage.cs" />

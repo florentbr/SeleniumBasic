@@ -9,8 +9,8 @@ namespace Selenium.Serializer {
         internal JsonException(string message)
             : base(message) { }
 
-        internal JsonException(string message, int index)
-            : base(string.Format("{0} (index: {1})", message, index)) { }
+        internal JsonException(string message, byte[] data, int index)
+            : base(string.Format("{0} (position: {1})", message, index)) { }
     }
 
 }
