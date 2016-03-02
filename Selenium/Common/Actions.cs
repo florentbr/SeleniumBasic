@@ -23,8 +23,8 @@ namespace Selenium {
     public class Actions : ComInterfaces._Actions {
 
         const char KEY_SHIFT = '\xE008';
-        const char KEY_ALT = '\xE009';
-        const char KEY_CTRL = '\xE00A';
+        const char KEY_CTRL = '\xE009';
+        const char KEY_ALT = '\xE00A';
 
         delegate void Action();
 
