@@ -144,8 +144,8 @@ namespace Selenium {
         /// Creates a new instance of Dictionary
         /// </summary>
         /// <returns></returns>
-        public List Dictionary() {
-            return new List();
+        public Dictionary Dictionary() {
+            return new Dictionary();
         }
 
         /// <summary>

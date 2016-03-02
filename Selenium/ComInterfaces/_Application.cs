@@ -52,7 +52,7 @@ namespace Selenium.ComInterfaces {
 
 
         [DispId(92), Description("")]
-        List Dictionary();
+        Dictionary Dictionary();
 
         [DispId(95), Description("")]
         List List();
@@ -67,10 +67,8 @@ namespace Selenium.ComInterfaces {
         Table Table();
 
 
-
         [DispId(120), Description("")]
         PdfFile PdfFile();
-
 
     }
 
