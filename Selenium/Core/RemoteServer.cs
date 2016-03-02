@@ -116,10 +116,14 @@ namespace Selenium.Core {
             SysWaiter.OnInterrupt = request.Abort;
             HttpWebResponse response = null;
             Dictionary responseDict = null;
+            IAsyncResult asyncResult = null;
 
             try {
-                IAsyncResult asyncResult = request.BeginGetResponse(null, null);
-                asyncResult.AsyncWaitHandle.WaitOne();
+                asyncResult = request.BeginGetResponse(null, null);
+                if(!asyncResult.AsyncWaitHandle.WaitOne(_response_timeout)){
+                    request.Abort();
+                    throw new WebException(null, WebExceptionStatus.Timeout);
+                }
                 response = (HttpWebResponse)request.EndGetResponse(asyncResult);
                 responseDict = GetHttpWebResponseContent(response);
             } catch (WebException ex) {
