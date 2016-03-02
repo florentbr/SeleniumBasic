@@ -10,10 +10,10 @@ namespace Selenium.ComInterfaces {
     public interface _TableElement {
 
         [DispId(810), Description("Return an array filled with data from a table element")]
-        object[,] Data(int firstRowsToSkip = 0, int lastRowsToSkip = 0);
+        object[,] Data(int firstRowsToSkip = 0, int lastRowsToSkip = 0, string map = null);
 
         [DispId(812), Description("Copy the data to the target (Address, Range or Worksheet).")]
-        void ToExcel(object target, bool clear = false);
+        void ToExcel(object target = null, bool clear = false, int firstRowsToSkip = 0, int lastRowsToSkip = 0, string map = null);
 
     }
 
