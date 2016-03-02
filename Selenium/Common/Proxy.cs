@@ -39,7 +39,7 @@ namespace Selenium {
                 _proxy = new Dictionary();
                 _capabilities.Add(KEY_PROXY, _proxy);
             }
-            _proxy.Add(key, value);
+            _proxy.Set(key, value);
         }
 
         /// <summary>
