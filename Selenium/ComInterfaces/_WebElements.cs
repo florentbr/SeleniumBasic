@@ -25,8 +25,11 @@ namespace Selenium.ComInterfaces {
         [DispId(67), Description("Return and array containing the attribute for each web element")]
         List Attribute(string attributeName, bool withAttributeOnly = true);
 
-        [DispId(70), Description("Executes a script for each element and returns the results. Ex: return element.tagName;")]
+        [DispId(601), Description("Executes a script for each element and returns the results. Ex: return element.tagName;")]
         List ExecuteScript(string script, bool includeNullResults = false);
+
+        [DispId(602), Description("Execute an asynchronous piece of JavaScript and returns the results.")]
+        List ExecuteAsyncScript(string script, int timeout = -1);
 
         [DispId(86), Description("Returns a list containing the text for each element")]
         List Text(int offsetStart = 0, int offsetEnd = 0, bool trim = true);

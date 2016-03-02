@@ -30,23 +30,48 @@ namespace Selenium.Core {
         }
 
         /// <summary>
+        /// Inject a snippet of JavaScript into the page for execution in the context
+        /// of the currently selected frame.
+        /// </summary>
+        /// <param name="script">The script to execute.</param>
+        /// <param name="arguments">Optional - The script arguments.</param>
+        /// <param name="unbox">Optional - Converts web elements to objects</param>
+        /// <param name="timeout">Optional - Optional timeout in milliseconds.</param>
+        /// <returns></returns>
+        public object ExecuteAsync(string script, object arguments = null, bool unbox = true, int timeout = -1) {
+            if (timeout != -1)
+                session.timeouts.Script = timeout;
+
+            string script_ex = "var callback=arguments[--arguments.length];" + script;
+
+            object result = this.session.Send(RequestMethod.POST, "/execute_async", "script", script_ex, "args", arguments);
+            if (unbox)
+                return Unbox(result);
+            return result;
+        }
+
+        /// <summary>
         /// Waits for a script to return true or not null.
         /// </summary>
-        /// <param name="script"></param>
-        /// <param name="arguments"></param>
-        /// <param name="timeout"></param>
+        /// <param name="script">Piece of JavaScript code to execute.</param>
+        /// <param name="arguments">Optional arguments for the script.</param>
+        /// <param name="timeout">Optional timeout in milliseconds.</param>
         /// <returns></returns>
-        public object WaitFor(string script, object arguments, int timeout = -1) {
-            if (!script.TrimStart().StartsWith("return"))
-                script = "return " + script;
+        public object WaitFor(string script, object arguments = null, int timeout = -1) {
+            if (timeout != -1)
+                session.timeouts.Script = timeout;
 
-            if (!script.TrimEnd().EndsWith(";"))
-                script = script + ";";
+            bool has_return = (script.IndexOf("return") & -4) == 0;
+            string script_ex
+                = "var callback=arguments[--arguments.length];"
+                + "var evl=function(){" + (has_return ? string.Empty : "return ") + script + "};"
+                + "var tst=function(){"
+                + " var res=evl();"
+                + " if(res) callback(res); else setTimeout(tst, 60);"
+                + "};"
+                + "tst();";
 
-            object result = this.session.SendUntil(timeout,
-                () => Execute(script, arguments, false),
-                (r) => r != null && !false.Equals(r)
-            );
+            object result = this.session.Send(RequestMethod.POST, "/execute_async", "script", script_ex, "args", arguments);
             return Unbox(result);
         }
 

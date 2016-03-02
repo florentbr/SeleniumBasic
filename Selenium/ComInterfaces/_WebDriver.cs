@@ -48,10 +48,10 @@ namespace Selenium.ComInterfaces {
 
         [DispId(31), Description("Sends a customized command.")]
         object Send(string method, string relativeUri,
-                    string param1 = null, string value1 = null,
-                    string param2 = null, string value2 = null,
-                    string param3 = null, string value3 = null,
-                    string param4 = null, string value4 = null);
+                    string param1 = null, object value1 = null,
+                    string param2 = null, object value2 = null,
+                    string param3 = null, object value3 = null,
+                    string param4 = null, object value4 = null);
 
         #endregion
 
@@ -143,11 +143,14 @@ namespace Selenium.ComInterfaces {
 
         #region Javascript
 
-        [DispId(601), Description("Execute JavaScrip on the page")]
+        [DispId(601), Description("Execute a piece of JavaScript in the current frame or window. Returns the value specified by the return statement.")]
         object ExecuteScript(string script, object arguments = null);
 
+        [DispId(602), Description("Execute an asynchronous piece of JavaScript in the current frame or window. Returns the first argument of the callback function.")]
+        object ExecuteAsyncScript(string script, object arguments = null, int timeout = -1);
+
         [DispId(605), Description("Waits for the Javascript engine to return true or not null")]
-        object WaitForScript(string script, object arguments, int timeout = -1);
+        object WaitForScript(string script, object arguments = null, int timeout = -1);
 
         #endregion
 

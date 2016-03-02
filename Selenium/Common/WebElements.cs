@@ -106,7 +106,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Execute a script against each web element and returns all the results;
+        /// Execute a piece of JavaScript against each web element and returns all the results;
         /// </summary>
         /// <param name="script">Javascript script</param>
         /// <param name="ignoreNulls">Null elements are skiped</param>
@@ -123,13 +123,41 @@ namespace Selenium {
             if (this.Count == 0)
                 return null;
             var session = ((WebElement)base[0])._session;
-            object[] args = new object[] { this };
-            string script2 = "var f=function(){" + script + "};"
-                + @"var e=arguments[0],r=[];"
-                + "for(var i=0;i<e.length;i++){"
-                + (ignoreNulls ? "v=f.apply(e[i]);if(v!=null)r.push(v);" : "r.push(f.apply(e[i]));")
-                + "}return r;";
-            var results = (List)session.javascript.Execute(script2, args, true);
+            object[] args = { this };
+            string script_ex
+                = "var args=arguments[0],arr=[],fn=function(){" + script + "};"
+                + "for(var i=0,v;i<args.length;i++){"
+                + "  v=fn.apply(args[i]);" + (ignoreNulls ? "v && " : "") + "arr.push(v);"
+                + "} return arr;";
+            var results = (List)session.javascript.Execute(script_ex, args, true);
+            return results;
+        }
+
+        /// <summary>
+        /// Execute an asynchronous piece of JavaScript against each web element and returns all the results;
+        /// </summary>
+        /// <param name="script">Javascript script</param>
+        /// <param name="ignoreNulls">Null elements are skiped</param>
+        /// <returns>List</returns>
+        /// <example>
+        /// <code lang="vbs">
+        /// Set driver = CreateObject("Selenium.FirefoxDriver")
+        /// driver.Get "https://www.google.co.uk/search?q=Eiffel+tower"
+        /// Set links = driver.FindElementsByTagName("a").ExecuteScript("var e=this; setTimeout(function(){callback(e.getAttribute('href'))}, 100);")
+        /// WScript.Echo "Count:" &amp; links.Count &amp; " Values:" &amp; vbCr &amp; Join(links.Values, vbCr)
+        /// </code>
+        /// </example>
+        public List ExecuteAsyncScript(string script, int timeout = -1) {
+            if (this.Count == 0)
+                return null;
+            var session = ((WebElement)base[0])._session;
+            object[] args = { this };
+            string script_ex
+                = "var arr=[],args=arguments[0],len=args.length-1,cpt=len;"
+                + "var fn=function(callback){" + script + "};"
+                + "var cb=function(i){return function(v){arr[i]=v;if(--cpt<1)callback(arr);}};"
+                + "for(var i=0;i<len;i++)fn.apply(args[i],cb(i));";
+            var results = (List)session.javascript.ExecuteAsync(script_ex, args, true, timeout);
             return results;
         }
 

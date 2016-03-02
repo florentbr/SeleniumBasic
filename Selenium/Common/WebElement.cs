@@ -647,7 +647,7 @@ namespace Selenium {
         #region Javascript
 
         /// <summary>
-        /// Executes a JavaScript function in the context of the current element and returns the return value of the function.
+        /// Executes a piece of JavaScript in the context of the current element.
         /// </summary>
         /// <param name="script">The JavaScript code to execute.</param>
         /// <param name="arguments">The arguments to the script.</param>
@@ -659,27 +659,50 @@ namespace Selenium {
         /// </code>
         /// </example>
         public object ExecuteScript(string script, object arguments = null) {
-            string newscript = "return (function(){" + script + "}).apply(arguments[0],arguments[1]);";
-            object[] newargs = FormatArguments(this, arguments);
-            var result = session.javascript.Execute(newscript, newargs, true);
+            string script_ex = WrapScript(script);
+            object[] args_ex = WrapArguments(this, arguments);
+            var result = session.javascript.Execute(script_ex, args_ex, true);
+            return result;
+        }
+
+        /// <summary>
+        /// Execute an asynchronous piece of JavaScript in the context of the current element
+        /// </summary>
+        /// <param name="script">The JavaScript code to execute.</param>
+        /// <param name="arguments">Optional arguments for the script.</param>
+        /// <param name="timeout">Optional timeout in milliseconds.</param>
+        /// <returns>The first argument of the callback function.</returns>
+        /// <example>
+        /// <code lang="vb">
+        ///     href = ele.ExecuteAsyncScript("callback(this.href);");"
+        /// </code>
+        /// </example>
+        public object ExecuteAsyncScript(string script, object arguments = null, int timeout = -1) {
+            string script_ex = WrapScript(script);
+            object[] args_ex = WrapArguments(this, arguments);
+            var result = session.javascript.ExecuteAsync(script_ex, args_ex, true, timeout);
             return result;
         }
 
         /// <summary>
         /// Waits for a script to return true or not null.
         /// </summary>
-        /// <param name="script"></param>
-        /// <param name="arguments"></param>
-        /// <param name="timeout"></param>
-        /// <returns></returns>
-        public object WaitForScript(string script, object arguments, int timeout = -1) {
-            string newscript = "return (function(){" + script + "}).apply(arguments[0],arguments[1]);";
-            object[] newargs = FormatArguments(this, arguments);
-            var result = session.javascript.WaitFor(newscript, newargs, timeout);
+        /// <param name="script">The JavaScript code to execute.</param>
+        /// <param name="arguments">The arguments to the script.</param>
+        /// <param name="timeout">Optional timeout in milliseconds.</param>
+        /// <returns>Value not null</returns>
+        public object WaitForScript(string script, object arguments = null, int timeout = -1) {
+            string script_ex = WrapScript(script);
+            object[] args_ex = WrapArguments(this, arguments);
+            var result = session.javascript.WaitFor(script_ex, args_ex, timeout);
             return result;
         }
 
-        private static object[] FormatArguments(object item, object arguments) {
+        private static string WrapScript(string script) {
+            return "return (function(){" + script + "}).apply(arguments[0],arguments[1]);";
+        }
+
+        private static object[] WrapArguments(object item, object arguments) {
             if (arguments == null) {
                 return new[] { item, new object[0] };
             } else if (arguments is IEnumerable && !(arguments is string || arguments is Dictionary)) {

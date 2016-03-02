@@ -242,11 +242,14 @@ namespace Selenium.ComInterfaces {
 
         #region Javascript
 
-        [DispId(601), Description("Execute JavaScrip on the page")]
+        [DispId(601), Description("Executes a piece of JavaScript in the context of the current element. Returns the value specified by the return statement.")]
         object ExecuteScript(string script, object arguments = null);
 
-        [DispId(605), Description("Waits for the Javascript engine to return true or not null")]
-        object WaitForScript(string script, object arguments, int timeout = -1);
+        [DispId(602), Description("Executes an asynchronous piece of JavaScript in the context of the current element. Returns the first argument of the callback function.")]
+        object ExecuteAsyncScript(string script, object arguments = null, int timeout = -1);
+
+        [DispId(605), Description("Waits for a piece of JavaScript to return true or not null")]
+        object WaitForScript(string script, object arguments = null, int timeout = -1);
 
         #endregion
 

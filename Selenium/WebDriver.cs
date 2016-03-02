@@ -389,10 +389,10 @@ namespace Selenium {
         /// </code>
         /// </example>
         public object Send(string method, string relativeUri,
-                                 string param1 = null, string value1 = null,
-                                 string param2 = null, string value2 = null,
-                                 string param3 = null, string value3 = null,
-                                 string param4 = null, string value4 = null) {
+                                 string param1 = null, object value1 = null,
+                                 string param2 = null, object value2 = null,
+                                 string param3 = null, object value3 = null,
+                                 string param4 = null, object value4 = null) {
 
             RequestMethod mth = 0;
             switch (method.ToUpper()) {
@@ -692,27 +692,50 @@ namespace Selenium {
         #region Javascript
 
         /// <summary>
-        /// Executes JavaScript in the context of the currently selected frame or window
+        /// Execute a piece of JavaScript in the context of the currently selected frame or window
         /// </summary>
         /// <param name="script">The JavaScript code to execute.</param>
         /// <param name="arguments">The arguments to the script.</param>
-        /// <returns>The value returned by the script.</returns>
+        /// <returns>The value specified by the return statement.</returns>
+        /// <example>
+        /// <code lang="vb">
+        ///     txt = driver.ExecuteScript("return 'xyz' + arguments[0];", "123")
+        /// </code>
+        /// </example>
         public object ExecuteScript(string script, object arguments = null) {
-            object args = FormatArguments(arguments);
-            object result = session.javascript.Execute(script, args, true);
+            object args_ex = FormatArguments(arguments);
+            object result = session.javascript.Execute(script, args_ex, true);
             return result;
         }
 
         /// <summary>
-        /// Waits for a script to return true or not null.
+        /// Execute an asynchronous piece of JavaScript in the context of the current frame or window.
         /// </summary>
-        /// <param name="script"></param>
-        /// <param name="arguments"></param>
-        /// <param name="timeout"></param>
-        /// <returns></returns>
+        /// <param name="script">Piece of JavaScript code to execute.</param>
+        /// <param name="arguments">Optional arguments for the script.</param>
+        /// <param name="timeout">Optional timeout in milliseconds.</param>
+        /// <returns>The first argument of the callback function.</returns>
+        /// <example>
+        /// <code lang="vb">
+        ///     txt = driver.ExecuteAsyncScript("callback('xyz')");"
+        /// </code>
+        /// </example>
+        public object ExecuteAsyncScript(string script, object arguments = null, int timeout = -1) {
+            object args_ex = FormatArguments(arguments);
+            object result = session.javascript.ExecuteAsync(script, args_ex, true, timeout);
+            return result;
+        }
+
+        /// <summary>
+        /// Waits for a piece of JavaScript to return true or not null.
+        /// </summary>
+        /// <param name="script">Piece of JavaScript code to execute.</param>
+        /// <param name="arguments">Optional arguments for the script.</param>
+        /// <param name="timeout">Optional timeout in milliseconds.</param>
+        /// <returns>Value not null</returns>
         public object WaitForScript(string script, object arguments, int timeout = -1) {
-            object args = FormatArguments(arguments);
-            object result = session.javascript.WaitFor(script, args, timeout);
+            object args_ex = FormatArguments(arguments);
+            object result = session.javascript.WaitFor(script, args_ex, timeout);
             return result;
         }
 
