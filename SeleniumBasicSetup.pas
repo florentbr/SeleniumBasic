@@ -4,7 +4,7 @@
 }
 
 lib.Guid := '{0277FC34-FD1B-4616-BB19-A9AABCAF2A70}';
-lib.FullName := 'Selenium, Version=2.0.8.0, Culture=neutral, PublicKeyToken=d499ab7f7ba4d827';
+lib.FullName := 'Selenium, Version=2.0.9.0, Culture=neutral, PublicKeyToken=d499ab7f7ba4d827';
 lib.Description := 'Selenium Type Library';
 lib.TypeVersion := '2.0';
 lib.PathDll := ExpandConstant('{app}\Selenium.dll');

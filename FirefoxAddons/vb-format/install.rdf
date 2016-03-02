@@ -3,7 +3,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>vbformatters@florent.breheret</em:id>
     <em:name>Selenium IDE: VBA/VBS Formatters</em:name>
-    <em:version>2.0.8.0</em:version>
+    <em:version>2.0.9.0</em:version>
     <em:creator>Florent BREHERET</em:creator>
     <em:description>VBA/VBS code formatters for Selenium IDE</em:description>
     <em:type>2</em:type>

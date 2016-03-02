@@ -15,6 +15,21 @@ Third party softwares:
  PhantomJs web stack - BSD license
  http://phantomjs.org/
 
+
+v2.0.9.0  (2016/03/02)
+===============================================================================
+ * Updated examples
+ * Updated Firefox driver to version 2.52.0
+ * Updated IE driver to version 2.52.1
+ * Changed KO to NOK in the message for the Verify object
+ * Added the ExecuteAsyncScript method on WebDriver, WebElement and WebElements
+ * Added an option on a TableElement to use some javascript to parse a cell
+ * Fixed the timeout on driver.Get
+ * Fixed Ctrl/Alt key code in the Action class
+ * Fixed timeout for the connection to the server #75
+ * Fixed the SetHttpProxy and SetSSLProxy not handling double #74
+ * Fixed Dictionary method of Selenium.Application returns a List #76
+
 v2.0.8.0  (2016/02/08)
 ===============================================================================
  * Updated examples

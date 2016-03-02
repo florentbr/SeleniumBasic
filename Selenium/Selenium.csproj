@@ -139,7 +139,7 @@
     <Compile Include="Internal\StringExt.cs" />
     <Compile Include="Internal\ThreadExt.cs" />
     <Compile Include="Internal\UnhandledException.cs" />
-    <Compile Include="ComInterfaces\_Selenium.cs" />
+    <Compile Include="ComInterfaces\_Application.cs" />
     <Compile Include="Pdf\PdfFonts.cs" />
     <Compile Include="Pdf\PdfImage.cs" />
     <Compile Include="Pdf\PdfOutlines.cs" />
