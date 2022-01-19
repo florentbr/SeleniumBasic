@@ -1,4 +1,3 @@
-
 """Script to download the references used by the project
 """
 
@@ -10,9 +9,9 @@ __dir__ = os.path.dirname(os.path.realpath(__file__))
 def main():
     set_working_dir(__dir__ + r'\References\\')
     
-    print __doc__
-    print 'Last update : ' + file_datetime('references.json', format='%Y-%m-%d %H:%M:%S')
-    print ''
+    print(__doc__)
+    print('Last update : ' + file_datetime('references.json', format='%Y-%m-%d %H:%M:%S'))
+    print('')
     
     Log('Update references ...')
     
@@ -22,11 +21,11 @@ def main():
         exitcode = ParallelWorker(tasks).run(pattern='^update_')
     
     if exitcode:
-        print '\nFailed!'
+        print('\nFailed!')
         sys.stderr = ''
         sys.exit(1)
     else:
-        print '\nDone'
+        print('\nDone')
 
 class Tasks():
     
@@ -266,7 +265,7 @@ class ConfigFile(dict):
         with self.lock:
             return self.data.setdefault(key, {})
 
-from Queue import Queue
+from queue import Queue
 
 class ParallelWorker(Queue):
 
@@ -286,8 +285,7 @@ class ParallelWorker(Queue):
                 e_type, e_value, e_trace = sys.exc_info()
                 sys.stderr.write(format_ex(e_type, e_value, e_trace.tb_next))
             finally:
-                self.task_done()
-                sys.exc_clear()
+                self.task_done()                
 
     def run(self, pattern=''):
         methods = [getattr(self.instance, k) for k, v in self.instance.__class__.__dict__.items() \
@@ -426,7 +424,7 @@ class PatternNotFound(Exception):
 
 def Log(message):
     with Logger.lock:
-        print message
+        print(message)
         Logger.write(message)
 
 class Logger:
