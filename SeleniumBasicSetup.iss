@@ -73,13 +73,13 @@ Source: "CHANGELOG.txt"; DestDir: "{app}"; Flags: ignoreversion overwritereadonl
 Source: "VbsConsole\bin\Release\vbsc.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cons;
 
 ;drivers
-Source: "References\firefoxdriver.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ff;
-Source: "References\chromedriver.exe";  DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cr;
-Source: "References\operadriver.exe";   DestDir: "{app}"; Flags: ignoreversion; Components: pkg_op;
-Source: "References\phantomjs.exe";     DestDir: "{app}"; Flags: ignoreversion; Components: pkg_pjs;
-Source: "References\iedriver.exe";      DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;
-;Source: "References\iedriver64.exe";    DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;  Check: IsWin64;
-Source: "References\edgedriver.exe";    DestDir: "{app}"; Flags: ignoreversion; Components: pkg_edg;
+Source: "References\firefoxdriver.xpi"; DestDir: "{localappdata}\WebDrivers"; Flags: ignoreversion; Components: pkg_ff;
+Source: "References\chromedriver.exe";  DestDir: "{localappdata}\WebDrivers"; Flags: ignoreversion; Components: pkg_cr;
+Source: "References\operadriver.exe";   DestDir: "{localappdata}\WebDrivers"; Flags: ignoreversion; Components: pkg_op;
+Source: "References\phantomjs.exe";     DestDir: "{localappdata}\WebDrivers"; Flags: ignoreversion; Components: pkg_pjs;
+Source: "References\iedriver.exe";      DestDir: "{localappdata}\WebDrivers"; Flags: ignoreversion; Components: pkg_ie;
+;Source: "References\iedriver64.exe";    DestDir: "{localappdata}\WebDrivers"; Flags: ignoreversion; Components: pkg_ie;  Check: IsWin64;
+Source: "References\edgedriver.exe";    DestDir: "{localappdata}\WebDrivers"; Flags: ignoreversion; Components: pkg_edg;
 
 ;Firefox extensions
 Source: "FirefoxAddons\bin\extensions.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ide;
@@ -516,7 +516,7 @@ Procedure RegClass(Const lib : TNetLib; Const guid, progid, typename: String);
     If Not IsUninstaller Then Begin
       RegString(HK, key, '', progid);
       RegString(HK, key + '\CLSID', '', guid);
-    End
+    End;
 
     RegClsid(lib, HK, guid, progid, typename, '{sys}');
     If IsWin64 Then
