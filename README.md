@@ -1,6 +1,6 @@
 # SeleniumBasic
 A Selenium based browser automation framework for VB.Net, Visual Basic Applications and VBScript.
-This repository made modifications to the Driver Library path based on the Floren (original author)'s suggestion: https://gist.github.com/florentbr/6be960752fc852ee99eece6b4acb8ba7
+This repository made modifications to the Driver Library path based on Floren (the original author)'s suggestion: https://gist.github.com/florentbr/6be960752fc852ee99eece6b4acb8ba7
 
 This repository by default has also included the references files and other files needed for executing SeleniumBasicSetup.iss with Inno Setup directly after acquisition.
 
