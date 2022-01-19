@@ -76,8 +76,8 @@ class HTTPServerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    print __doc__
-    print "Start tests ...\n"
+    print(__doc__)
+    print("Start tests ...\n")
     server = multiprocessing.Process(target=RunHTTPServer)
     server.start()
     try:
