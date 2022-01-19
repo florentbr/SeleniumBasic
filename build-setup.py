@@ -41,7 +41,7 @@ def main():
     clear_dir(r'.\FirefoxAddons\bin')
     clear_dir(r'.\Selenium\bin\Release')
     clear_dir(r'.\Selenium\obj\Release')
-    clear_dir(r'.\Selenium\bin\Help')
+    """clear_dir(r'.\Selenium\bin\Help')"""
     clear_dir(r'.\VbsConsole\bin\Release')
     clear_dir(r'.\VbsConsole\obj\Release')
     
