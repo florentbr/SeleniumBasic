@@ -87,7 +87,7 @@ Source: "FirefoxAddons\bin\extensions.xpi"; DestDir: "{app}"; Flags: ignoreversi
 ;examples                                                                                                                                                     
 Source: "Scripts\*.*" ;               DestDir: "{app}\Scripts";             Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_core;
 Source: "Templates\*.vbs" ;           DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Templates\Xlbin\*.xlt";      DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
+;Source: "Templates\Xlbin\*.xlt";      DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
 Source: "Templates\*.xltm" ;          DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasNewExcel
 Source: "Templates\*.au3" ;           DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasAutoIt
 Source: "Examples\VBScript\*.vbs";    DestDir: "{app}\Examples\VBScript";   Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; 
