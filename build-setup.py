@@ -87,8 +87,8 @@ def main():
     execute(APP_IRONPYTHON_PATH, r'gen-registration.ipy', \
         r'Selenium\bin\Release\Selenium.dll', __dir__ + r'\SeleniumBasicSetup.pas')
     
-    print('Rebuild excel files ...')
-    execute(APP_PYTHON_PATH, __dir__ + r'\rebuild_exel_files.py')
+    """print('Rebuild excel files ...')
+    execute(APP_PYTHON_PATH, __dir__ + r'\rebuild_exel_files.py')"""
     
     print('Build setup package ...')
     execute(APP_INNOSETUP_PATH, '/q', '/O' + __dir__, __dir__ + r'\SeleniumBasicSetup.iss')
