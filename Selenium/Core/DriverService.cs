@@ -25,7 +25,7 @@ namespace Selenium.Core {
         private string _temp_folder;
 
         public DriverService() {
-            _library_dir = IOExt.GetAssemblyDirectory();
+            _library_dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\WebDrivers";
             _arguments = new List<string>();
             _temp_folder = GetTempFolder();
             _endpoint = EndPointExt.Create(IPAddress.Loopback, false);
