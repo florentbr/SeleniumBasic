@@ -1,4 +1,6 @@
 """Script to download the references used by the project
+   Note 19/01/22: many of the functions here no longer work due to the urls may now be directing to a different page.
+   The reference files should therefore be obtained manually and store in the the {App}\References folder instead.
 """
 
 import sys, os, time, types, re, traceback, threading, io, datetime, csv, json, urllib, requests, zipfile, tarfile
