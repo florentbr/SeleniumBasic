@@ -25,9 +25,9 @@ VIEW64 = win32con.KEY_WOW64_64KEY | win32con.KEY_ALL_ACCESS
 VIEWMAP = {VIEW32:'32', VIEW64:''}
 
 def main():
-    print __doc__
-    print "Start cleaning registry ..."
-    print ""
+    print(__doc__)
+    print("Start cleaning registry ...")
+    print("")
     
     for view in (VIEW64, VIEW32):
         hRoot = HKCR
@@ -35,14 +35,14 @@ def main():
             hKey = win32api.RegOpenKeyEx(hRoot, subkey1, 0, view)
             for subkey2, r, c, l in win32api.RegEnumKeyEx(hKey):
                 if subkey2.startswith(STARTSWITH_GUID) or subkey2.startswith(STARTSWITH_PROGID):
-                    print '\\'.join((HKMAP[hRoot] + VIEWMAP[view], subkey1, subkey2)).replace('\\\\', '\\')
+                    print('\\'.join((HKMAP[hRoot] + VIEWMAP[view], subkey1, subkey2)).replace('\\\\', '\\'))
                     try:
                         win32api.RegDeleteTree(hKey, subkey2)
                     except Exception as ex :
-                        print ' failed: %s' % ex.strerror
+                        print(' failed: %s' % ex.strerror)
             win32api.RegCloseKey(hKey)
     
-    print "\nDone"
+    print("\nDone")
 
 def elevate():
     import ctypes, win32com.shell.shell, win32event, win32process
