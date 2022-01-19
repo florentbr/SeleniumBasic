@@ -1,0 +1,9 @@
+{
+    "ChromeDriver": {
+        "version": "97.0.4692.71",
+        "url": "http://chromedriver.storage.googleapis.com/97.0.4692.71/chromedriver_win32.zip"
+    },
+    "IEDriver": {},
+    "FirefoxPrefs": {},
+    "FirefoxDriver": {}
+}
