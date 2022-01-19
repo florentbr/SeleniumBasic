@@ -6,12 +6,12 @@ import sys, os, shutil, zipfile, re, glob, tempfile
 from win32com import client  #http://sourceforge.net/projects/pywin32/files/pywin32/
 
 def main(args):
-    print __doc__
+    print(__doc__)
     
     for folder in (r'\Templates', r'\Examples\Excel'):
         rebuild(__dir__ + folder)
     
-    print "\nDone"
+    print("\nDone")
 
 
 def rebuild(directory):
@@ -21,29 +21,29 @@ def rebuild(directory):
         shortname = get_shortname(file)
         extention = get_extention(file)
         
-        print "Extract %s ..." % file
+        print("Extract %s ..." % file)
         tmp_folder = extract_excel(file)
         
-        print "Rebuild %s ..." % shortname
+        print("Rebuild %s ..." % shortname)
         (wb, wb_file) = build_excel(tmp_folder, extention)
         wb.VBProject.References.AddFromGuid("{0277FC34-FD1B-4616-BB19-A9AABCAF2A70}", 2, 0)
         
         if extention == ".xlsm":
-            print "Save %s.xlsm ..." % shortname
+            print("Save %s.xlsm ..." % shortname)
             wb.SaveAs(directory + r'\%s.xlsm' % shortname, xlOpenXMLWorkbookMacroEnabled)
-            print "Save %s.xls ..." % shortname
+            print("Save %s.xls ..." % shortname)
             wb.SaveAs(xlbin_dir + r'\%s.xls' % shortname,  xlWorkbook8)
             
         elif extention == ".xltm":
-            print "Save %s.xltm ..." % shortname
+            print("Save %s.xltm ..." % shortname)
             wb.SaveAs(directory + r'\%s.xltm' % shortname, xlOpenXMLTemplateMacroEnabled)
-            print "Save %s.xlt ..." % shortname
+            print("Save %s.xlt ..." % shortname)
             wb.SaveAs(xlbin_dir + r'\%s.xlt' % shortname,  xlTemplate8)
         
         wb.Application.Quit()
         shutil.rmtree(tmp_folder)
         os.remove(wb_file)
-        print ""
+        print("")
     
 def build_excel(folder, extension):
     # Create excel file for folder
