@@ -12,10 +12,10 @@ import os, re, time, sys, traceback, shutil, datetime, subprocess, zipfile, glob
 __dir__ = os.path.dirname(os.path.realpath(__file__))
 
 APP_MSBUILD_PATH = r'c:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe'
-APP_TLBEXP_PATH = r'c:\Progra~2\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\TlbExp.exe'
-APP_INNOSETUP_PATH = r'c:\Progra~2\Inno Setup 5\ISCC.exe'
-APP_PYTHON_PATH = r'c:\Progra~2\Python27\python.exe'
-APP_IRONPYTHON_PATH = r'c:\Progra~2\IronPython 2.7\ipy.exe'
+APP_TLBEXP_PATH = r'c:\Progra~2\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\TlbExp.exe'
+APP_INNOSETUP_PATH = r'c:\Progra~2\Inno Setup 6\ISCC.exe'
+APP_PYTHON_PATH = os.getenv('LOCALAPPDATA') + r'\Programs\Python\Python310\python.exe'
+APP_IRONPYTHON_PATH = r'C:\Program Files\IronPython 2.7\ipy.exe'
 APP_SHFBROOT_DIR = r'c:\Progra~2\EWSoftware\Sandcastle Help File Builder'
 
 def main():
@@ -26,18 +26,18 @@ def main():
     last_modified_time = get_file_mtime(assemblyinfo_path, '%Y-%m-%d %H:%M:%S')
     current_version = match_in_file(assemblyinfo_path, r'AssemblyFileVersion\("([.\d]+)"\)')
     
-    print __doc__
-    print 'Last compilation : ' + (last_modified_time or 'none')
-    print 'Current Version  : ' + current_version
-    print ''
+    print(__doc__)
+    print('Last compilation : ' + (last_modified_time or 'none'))
+    print('Current Version  : ' + current_version)
+    print('')
     
     new_version = get_input_version(current_version)
 
-    print 'New version : ' + new_version + '\n'
-    print 'Update version number ...'
+    print('New version : ' + new_version + '\n')
+    print('Update version number ...')
     replace_in_file(assemblyinfo_path, r'Version\("[.\d]+"\)', r'Version("{}")'.format(new_version))
 
-    print 'Delete previous builds ...'
+    print('Delete previous builds ...')
     clear_dir(r'.\FirefoxAddons\bin')
     clear_dir(r'.\Selenium\bin\Release')
     clear_dir(r'.\Selenium\obj\Release')
@@ -45,61 +45,59 @@ def main():
     clear_dir(r'.\VbsConsole\bin\Release')
     clear_dir(r'.\VbsConsole\obj\Release')
     
-    print 'Build vb-format addin ...'
+    print('Build vb-format addin ...')
     execute(APP_IRONPYTHON_PATH, __dir__ + r'\FirefoxAddons\build-vb-format.py', current_version)
     
-    print 'Build implicit-wait addin ...'
+    print('Build implicit-wait addin ...')
     execute(APP_IRONPYTHON_PATH, __dir__ + r'\FirefoxAddons\build-implicit-wait.py', current_version)
     
-    print 'Build extensions package ...'
+    print('Build extensions package ...')
     with zipfile.ZipFile(__dir__ + r'\FirefoxAddons\bin\extensions.xpi', 'a') as zip:
         zip.write(__dir__ + r'\FirefoxAddons\install.rdf', 'install.rdf')
         zip.write(__dir__ + r'\References\selenium-ide.xpi', 'selenium-ide.xpi')
         zip.write(__dir__ + r'\FirefoxAddons\bin\vb-formatters.xpi', 'vb-formatters.xpi')
         zip.write(__dir__ + r'\FirefoxAddons\bin\implicit-wait.xpi', 'implicit-wait.xpi')
     
-    print 'Build .Net library ...'
+    print('Build .Net library ...')
     execute(APP_MSBUILD_PATH, '/t:build', '/nologo', '/v:quiet',
         r'/p:Configuration=Release;TargetFrameworkVersion=v3.5',
         r'/p:RegisterForComInterop=False',
         r'/p:SignAssembly=true;AssemblyOriginatorKeyFile=key.snk', 
         r'.\Selenium\Selenium.csproj' )
     
-    print 'Build Type libraries 32bits ...'
+    print('Build Type libraries 32bits ...')
     execute(APP_TLBEXP_PATH, r'.\Selenium\bin\Release\Selenium.dll', 
         r'/win32', r'/out:.\Selenium\bin\Release\Selenium32.tlb' )
     
-    print 'Build Type libraries 64bits ...'
+    print('Build Type libraries 64bits ...')
     execute(APP_TLBEXP_PATH,
         r'.\Selenium\bin\Release\Selenium.dll', 
         r'/win64', r'/out:.\Selenium\bin\Release\Selenium64.tlb' )
     
-    print 'Build console runner ...'
+    print('Build console runner ...')
     execute(APP_MSBUILD_PATH, '/v:quiet', '/t:build', '/nologo', 
         r'/p:Configuration=Release;TargetFrameworkVersion=v3.5', 
         r'.\VbsConsole\VbsConsole.csproj' )
     
-    print 'Build documentation ...'
+    """print('Build documentation ...')
     os.environ['SHFBROOT'] = APP_SHFBROOT_DIR
-    execute(APP_MSBUILD_PATH, '/p:Configuration=Release', '/nologo', '.\Selenium\Selenium.shfbproj')
+    execute(APP_MSBUILD_PATH, '/p:Configuration=Release', '/nologo', '.\Selenium\Selenium.shfbproj')"""
     
-    print 'Build registration file ...'
+    print('Build registration file ...')
     execute(APP_IRONPYTHON_PATH, r'gen-registration.ipy', \
         r'Selenium\bin\Release\Selenium.dll', __dir__ + r'\SeleniumBasicSetup.pas')
     
-    print 'Rebuild excel files ...'
+    print('Rebuild excel files ...')
     execute(APP_PYTHON_PATH, __dir__ + r'\rebuild_exel_files.py')
     
-    print 'Build setup package ...'
+    print('Build setup package ...')
     execute(APP_INNOSETUP_PATH, '/q', '/O' + __dir__, __dir__ + r'\SeleniumBasicSetup.iss')
     
-    print 'Launch install ...'
+    print('Launch install ...')
     execute(__dir__ + '\SeleniumBasic-%s.exe' % new_version)
 
-    print '\nDone'
-
+    print('\nDone')
     
-
 def set_working_dir(directory):
     make_dir(directory)
     os.chdir(directory)
