@@ -38,7 +38,7 @@ namespace Selenium.Core {
             bool createdNew;
             _signal_interrupt = new EventWaitHandle(false,
                                                     EventResetMode.ManualReset,
-                                                    @"Global\InterruptKey",
+                                                    @"Global\InterruptKey"+ Environment.UserName,
                                                     out createdNew,
                                                     security);
 
