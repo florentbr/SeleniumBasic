@@ -191,9 +191,7 @@ namespace Selenium {
         /// Closes the current window.
         /// </summary>
         public void Close() {
-            if (this != _windows.CurrentWindow)
-                this.Activate();
-            _session.Send(RequestMethod.DELETE, "/window");
+            _windows.Close( this );
         }
 
     }

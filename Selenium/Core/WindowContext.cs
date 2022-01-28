@@ -37,6 +37,31 @@ namespace Selenium.Core {
             _cachedWindows.Add(_currentWindow);
         }
 
+        /// <summary>
+        /// Removes the specific window from all references and closes it
+        /// </summary>
+        public void Close(Window w)
+        {
+            if( w == null ) return;
+            _cachedWindows.Remove(w);
+            bool not_current = w != _currentWindow;
+            if( not_current ) {
+                ActivateWindow(_session, w.Handle);
+            }
+            _session.Send(RequestMethod.DELETE, "/window");
+            if( not_current ) {
+                ActivateWindow(_session, _currentWindow.Handle);
+                if( _previousWindow == w )
+                    _previousWindow = _currentWindow;
+            } else if( _previousWindow != _currentWindow && _previousWindow != null ) {
+                ActivateWindow(_session, _previousWindow.Handle);
+                _currentWindow = _previousWindow;
+            } else {
+                _currentWindow = null;
+                _previousWindow = null;
+            }
+        }
+
         public void ListWindows(out List windows, out List handles) {
             handles = WindowContext.GetWindowsHandles(_session);
             windows = new List(handles.Count);
@@ -72,7 +97,7 @@ namespace Selenium.Core {
                 List windows, handles;
                 this.ListWindows(out windows, out handles);
                 foreach (Window win in windows) {
-                    if (win.Handle == _currentWindow.Handle)
+                    if (_currentWindow != null && win.Handle == _currentWindow.Handle)
                         continue;
                     WindowContext.ActivateWindow(_session, win.Handle);
                     string winTitle = GetCurrentTitle(_session);
@@ -107,7 +132,7 @@ namespace Selenium.Core {
                             return _currentWindow;
                         }
                     }
-                    _currentWindow = new Window(_session, this, null);
+                    _currentWindow = new Window(_session, this, handle);
                     _cachedWindows.Add(_currentWindow);
                     return _currentWindow;
                 } catch (Errors.NoSuchWindowError) { }
@@ -126,8 +151,8 @@ namespace Selenium.Core {
         /// <returns></returns>
         public Window SwitchToNextWindow(int timeout = -1) {
             DateTime endTime = _session.GetEndTime(timeout);
-            string currentHandle = _currentWindow.Handle;
-            string previousHandle = _previousWindow.Handle;
+            string currentHandle = _currentWindow?.Handle;
+            string previousHandle = _previousWindow?.Handle;
 
             while (true) {
                 List windows, handles;
@@ -162,6 +187,8 @@ namespace Selenium.Core {
         /// </summary>
         /// <returns></returns>
         public Window SwitchToPreviousWindow() {
+            if( _previousWindow == null )
+                return null;
             return _previousWindow.Activate();
         }
 
