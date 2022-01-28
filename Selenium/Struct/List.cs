@@ -309,7 +309,8 @@ namespace Selenium {
         public void RemoveAt(int index) {
             if (index < 0 || index >= _count)
                 throw new IndexOutOfRangeException();
-            Array.Copy(_items, index + 1, _items, index, _count - index);
+            if( index < _count - 1 )
+                Array.Copy(_items, index + 1, _items, index, _count - index);
             _items[--_count] = null;
         }
 
