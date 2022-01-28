@@ -34,6 +34,9 @@ namespace Selenium.ComInterfaces {
         [DispId(550), Description("Get the title of the window")]
         string Title { get; }
 
+        [DispId(551), Description("Get the handle of the window")]
+        string Handle { get; }
+
         [DispId(554), Description("Gets the position of the browser window relative to the upper-left corner of the screen.")]
         Point Position();
 
