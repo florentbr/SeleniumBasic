@@ -6,7 +6,7 @@ using System.Threading;
 namespace Selenium.Core {
 
     /// <summary>
-    /// Provides waits methods that can be interrupted with a regitered hot key
+    /// Provides waits methods that can be interrupted with a registered hot key
     /// </summary>
     class SysWaiter {
 
@@ -42,7 +42,7 @@ namespace Selenium.Core {
                                                     out createdNew,
                                                     security);
 
-            HotKeyGlobal.DefineHotKey(MOD_NONE, VK_ESCAPE, ProcInterrupt);
+            HotKeyGlobal.DefineHotKey(MOD_ALT, VK_ESCAPE, ProcInterrupt);
         }
 
         public static Action OnInterrupt {
