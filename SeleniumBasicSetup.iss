@@ -106,22 +106,22 @@ Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|winword.exe}";  D
 Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|msaccess.exe}"; DestName: "MSACCESS.EXE.CONFIG"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('msaccess.exe');
 Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|outlook.exe}";  DestName: "OUTLOOK.EXE.CONFIG";  Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('outlook.exe');
 
-[Icons]
-Name: "{group}\Project Home Page";  Filename: {#AppURL};                      WorkingDir: "{app}";
-Name: "{group}\Vbs Console";        Filename: "{app}\vbsc.exe";               Components: pkg_cons;
-Name: "{group}\Examples";           Filename: "{app}\Examples";               
-Name: "{group}\Templates";          Filename: "{app}\Templates";              
-Name: "{group}\RunCleaner";         Filename: "{app}\Scripts\RunCleaner.vbs";
-Name: "{group}\API documentation";  Filename: "{app}\Selenium.chm";           
-Name: "{group}\ChangeLog";          Filename: "{app}\CHANGELOG.txt";    
-Name: "{group}\Uninstall";          Filename: "{uninstallexe}"
+;[Icons]
+;Name: "{group}\Project Home Page";  Filename: {#AppURL};                      WorkingDir: "{app}";
+;Name: "{group}\Vbs Console";        Filename: "{app}\vbsc.exe";               Components: pkg_cons;
+;Name: "{group}\Examples";           Filename: "{app}\Examples";               
+;Name: "{group}\Templates";          Filename: "{app}\Templates";              
+;Name: "{group}\RunCleaner";         Filename: "{app}\Scripts\RunCleaner.vbs";
+;Name: "{group}\API documentation";  Filename: "{app}\Selenium.chm";           
+;Name: "{group}\ChangeLog";          Filename: "{app}\CHANGELOG.txt";    
+;Name: "{group}\Uninstall";          Filename: "{uninstallexe}"
 
-Name: "{group}\Start Firefox";      Filename: "{app}\Scripts\StartFirefox.vbs";          Components: pkg_ff;
-Name: "{group}\Start Chrome";       Filename: "{app}\Scripts\StartChrome.vbs";           Components: pkg_cr;
-Name: "{group}\Start Chrome Debug"; Filename: "{app}\Scripts\StartChromeDebug.vbs";      Components: pkg_cr;
-Name: "{group}\Start IE";           Filename: "{app}\Scripts\StartInternetExplorer.vbs"; Components: pkg_ie;
-Name: "{group}\Start Opera";        Filename: "{app}\Scripts\StartOpera.vbs";            Components: pkg_op;
-Name: "{group}\Start PhantomJS";    Filename: "{app}\Scripts\StartPhantomJS.vbs";        Components: pkg_pjs;
+;Name: "{group}\Start Firefox";      Filename: "{app}\Scripts\StartFirefox.vbs";          Components: pkg_ff;
+;Name: "{group}\Start Chrome";       Filename: "{app}\Scripts\StartChrome.vbs";           Components: pkg_cr;
+;Name: "{group}\Start Chrome Debug"; Filename: "{app}\Scripts\StartChromeDebug.vbs";      Components: pkg_cr;
+;Name: "{group}\Start IE";           Filename: "{app}\Scripts\StartInternetExplorer.vbs"; Components: pkg_ie;
+;Name: "{group}\Start Opera";        Filename: "{app}\Scripts\StartOpera.vbs";            Components: pkg_op;
+;Name: "{group}\Start PhantomJS";    Filename: "{app}\Scripts\StartPhantomJS.vbs";        Components: pkg_pjs;
 
 
 [Registry]
