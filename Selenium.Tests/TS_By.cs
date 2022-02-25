@@ -8,6 +8,9 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 namespace Selenium.Tests {
 
     [TestFixture(Browser.Firefox)]
+    [TestFixture(Browser.Gecko)]
+    [TestFixture(Browser.Chrome)]
+    [TestFixture(Browser.Edge)]
     class TS_By : BaseBrowsers {
 
         _By by = new By();
@@ -73,8 +76,6 @@ namespace Selenium.Tests {
             var ele = driver.FindElement(By.Any(By.Id("id_missing"), By.Id("id-4")));
             A.AreEqual("Div4", ele.Text());
         }
-
-
 
         [TestCase]
         public void ShouldFindElementsById() {

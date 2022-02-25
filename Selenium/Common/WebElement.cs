@@ -18,21 +18,23 @@ namespace Selenium {
     [Description("Defines the interface through which the user controls elements on the page.")]
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     public class WebElement : SearchContext, ComInterfaces._WebElement, IJsonObject {
+        public const string ELEMENT    = "ELEMENT";
+        public const string IDENTIFIER = "element-6066-11e4-a52e-4f735466cecf";
 
         /// <summary>
         /// Returns the element with focus, or BODY if nothing has focus.
         /// </summary>
         internal static WebElement GetActiveWebElement(RemoteSession session) {
-            var result = (Dictionary)session.Send(RequestMethod.POST, "/element/active");
+            RequestMethod method = WebDriver.LEGACY ? RequestMethod.POST : RequestMethod.GET;
+            var result = (Dictionary)session.Send(method, "/element/active");
             return new WebElement(session, result);
         }
 
         internal static bool TryParse(Dictionary dict, out string id) {
-            return dict.TryGetValue("ELEMENT", out id);
-            //TODO: Change the key once implemented on the server side
-            //return dict.TryGetValue("ELEMENT-6066-11e4-a52e-4f735466cecf", out id);
+            if( WebDriver.LEGACY && dict.TryGetValue(ELEMENT, out id) )
+                return true;
+            return dict.TryGetValue(IDENTIFIER, out id);
         }
-
 
         internal readonly RemoteSession _session;
         internal readonly string Id;
@@ -65,9 +67,9 @@ namespace Selenium {
         /// <returns></returns>
         public Dictionary SerializeJson() {
             var dict = new Dictionary();
-            dict.Add("ELEMENT", this.Id);
-            //TODO: Change the key once implemented on the server side
-            //dict.Add("ELEMENT-6066-11e4-a52e-4f735466cecf", id);
+            if( !WebDriver.LEGACY )
+                dict.Add(IDENTIFIER, this.Id); // Selenium.NET sends both. Let's do the same.
+            dict.Add( ELEMENT, this.Id);
             return dict;
         }
 
@@ -125,8 +127,13 @@ namespace Selenium {
         /// </summary>
         /// <returns>Point</returns>
         public Point Location() {
-            var dict = (Dictionary)Send(RequestMethod.GET, "/location");
-            return new Point(dict);
+            if( WebDriver.LEGACY ) {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/location");
+                return new Point(dict);
+            } else {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/rect");
+                return new Point(dict);
+            }
         }
 
         /// <summary>
@@ -141,8 +148,13 @@ namespace Selenium {
         /// Returns the size of the element
         /// </summary>
         public Size Size() {
-            var dict = (Dictionary)Send(RequestMethod.GET, "/size");
-            return new Size(dict);
+            if( WebDriver.LEGACY ) {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/size");
+                return new Size(dict);
+            } else {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/rect");
+                return new Size(dict);
+            }
         }
 
         /// <summary>
@@ -189,6 +201,16 @@ namespace Selenium {
         }
 
         /// <summary>
+        /// Gets the property value.
+        /// </summary>
+        /// <param name="property">Property name</param>
+        /// <returns>Property</returns>
+        public object Property(string property) {
+            var value = Send(RequestMethod.GET, "/property/" + property);
+            return value;
+        }
+
+        /// <summary>
         /// Returns the value of a CSS property
         /// </summary>
         /// <param name="property">Property name</param>
@@ -203,8 +225,11 @@ namespace Selenium {
         /// </summary>
         /// <returns></returns>
         public object Value() {
-            var value = Send(RequestMethod.GET, "/attribute/value");
-            return value;
+            if( WebDriver.LEGACY ) {
+                var value = Send(RequestMethod.GET, "/attribute/value");
+                return value;
+            }
+            return Send(RequestMethod.GET, "/property/value");
         }
 
         /// <summary>
@@ -259,7 +284,7 @@ namespace Selenium {
         /// Clears the text if it’s a text entry element.
         /// </summary>
         public WebElement Clear() {
-            Send(RequestMethod.POST, "/clear");
+            Send(RequestMethod.POST, "/clear", "id", Id);
             return this;
         }
 
@@ -371,7 +396,7 @@ namespace Selenium {
             if (!_session.IsLocal && text.IndexOf(":/") != -1 && File.Exists(text)) {
                 text = _session.UploadFile(text);
             }
-            Send(RequestMethod.POST, "/value", "value", new string[] { text });
+            Send(RequestMethod.POST, "/value", "value", new string[] { text }, "text", text);
             return this;
         }
 
@@ -387,11 +412,22 @@ namespace Selenium {
         /// </summary>
         /// <param name="keys">Optional - Modifier Keys to press</param>
         public void Click(string keys = null) {
-            if (keys != null)
+            if (keys != null) {
+                if( WebDriver.LEGACY )
+                    _session.keyboard.SendKeys(keys);
+                else {
+                    new Actions( _session )
+                    .KeyDown(keys, this)
+                    .Click(this)
+                    .KeyUp(keys)
+                    .Perform();
+                    return;
+                }
+            }
+            Send(RequestMethod.POST, "/click", "id", Id );
+            if (keys != null) {
                 _session.keyboard.SendKeys(keys);
-            Send(RequestMethod.POST, "/click");
-            if (keys != null)
-                _session.keyboard.SendKeys(keys);
+            }
         }
 
         /// <summary>

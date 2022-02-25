@@ -60,7 +60,8 @@ namespace Selenium.Core {
         }
 
         public void ShutDown() {
-            Send(RequestMethod.GET, @"/shutdown", null);
+            if( WebDriver.LEGACY )
+                Send(RequestMethod.GET, @"/shutdown", null);
         }
 
         /// <summary>
@@ -127,6 +128,12 @@ namespace Selenium.Core {
                 response = (HttpWebResponse)request.EndGetResponse(asyncResult);
                 responseDict = GetHttpWebResponseContent(response);
             } catch (WebException ex) {
+#if DEBUG
+                Console.WriteLine( ex.Message );
+                Console.WriteLine( uri );
+                if( data != null )
+                    Console.WriteLine( data.ToString() );
+#endif                
                 if (ex.Status == WebExceptionStatus.RequestCanceled) {
                     throw new Errors.KeyboardInterruptError();
                 } else if (ex.Status == WebExceptionStatus.Timeout) {
@@ -135,6 +142,7 @@ namespace Selenium.Core {
                     try {
                         responseDict = GetHttpWebResponseContent(response);
                     } catch (Exception ex2) {
+                        Console.WriteLine( ex2.Message );
                         throw new SeleniumException(ex2);
                     }
                 } else {
@@ -148,21 +156,44 @@ namespace Selenium.Core {
                     response.Close();
             }
 
-            if (responseDict != null) {
-                //Evaluate the status and error
-                int statusCode = (int)responseDict["status"];
-                if (statusCode != 0) {
-                    object errorObject = responseDict["value"];
-                    Dictionary errorAsDict = errorObject as Dictionary;
-                    string errorMessage;
-                    if (errorAsDict != null) {
-                        errorMessage = errorAsDict["message"] as string;
-                    } else {
-                        errorMessage = errorObject as string;
+            if (responseDict != null ) {
+                if(responseDict.ContainsKey("status")) {
+                    //Evaluate the status and error
+                    int statusCode = (int)responseDict["status"];
+                    if (statusCode != 0) {
+                        object errorObject = responseDict["value"];
+                        Dictionary errorAsDict = errorObject as Dictionary;
+                        string errorMessage;
+                        if (errorAsDict != null) {
+                            errorMessage = errorAsDict["message"] as string;
+                        } else {
+                            errorMessage = errorObject as string;
+                        }
+                        SeleniumError error = Errors.WebRequestError.Select(statusCode, errorMessage);
+                        error.ResponseData = responseDict;
+                        throw error;
                     }
-                    SeleniumError error = Errors.WebRequestError.Select(statusCode, errorMessage);
-                    error.ResponseData = responseDict;
-                    throw error;
+                }
+                if( !WebDriver.LEGACY && response.StatusCode != HttpStatusCode.OK && responseDict.ContainsKey("value")) {
+                    object errorObject = responseDict["value"];
+                    if( errorObject is Dictionary ) {
+                        Dictionary errorAsDict = errorObject as Dictionary;
+                        if (errorAsDict != null) {
+                            string errorMessage = errorAsDict["message"] as string;
+                            string errorStr = errorAsDict["error"] as string;
+#if DEBUG
+                            Console.WriteLine( "!!! Error: " + errorStr );
+                            Console.WriteLine( errorMessage );
+#endif                
+                            if( errorStr == "no such element" )
+                                throw new Errors.NoSuchElementError(errorMessage);
+                            if( errorStr == "no such alert" )
+                                throw new Errors.NoAlertPresentError(errorMessage);
+                            if( errorStr == "unexpected alert open" )
+                                throw new Errors.UnexpectedAlertOpenError(errorMessage);
+                            throw new Errors.WebRequestError(errorMessage);
+                        }
+                    }
                 }
             }
             return responseDict;

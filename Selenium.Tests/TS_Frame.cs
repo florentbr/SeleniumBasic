@@ -7,10 +7,14 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 namespace Selenium.Tests {
 
     [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Opera)]
+    [TestFixture(Browser.Gecko)]
     [TestFixture(Browser.Chrome)]
+    [TestFixture(Browser.Edge)]
+/*
+    [TestFixture(Browser.Opera)]
     [TestFixture(Browser.IE)]
     [TestFixture(Browser.PhantomJS)]
+*/
     class TS_Frame : BaseBrowsers {
 
         public TS_Frame(Browser browser)
@@ -77,7 +81,5 @@ namespace Selenium.Tests {
             driver.SwitchToParentFrame();
             A.AreEqual("Frame2", driver.FindElementById("info").Text());
         }
-
     }
-
 }

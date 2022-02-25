@@ -51,6 +51,8 @@ namespace Selenium {
 
         const string RUNNING_OBJECT_NAME = "Selenium.WebDriver";
 
+        public static bool LEGACY = true; // but Gecko driver does not support many endpoints and payloads previously used here
+
         internal Capabilities Capabilities = new Capabilities();
         internal Dictionary Preferences = new Dictionary();
         internal List Extensions = new List();
@@ -70,6 +72,7 @@ namespace Selenium {
         /// Creates a new WebDriver object. 
         /// </summary>
         public WebDriver() {
+            WebDriver.LEGACY = true;
             UnhandledException.Initialize();
             RegisterRunningObject();
             COMDisposable.Subscribe(this, typeof(ComInterfaces._WebDriver));
@@ -223,6 +226,9 @@ namespace Selenium {
             try {
                 browser = ExpendBrowserName(browser);
                 switch (browser) {
+                    case "gecko":
+                        _service = GeckoDriver.StartService(this);
+                        break;
                     case "firefox":
                         _service = FirefoxDriver.StartService(this);
                         break;
@@ -281,6 +287,9 @@ namespace Selenium {
                 switch (browser) {
                     case "firefox":
                         FirefoxDriver.ExtendCapabilities(this, true);
+                        break;
+                    case "gecko":
+                        GeckoDriver.ExtendCapabilities(this, true);
                         break;
                     case "chrome":
                         ChromeDriver.ExtendCapabilities(this, true);
@@ -346,6 +355,8 @@ namespace Selenium {
                 case "firefox":
                 case "ff":
                     return "firefox";
+                case "gecko":
+                    return "gecko";
                 case "chrome":
                 case "cr":
                     return "chrome";
@@ -882,6 +893,18 @@ namespace Selenium {
         /// <returns>Current web driver</returns>
         public bool SwitchToFrame(object identifier, int timeout = -1, bool raise = true) {
             try {
+
+                if( !WebDriver.LEGACY ) {
+                    var name = identifier as string;
+                    if( name != null ) {
+                        string css = "frame[name='" + name + "'],iframe[name='" + name + "'],frame#" + name + ",iframe#" + name;
+                        WebElement fr_elem = FindElementBy(Strategy.Css, css, timeout, raise);
+                        if( fr_elem == null )
+                            throw new Errors.NoSuchFrameError();
+                        identifier = fr_elem;
+                    }
+                }
+
                 this.session.frame.SwitchToFrame(identifier, timeout);
             } catch (Errors.NoSuchFrameError) {
                 if (raise)

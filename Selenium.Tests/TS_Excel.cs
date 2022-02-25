@@ -9,7 +9,7 @@ using TestFixtureTearDown = NUnit.Framework.TestFixtureTearDownAttribute;
 
 namespace Selenium.Tests {
 
-    [TestFixture]
+//    [TestFixture]
     class TS_Excel : BaseExcel {
 
         [Test]

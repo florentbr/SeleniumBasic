@@ -155,7 +155,8 @@ namespace Selenium {
             string match = index.ToString(CultureInfo.InvariantCulture);
             bool matched = false;
             foreach (WebElement option in this.Options) {
-                if (match.Equals(option.Attribute("index"))) {
+                var value = WebDriver.LEGACY ? option.Attribute("index") : option.Property("index");
+                if (value != null && match.Equals( value.ToString() )) {
                     SetSelected(option);
                     if (!this.IsMultiple)
                         return;

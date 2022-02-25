@@ -5,12 +5,15 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 using ExpectedException = NUnit.Framework.ExpectedExceptionAttribute;
 
 namespace Selenium.Tests {
-
     [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Opera)]
+    [TestFixture(Browser.Gecko)]
     [TestFixture(Browser.Chrome)]
+    [TestFixture(Browser.Edge)]
+/*
+    [TestFixture(Browser.Opera)]
     [TestFixture(Browser.IE)]
-    //[TestFixture(Browser.PhantomJS)]
+    [TestFixture(Browser.PhantomJS)]
+*/
     class TS_Alert : BaseBrowsers {
 
         public TS_Alert(Browser browser)
@@ -72,10 +75,10 @@ namespace Selenium.Tests {
         public void ShouldThrowUnexpectedAlert() {
             driver.Get("/input.html");
             driver.ExecuteScript("window.setTimeout(function(){window.alert('na');}, 0);");
+            driver.Wait( 1000 );
             var ele = driver.FindElementById("input__search");
             ele.Clear();
         }
-
     }
 
 }

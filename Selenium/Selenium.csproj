@@ -96,6 +96,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -110,6 +113,7 @@
     <Compile Include="ComInterfaces\_Size.cs" />
     <Compile Include="Core\DriverExtension.cs" />
     <Compile Include="Drivers\EdgeDriver.cs" />
+    <Compile Include="Drivers\GeckoDriver.cs" />
     <Compile Include="Errors\FileNotFoundError.cs" />
     <Compile Include="Internal\COMDisposable.cs" />
     <Compile Include="Internal\ProcessExt.cs" />
@@ -276,10 +280,8 @@
   <PropertyGroup>
     <PostBuildEvent>xcopy /D /Y "$(ProjectDir)\..\References\firefoxdriver.xpi" .
 xcopy /D /Y "$(ProjectDir)\..\References\chromedriver.exe" .
-xcopy /D /Y "$(ProjectDir)\..\References\operadriver.exe" .
-xcopy /D /Y "$(ProjectDir)\..\References\iedriver.exe" .
-xcopy /D /Y "$(ProjectDir)\..\References\iedriver64.exe" .
-xcopy /D /Y "$(ProjectDir)\..\References\phantomjs.exe" .</PostBuildEvent>
+xcopy /D /Y "$(ProjectDir)\..\References\edgedriver.exe" .
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

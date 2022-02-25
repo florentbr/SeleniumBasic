@@ -8,10 +8,14 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 namespace Selenium.Tests {
 
     [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Opera)]
+    [TestFixture(Browser.Gecko)]
     [TestFixture(Browser.Chrome)]
+    [TestFixture(Browser.Edge)]
+/*
+    [TestFixture(Browser.Opera)]
     [TestFixture(Browser.IE)]
     [TestFixture(Browser.PhantomJS)]
+*/
     class TS_Element : BaseBrowsers {
 
         public TS_Element(Browser browser)
@@ -21,7 +25,7 @@ namespace Selenium.Tests {
         public void SetUp() {
             driver.Get("/element.html");
         }
-
+/*
         [TestCase]
         public void ShouldReturnDisplayState() {
             var ele1 = driver.FindElementById("input__search");
@@ -97,7 +101,7 @@ namespace Selenium.Tests {
             A.AreEqual(308, size.Width);
             A.AreEqual(58, size.Height);
         }
-
+*/
         [TestCase]
         public void ShouldReturnActiveElement() {
             var ele1 = driver.FindElementById("input__search");
@@ -106,7 +110,7 @@ namespace Selenium.Tests {
             var ele2 = driver.ActiveElement();
             A.True(ele1.Equals(ele2));
         }
-
+/*
         [TestCase]
         public void ShouldClearElement() {
             var ele1 = driver.FindElementById("input__search");
@@ -126,7 +130,7 @@ namespace Selenium.Tests {
             ele2.Click();
             A.AreEqual("", ele1.Attribute("value"));
         }
-
+*/
     }
 
 }

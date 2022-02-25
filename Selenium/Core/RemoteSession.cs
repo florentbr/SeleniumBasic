@@ -52,9 +52,15 @@ namespace Selenium.Core {
 
             var response = (Dictionary)server.Send(RequestMethod.POST, "/session", param);
             try {
-                _id = (string)response["sessionId"];
+                if( response.ContainsKey("sessionId") ) {
+                    _id = (string)response["sessionId"];
+                    this.capabilities = (Dictionary)response["value"];
+                } else { 
+                    Dictionary value = (Dictionary)response["value"];
+                    _id = (string)value["sessionId"];
+                    this.capabilities = (Dictionary)value["capabilities"];
+                }
                 _uri = "/session/" + _id;
-                this.capabilities = (Dictionary)response["value"];
             } catch (Errors.KeyNotFoundError ex) {
                 throw new DeserializeException(typeof(RemoteSession), ex);
             }

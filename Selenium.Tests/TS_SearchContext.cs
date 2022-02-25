@@ -9,10 +9,14 @@ using ExpectedException = NUnit.Framework.ExpectedExceptionAttribute;
 namespace Selenium.Tests {
 
     [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Opera)]
+    [TestFixture(Browser.Gecko)]
     [TestFixture(Browser.Chrome)]
+    [TestFixture(Browser.Edge)]
+/*
+    [TestFixture(Browser.Opera)]
     [TestFixture(Browser.IE)]
     [TestFixture(Browser.PhantomJS)]
+*/
     class TS_SearchContext : BaseBrowsers {
 
         public TS_SearchContext(Browser browser)

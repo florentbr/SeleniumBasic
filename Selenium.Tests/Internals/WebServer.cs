@@ -10,7 +10,7 @@ namespace Selenium.Tests.Internals {
 
     public class WebServer {
 
-        public static string BaseUri = @"http://localhost:9328";
+        public static string BaseUri = @"http://localhost:19328";
 
         static WebServer _server = null;
 

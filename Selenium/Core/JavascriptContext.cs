@@ -23,7 +23,9 @@ namespace Selenium.Core {
         /// <param name="unbox">Optional - Converts web elements to objects</param>
         /// <returns></returns>
         public object Execute(string script, object arguments = null, bool unbox = true) {
-            object result = this.session.Send(RequestMethod.POST, "/execute", "script", script, "args", arguments);
+            string endpoint = WebDriver.LEGACY ? "/execute" : "/execute/sync";
+            // The '/sync' suffix is required by the spec
+            object result = this.session.Send(RequestMethod.POST, endpoint, "script", script, "args", arguments);
             if (unbox)
                 return Unbox(result);
             return result;
@@ -43,8 +45,8 @@ namespace Selenium.Core {
                 session.timeouts.Script = timeout;
 
             string script_ex = "var callback=arguments[--arguments.length];" + script;
-
-            object result = this.session.Send(RequestMethod.POST, "/execute_async", "script", script_ex, "args", arguments);
+            string endpoint = WebDriver.LEGACY ? "/execute_async" : "/execute/async";
+            object result = this.session.Send(RequestMethod.POST, endpoint, "script", script_ex, "args", arguments);
             if (unbox)
                 return Unbox(result);
             return result;
@@ -70,8 +72,8 @@ namespace Selenium.Core {
                 + " if(res) callback(res); else setTimeout(tst, 60);"
                 + "};"
                 + "tst();";
-
-            object result = this.session.Send(RequestMethod.POST, "/execute_async", "script", script_ex, "args", arguments);
+            string endpoint = WebDriver.LEGACY ? "/execute_async" : "/execute/async";
+            object result = this.session.Send(RequestMethod.POST, endpoint, "script", script_ex, "args", arguments);
             return Unbox(result);
         }
 

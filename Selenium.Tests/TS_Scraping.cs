@@ -6,10 +6,14 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 namespace Selenium.Tests {
 
     [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Opera)]
+    [TestFixture(Browser.Gecko)]
     [TestFixture(Browser.Chrome)]
+    [TestFixture(Browser.Edge)]
+/*
+    [TestFixture(Browser.Opera)]
     [TestFixture(Browser.IE)]
     [TestFixture(Browser.PhantomJS)]
+*/
     class TS_Scraping : BaseBrowsers {
 
         public TS_Scraping(Browser browser)

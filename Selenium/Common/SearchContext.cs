@@ -112,7 +112,11 @@ namespace Selenium {
         /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
         /// <returns><see cref="WebElement" /> or null</returns>
         public WebElement FindElementById(string id, int timeout = -1, bool raise = true) {
-            return this.FindElementBy(Strategy.Id, id, timeout, raise);
+            if( WebDriver.LEGACY )
+                return this.FindElementBy(Strategy.Id, id, timeout, raise);
+            else {
+                return this.FindElementBy(Strategy.Css, "#" + id, timeout, raise);
+            }
         }
 
         /// <summary>
@@ -297,6 +301,8 @@ namespace Selenium {
             string relativeUri = this.uri + "/element";
             Dictionary element;
             try {
+                if( !WebDriver.LEGACY )
+                    TranslateStrategy( ref strategy, ref value );
                 string method = By.FormatStrategy(strategy);
                 element = (Dictionary)session.Send(RequestMethod.POST, relativeUri, "using", method, "value", value);
             } catch (Errors.NoSuchElementError) {
@@ -317,6 +323,24 @@ namespace Selenium {
             return new WebElement(session, element);
         }
 
+        private bool TranslateStrategy( ref Strategy strategy, ref string value ) {
+            switch( strategy ) {
+            case Strategy.Id:
+                strategy = Strategy.Css;
+                value = "#" + value;
+                return true;
+            case Strategy.Class:
+                strategy = Strategy.Css;
+                value = "." + value;
+                return true;
+            case Strategy.Name:
+                strategy = Strategy.XPath;
+                value = ( this is WebElement ? "." : "" ) + "//*[@name='" + value + "']";
+                return true;
+            }
+            return false;
+        }
+
         private WebElement FindAnyElement(By byAny, int timeout) {
             RemoteSession session = this.session;
             string relativeUri = this.uri + "/element";
@@ -327,8 +351,11 @@ namespace Selenium {
                     if (by == null)
                         break;
                     try {
-                        string method = By.FormatStrategy(by.Strategy);
+                        Strategy strategy = by.Strategy;
                         string value = by.Value.ToString();
+                        if( !WebDriver.LEGACY )
+                            TranslateStrategy( ref strategy, ref value );
+                        string method = By.FormatStrategy(strategy);
                         element = (Dictionary)session.Send(RequestMethod.POST, relativeUri, "using", method, "value", value);
                         return new WebElement(session, element);
                     } catch (Errors.NoSuchElementError) { }
@@ -346,6 +373,8 @@ namespace Selenium {
             RemoteSession session = this.session;
             string uri = this.uri + "/elements";
             try {
+                if( !WebDriver.LEGACY )
+                    TranslateStrategy( ref strategy, ref value );
                 var method = By.FormatStrategy(strategy);
                 List elements = session.SendUntil(timeout,
                     () => (List)session.Send(RequestMethod.POST, uri, "using", method, "value", value),
@@ -366,8 +395,11 @@ namespace Selenium {
                 foreach (By by in (By[])byAny.Value) {
                     if (by == null)
                         break;
-                    var method = By.FormatStrategy(by.Strategy);
+                    Strategy strategy = by.Strategy;
                     var value = (string)by.Value;
+                    if( !WebDriver.LEGACY )
+                        TranslateStrategy( ref strategy, ref value );
+                    var method = By.FormatStrategy(strategy);
                     List elements = (List)session.Send(RequestMethod.POST, uri, "using", method, "value", value);
                     webelements.Add(session, elements);
                 }
@@ -385,6 +417,8 @@ namespace Selenium {
         private void WaitElementNotPresent(Strategy strategy, string value, int timeout) {
             RemoteSession session = this.session;
             string uri = this.uri + "/element";
+            if( !WebDriver.LEGACY )
+                TranslateStrategy( ref strategy, ref value );
             string method = By.FormatStrategy(strategy);
             DateTime endTime = session.GetEndTime(timeout);
             try {
@@ -409,8 +443,11 @@ namespace Selenium {
                 if (by == null)
                     break;
                 try {
-                    string method = By.FormatStrategy(by.Strategy);
+                    Strategy strategy = by.Strategy;
                     string value = by.Value.ToString();
+                    if( !WebDriver.LEGACY )
+                        TranslateStrategy( ref strategy, ref value );
+                    string method = By.FormatStrategy(strategy);
                     session.Send(RequestMethod.POST, uri, "using", method, "value", value);
                     while (true) {
                         if (DateTime.UtcNow > endTime)
