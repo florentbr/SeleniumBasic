@@ -133,6 +133,16 @@ namespace Selenium.Core {
             }
         }
 
+        private Window MayBeAddWindowToCache( string handle ) {
+            foreach (Window win in _cachedWindows) {
+                if (win.Handle == handle)
+                    return win;
+            }
+            Window new_win = new Window(_session, this, handle);
+            _cachedWindows.Add(new_win);
+            return new_win;
+        }
+
         /// <summary>
         /// Change focus to another window.
         /// </summary>
@@ -142,19 +152,22 @@ namespace Selenium.Core {
             var endTime = _session.GetEndTime(timeout);
             while (true) {
                 try {
+                    string handle = null;
                     if( WebDriver.LEGACY ) {
-                        string handle = WindowContext.ActivateWindow(_session, name);
+                        handle = WindowContext.ActivateWindow(_session, name);
                         _previousWindow = _currentWindow;
-                        foreach (Window win in _cachedWindows) {
-                            if (win.Handle == handle) {
-                                _currentWindow = win;
-                                return _currentWindow;
-                            }
-                        }
-                        _currentWindow = new Window(_session, this, handle);
-                        _cachedWindows.Add(_currentWindow);
+                        _currentWindow = MayBeAddWindowToCache( handle );
                         return _currentWindow;
                     } else {
+                        // assume first that the name is actually the handle
+                        try {
+                            handle = WindowContext.ActivateWindow(_session, name);
+                        } catch( Selenium.Errors.WebRequestError ) {}
+                        if (handle == name) {
+                            _previousWindow = _currentWindow;
+                            _currentWindow = MayBeAddWindowToCache( handle );
+                            return _currentWindow;
+                        }
                         List windows, handles;
                         this.ListWindows(out windows, out handles);
                         foreach (Window win in windows) {

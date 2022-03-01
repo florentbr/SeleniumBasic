@@ -51,6 +51,8 @@ namespace Selenium.Tests {
             driver.Get("/win1.html");
             A.AreEqual("Window1", driver.Title);
 
+            var win1_handle = driver.Window.Handle;
+
             driver.FindElementByLinkText("Window2").Click();
             driver.SwitchToWindowByTitle("Window2");
             A.AreEqual("Window2", driver.Title);
@@ -64,6 +66,9 @@ namespace Selenium.Tests {
 
             driver.SwitchToWindowByName("win3");
             A.AreEqual("Window3", driver.Title);
+
+            driver.SwitchToWindowByName(win1_handle);
+            A.AreEqual("Window1", driver.Title);
         }
 
         [TestCase]

@@ -1,8 +1,10 @@
 .vs
 References
+packages
 bin
 obj
 Xlbin
+*.msi
 *.exe
 *.log
 *.bak
