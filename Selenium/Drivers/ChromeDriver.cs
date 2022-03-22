@@ -72,7 +72,7 @@ namespace Selenium {
             capa.TryMove("debuggerAddress", opts);
 
             if (wd.Profile != null)
-                wd.Arguments.Add("user-data-dir=" + ExpandProfile(wd.Profile, remote));
+                wd.Arguments.Add("user-data-dir=" + ExpandProfile(wd.Profile, remote)); // make sure the profile is not a symlinked path!
 
             if (wd.Arguments.Count != 0)
                 opts["args"] = wd.Arguments;

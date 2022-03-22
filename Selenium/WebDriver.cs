@@ -127,7 +127,8 @@ namespace Selenium {
         /// </summary>
         /// <param name="nameOrDirectory">Profil name (Firefox only) or directory (Firefox and Chrome)</param>
         /// <param name="persistant">If true, the browser will be launched without a copy the profile (Firefox only)</param>
-        /// <remarks>The profile directory can be copied from the user temp folder (run %temp%) before the WebDriver is stopped. It's also possible to create a new Firefox profile by launching firefox with the "-p" switch (firefox.exe -p).</remarks>
+        /// <remarks>The profile directory can be copied from the user temp folder (run %temp%) before the WebDriver is stopped. 
+        /// It's also possible to create a new Firefox profile by launching firefox with the "-p" switch (firefox.exe -p).</remarks>
         /// <example>
         /// <code lang="vbs">
         ///   Dim driver As New Selenium.FirefoxDriver

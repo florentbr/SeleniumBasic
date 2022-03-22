@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using Selenium.Core;
+using Selenium.Internal;
 using System;
+using System.IO;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -71,10 +73,27 @@ namespace Selenium {
 
             Dictionary opts;
             if (!capa.TryGetValue("edgeOptions", out opts))
-                capa["edgeOptions"] = opts = new Dictionary();
+                capa["ms:edgeOptions"] = opts = new Dictionary();
+
+            if (wd.Profile != null)
+                wd.Arguments.Add("--user-data-dir=" + ExpandProfile(wd.Profile, remote));
+
+            if (wd.Arguments.Count != 0)
+                opts["args"] = wd.Arguments;
 
         }
 
+        private static string ExpandProfile(string profile, bool remote) {
+            if (!remote) {
+                if (IOExt.IsPath(profile)) {
+                    profile = IOExt.ExpandPath(profile);
+                } else {
+                    profile = IOExt.AppDataFolder + @"\Microsoft\Edge\Profiles\" + profile;
+                }
+                Directory.CreateDirectory(profile);
+            }
+            return profile;
+        }
     }
 
 }
