@@ -72,7 +72,7 @@ namespace Selenium {
             Capabilities capa = wd.Capabilities;
 
             Dictionary opts;
-            if (!capa.TryGetValue("edgeOptions", out opts))
+            if (!capa.TryGetValue("ms:edgeOptions", out opts))
                 capa["ms:edgeOptions"] = opts = new Dictionary();
 
             if (wd.Profile != null)

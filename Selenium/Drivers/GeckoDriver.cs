@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using Selenium.Core;
+using Selenium.Internal;
 using System;
+using System.IO;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -73,9 +75,23 @@ namespace Selenium {
             Capabilities capa = wd.Capabilities;
 
             Dictionary opts;
-            if (!capa.TryGetValue("GeckoOptions", out opts))
-                capa["GeckoOptions"] = opts = new Dictionary();
+            if (!capa.TryGetValue("moz:firefoxOptions", out opts))
+                capa["moz:firefoxOptions"] = opts = new Dictionary();
 
+
+            if (wd.Profile != null) {
+                if (IOExt.IsPath(wd.Profile)) {
+                    string profile = IOExt.ExpandPath(wd.Profile);
+                    Directory.CreateDirectory(profile);
+                    wd.Arguments.Add("-profile");
+                    wd.Arguments.Add(profile);
+                } else {
+                    wd.Arguments.Add("-P");
+                    wd.Arguments.Add(wd.Profile);
+                }
+            }
+            if (wd.Arguments.Count != 0)
+                opts["args"] = wd.Arguments;
         }
 
     }
