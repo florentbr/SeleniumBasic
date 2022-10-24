@@ -607,21 +607,30 @@ namespace Selenium {
         /// Goes one step backward in the browser history.
         /// </summary>
         public void GoBack() {
-            this.session.Send(RequestMethod.POST, "/back");
+            if( WebDriver.LEGACY )
+                this.session.Send(RequestMethod.POST, "/back");
+            else
+                this.session.Send(RequestMethod.POST, "/back", new Dictionary());
         }
 
         /// <summary>
         /// Goes one step forward in the browser history.
         /// </summary>
         public void GoForward() {
-            this.session.Send(RequestMethod.POST, "/forward");
+            if( WebDriver.LEGACY )
+                this.session.Send(RequestMethod.POST, "/forward");
+            else
+                this.session.Send(RequestMethod.POST, "/forward", new Dictionary());
         }
 
         /// <summary>
         /// Refreshes the current page.
         /// </summary>
         public void Refresh() {
-            this.session.Send(RequestMethod.POST, "/refresh");
+            if( WebDriver.LEGACY )
+                this.session.Send(RequestMethod.POST, "/refresh");
+            else
+                this.session.Send(RequestMethod.POST, "/refresh", new Dictionary());
         }
 
         #endregion

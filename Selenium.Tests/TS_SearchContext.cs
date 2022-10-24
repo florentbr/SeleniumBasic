@@ -9,7 +9,7 @@ using ExpectedException = NUnit.Framework.ExpectedExceptionAttribute;
 namespace Selenium.Tests {
 
     [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Gecko)]
+    [TestFixture(Browser.Gecko, Category = "InFocus")]
     [TestFixture(Browser.Chrome)]
     [TestFixture(Browser.Edge)]
 /*
@@ -148,13 +148,13 @@ setTimeout(function(){
     document.body.appendChild(e);
 }, 100);
             ");
-            var ele = driver.FindElementById("id-append", 500, true);
+            var ele = driver.FindElementById("id-append", 1500, true);
         }
 
         [TestCase]
         [ExpectedException(typeof(Selenium.Errors.NoSuchElementError))]
         public void ShouldNotFind() {
-            var ele = driver.FindElementById("id-append", 50, true);
+            var ele = driver.FindElementById("id-append", 5000, true);
         }
 
         [TestCase]

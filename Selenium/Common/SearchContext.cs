@@ -308,9 +308,12 @@ namespace Selenium {
             } catch (Errors.NoSuchElementError) {
                 if (timeout == 0)
                     throw;
+                if( timeout == -1 ) timeout = session.timeouts.timeout_implicitwait;
+                int time_chunk = timeout / 10;
+                if( time_chunk < 50 ) time_chunk = 50;
                 var endTime = session.GetEndTime(timeout);
                 while (true) {
-                    SysWaiter.Wait();
+                    SysWaiter.Wait( time_chunk );
                     try {
                         element = (Dictionary)session.SendAgain();
                         break;

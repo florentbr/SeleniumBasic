@@ -22,7 +22,14 @@ namespace Selenium.Tests {
 
         [SetUp]
         public void SetUp() {
-            driver.Get("/win1.html");
+            driver.Get("/win1.html?param1=1&param2=2");
+        }
+
+        [TestCase]
+        public void Refresh() {
+            string url = driver.Url;
+            driver.Refresh();
+            A.AreEqual( url, driver.Url );
         }
 
         [TestCase]

@@ -9,7 +9,7 @@ namespace Sample {
                 Assembly.GetExecutingAssembly().Location,
                 "/run:Selenium.Tests"
                 // to test an individual fixture, uncomment the following line and add ', Category = "InFocus"' to the fixture
-                //,"/include:InFocus"
+                ,"/include:InFocus"
             };
             int returnCode = NUnit.ConsoleRunner.Runner.Main(my_args);
 

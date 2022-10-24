@@ -237,7 +237,7 @@ namespace Selenium.Core {
                         case 404: throw new Exception("Unknown Commands: " + bodyText);
                         case 405: throw new Exception("Invalid Command Method: " + bodyText);
                         case 501: throw new Exception("Unimplemented Commands: " + bodyText);
-                        default: throw new Exception(response.StatusDescription);
+                        default:  throw new Exception(response.StatusCode + " " + response.StatusDescription + " " + bodyText);
                     }
                 }
             }

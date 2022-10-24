@@ -25,7 +25,7 @@ namespace Selenium.Tests {
         public void SetUp() {
             driver.Get("/element.html");
         }
-/*
+
         [TestCase]
         public void ShouldReturnDisplayState() {
             var ele1 = driver.FindElementById("input__search");
@@ -101,7 +101,6 @@ namespace Selenium.Tests {
             A.AreEqual(308, size.Width);
             A.AreEqual(58, size.Height);
         }
-*/
         [TestCase]
         public void ShouldReturnActiveElement() {
             var ele1 = driver.FindElementById("input__search");
@@ -110,27 +109,33 @@ namespace Selenium.Tests {
             var ele2 = driver.ActiveElement();
             A.True(ele1.Equals(ele2));
         }
-/*
         [TestCase]
         public void ShouldClearElement() {
             var ele1 = driver.FindElementById("input__search");
             ele1.SendKeys("abc");
-            A.AreEqual("abc", ele1.Attribute("value"));
+            A.AreEqual("abc", ele1.Value());
             ele1.Clear();
-            A.AreEqual("", ele1.Attribute("value"));
+            A.AreEqual("", ele1.Value());
         }
 
         [TestCase]
         public void ShouldClickElement() {
             var ele1 = driver.FindElementById("input__search");
             ele1.SendKeys("abc");
-            A.AreEqual("abc", ele1.Attribute("value"));
+            A.AreEqual("abc", ele1.Value());
 
             var ele2 = driver.FindElementById("bt_reset");
             ele2.Click();
-            A.AreEqual("", ele1.Attribute("value"));
+            A.AreEqual("", ele1.Value());
         }
-*/
+        [TestCase]
+        public void ShouldThrowOnBlockedClick() {
+            var ble = driver.FindElementById("blocker");
+            ble.ExecuteScript("this.style.display='block';");
+
+            var ele2 = driver.FindElementById("bt_reset");
+            A.Catch( () => ele2.Click(), "Expected to throw when the element was blocked!" );
+        }
     }
 
 }
