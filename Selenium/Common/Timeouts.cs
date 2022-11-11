@@ -40,8 +40,9 @@ namespace Selenium {
         internal int timeout_script = 15000;       // 15 seconds
 
         /// <summary>
-        /// Amount of time that Selenium will wait for waiting commands to complete
+        /// Amount of time that Selenium will wait for commands to complete. Default is 3000ms
         /// </summary>
+        /// <remarks>Default is 3000ms</remarks>
         public int ImplicitWait {
             get {
                 return timeout_implicitwait;
@@ -55,6 +56,7 @@ namespace Selenium {
         /// <summary>
         /// Amount of time the driver should wait while loading a page before throwing an exception.
         /// </summary>
+        /// <remarks>Default is 60000ms</remarks>
         public int PageLoad {
             get {
                 return timeout_pageload;
@@ -70,6 +72,7 @@ namespace Selenium {
         /// <summary>
         /// Amount of time the driver should wait while executing an asynchronous script before throwing an error.
         /// </summary>
+        /// <remarks>Default is 15000ms</remarks>
         public int Script {
             get {
                 return timeout_script;
@@ -83,8 +86,9 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Maximum amount of time the driver should wait while waiting for a response from the server.
+        /// Maximum amount of time the driver should wait while waiting for a response from the server. 
         /// </summary>
+        /// <remarks>Default is 90000ms</remarks>
         public int Server {
             get {
                 return timeout_server;

@@ -4,6 +4,8 @@ packages
 bin
 obj
 Xlbin
+Sandcastle/Help
+Sandcastle/COMs.xml
 *.msi
 *.exe
 *.log

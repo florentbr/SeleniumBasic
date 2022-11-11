@@ -8,7 +8,7 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 namespace Selenium.Tests {
 
     [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Gecko)]
+    [TestFixture(Browser.Gecko, Category = "InFocus")]
     [TestFixture(Browser.Chrome)]
     [TestFixture(Browser.Edge)]
 /*

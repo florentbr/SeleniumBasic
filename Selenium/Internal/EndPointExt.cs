@@ -62,7 +62,6 @@ namespace Selenium.Internal {
         /// <summary>
         /// Returns true if a given host:port is connectable, false otherwise
         /// </summary>
-        /// <param name="endPoint">Endpoint holding the host ip and port</param>
         /// <param name="timeout">Timeout in millisecond</param>
         /// <param name="delay">Delay to retry in millisecond</param>
         /// <returns>True if succeed, false otherwise</returns>
@@ -96,7 +95,6 @@ namespace Selenium.Internal {
         /// <summary>
         /// Waits for a local port to be listening on the Loopback or Any address.
         /// </summary>
-        /// <param name="port">Port number</param>
         /// <param name="timeout">Timeout in milliseconds</param>
         /// <param name="delay">Time to wait in milliseconds to wait before checking again</param>
         /// <returns></returns>

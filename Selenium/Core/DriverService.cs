@@ -63,7 +63,7 @@ namespace Selenium.Core {
 
         public virtual string Uri {
             get {
-                return "http://localhost:" + _endpoint.IPEndPoint.Port.ToString();
+                return "http://127.0.0.1:" + _endpoint.IPEndPoint.Port.ToString();
             }
         }
 

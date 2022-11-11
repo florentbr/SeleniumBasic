@@ -1,6 +1,10 @@
 Author : Florent BREHERET
 Website : https://github.com/florentbr/SeleniumBasic
 
+V3+ modifications : zc2
+Website : https://github.com/zc2com/SeleniumBasic
+
+
 Third party softwares:
  
  Selenium - Software Freedom Conservancy
@@ -15,6 +19,12 @@ Third party softwares:
  PhantomJs web stack - BSD license
  http://phantomjs.org/
 
+
+v3.0.0.1  (2022/11/11)
+===============================================================================
+ * Added support of Gecko webdriver and modern API endpoints
+ * Added partial support of the ShadowRoot
+ * Built in 64 bit assembly
 
 v2.0.9.0  (2016/03/02)
 ===============================================================================

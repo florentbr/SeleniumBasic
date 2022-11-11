@@ -1,37 +1,32 @@
 ﻿using System.Runtime.CompilerServices;
 
 namespace Selenium {
-
+    /// \mainpage
     /// <summary>
-    /// These are the namespace comments.
+    /// Selenium namespace of classes.
     /// </summary>
+    /// <remarks>
+    /// There are two modes of operation: modern and legacy.
+    /// gecko driver works only in the modern mode since it only supports the <see href="https://w3c.github.io/webdriver/#endpoints">modern endpoints</see>.
+    /// chrome and edge drivers should also support the modern mode, but since they also support the legacy endpoints
+    /// they operate in the lagacy mode for compatibility reasons.
+    /// </remarks>
     /// <example>
-    /// VBA:
-    /// <code lang="vbs">	
+    /// <code lang="VB">	
     /// Public Sub Script()
-    ///   Dim driver As New FirefoxDriver
+    ///   Dim driver As New ChromeDriver
     ///   driver.Get "http://www.google.com"
     ///   ...
     ///   driver.Quit
     /// End Sub
     /// </code>
     /// 
-    /// VBScript:
     /// <code lang="vbs">	
-    /// Class Script
     ///     Dim driver
-    ///     
-    ///     Sub Class_Initialize
-    ///         Set driver = CreateObject("Selenium.FirefoxDriver")
-    ///         driver.Get "http://www.google.com"
-    ///     End Sub
-    /// 
-    ///     Sub Class_Terminate
-    ///         driver.Quit
-    ///     End Sub
-    /// End Class
-    /// 
-    /// Set s = New Script
+    ///     Set driver = CreateObject("Selenium.GeckoDriver")
+    ///     driver.Get "http://www.google.com"
+    ///     ..........
+    ///     driver.Quit
     /// </code>
     /// </example>
     [CompilerGeneratedAttribute()]

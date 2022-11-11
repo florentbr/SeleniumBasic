@@ -9,7 +9,7 @@ using ExpectedException = NUnit.Framework.ExpectedExceptionAttribute;
 namespace Selenium.Tests {
 
     [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Gecko, Category = "InFocus")]
+    [TestFixture(Browser.Gecko)]
     [TestFixture(Browser.Chrome)]
     [TestFixture(Browser.Edge)]
 /*
@@ -163,6 +163,20 @@ setTimeout(function(){
             A.Null(ele);
         }
 
+        [TestCase]
+        [IgnoreFixture(Browser.Firefox, "Shadow is not supported")]
+        public void ShouldGetThroughShadow() {
+            var sc = driver.FindElementByCss("div#shadow-ctr");
+            var sr = sc.Shadow();
+            A.IsNotNull( sr, "Element has no Shadow " );
+            if( Fixture.Equals( Browser.Gecko ) )
+                A.Ignore( "DNW in gecko. See https://bugzilla.mozilla.org/show_bug.cgi?id=1700097" );
+            if( !( Fixture.Equals( Browser.Chrome ) || Fixture.Equals( Browser.Edge ) ) )
+                A.Ignore("Old browsers are not supported");
+            A.IsNotNull(sr.FindElementByCss("span"));
+            A.IsNotNull(sr.FindElementByTag("span"));
+            A.Throws<SeleniumError>( () => sr.FindElementByXPath(".//span") );  // apparently not supported
+        }
     }
 
 }

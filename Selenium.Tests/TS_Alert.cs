@@ -44,6 +44,7 @@ namespace Selenium.Tests {
         public void ShouldAcceptAlert() {
             driver.Get("/input.html");
             driver.ExecuteScript("window.setTimeout(function(){window.res=window.confirm('test dismiss');}, 100);");
+//            driver.Wait( 2000 );
             var alert = driver.SwitchToAlert();
             A.AreEqual("test dismiss", alert.Text);
             alert.Dismiss();

@@ -18,8 +18,8 @@ namespace Selenium {
     [Description("Defines the interface through which the user controls elements on the page.")]
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     public class WebElement : SearchContext, ComInterfaces._WebElement, IJsonObject {
-        public const string ELEMENT    = "ELEMENT";
-        public const string IDENTIFIER = "element-6066-11e4-a52e-4f735466cecf";
+        internal const string ELEMENT    = "ELEMENT";
+        internal const string IDENTIFIER = "element-6066-11e4-a52e-4f735466cecf";
 
         /// <summary>
         /// Returns the element with focus, or BODY if nothing has focus.
@@ -125,7 +125,7 @@ namespace Selenium {
         /// <summary>
         /// Returns the location of the element in the renderable canvas
         /// </summary>
-        /// <returns>Point</returns>
+        /// <returns>Point object</returns>
         public Point Location() {
             if( WebDriver.LEGACY ) {
                 var dict = (Dictionary)Send(RequestMethod.GET, "/location");
@@ -139,9 +139,15 @@ namespace Selenium {
         /// <summary>
         /// Gets the location of an element relative to the origin of the view port.
         /// </summary>
+        /// <remarks>In the modern mode (not legacy), same as Location()</remarks>
         public Point LocationInView() {
-            var dict = (Dictionary)Send(RequestMethod.GET, "/location_in_view");
-            return new Point(dict);
+            if( WebDriver.LEGACY ) {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/location_in_view");
+                return new Point(dict);
+            } else {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/rect");
+                return new Point(dict);
+            }
         }
 
         /// <summary>
@@ -170,6 +176,10 @@ namespace Selenium {
         /// <summary>
         /// Whether the element would be visible to a user
         /// </summary>
+        /// <returns>False if the element is is scrolled out of view, obscured and not visible to the user by any other reasons</returns>
+        /// <remarks>
+        /// The result does not relate to the visibility or display style properties!
+        /// </remarks>
         public bool IsDisplayed {
             get {
                 return (bool)Send(RequestMethod.GET, "/displayed");
@@ -230,6 +240,17 @@ namespace Selenium {
                 return value;
             }
             return Send(RequestMethod.GET, "/property/value");
+        }
+
+        /// <summary>
+        /// Returns the attached shadow root (if exists)
+        /// Note: Searching elements from a shadow root is not supported in gecko.
+        /// Also, the XPath strategy cannot be used.
+        /// </summary>
+        /// <returns>Shadow instance</returns>
+        public Shadow Shadow() {
+            var result = (Dictionary)Send(RequestMethod.GET, "/shadow");
+            return new Shadow(session, result);
         }
 
         /// <summary>
@@ -411,6 +432,7 @@ namespace Selenium {
         /// Clicks the element.
         /// </summary>
         /// <param name="keys">Optional - Modifier Keys to press</param>
+        /// <exception cref="Exception">Throws if the element is blocked by another element</exception>
         public void Click(string keys = null) {
             if (keys != null) {
                 if( WebDriver.LEGACY )
@@ -433,6 +455,12 @@ namespace Selenium {
         /// <summary>
         /// Scrolls the current element into the visible area of the browser window.
         /// </summary>
+        /// <param name="alignTop">Optional - desired position of the element</param>
+        /// <remarks>This method just executes the element's JavaScript method scrollIntoView(alignTop)
+        /// Sometimes, calling this won't make the element visible (or clickable)
+        /// because of other absolute positioned headers or footers.
+        /// To scroll into the center, execute a script like "this.scrollIntoView({block: "center"});"
+        /// </remarks>
         public WebElement ScrollIntoView(bool alignTop = false) {
             string script = "arguments[0].scrollIntoView("
                           + (alignTop ? "true);" : "false);");
@@ -497,12 +525,13 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Waits for a procesult to set result to true. VBScript: Function WaitEx(webdriver), VBA: Function WaitEx(webdriver As WebDriver) As Boolean 
+        /// Waits until a function(element, argument) returns a true-castable result.
         /// </summary>
-        /// <param name="procedure">Function reference.  Sub Procedure(element, result)  waitFor AddressOf Procedure</param>
-        /// <param name="argument">Optional - Argument: Sub Procedure(element, argument, result) waitFor AddressOf Procedure, "argument"</param>
+        /// <param name="procedure">Function reference. In VBScript use GetRef()</param>
+        /// <param name="argument">Optional - the function's second argument</param>
         /// <param name="timeout">Optional - timeout in milliseconds</param>
-        /// <returns>Current WebDriver</returns>
+        /// <returns>function's actual result</returns>
+        /// <exception cref="Errors.TimeoutError">Throws when time out has reached</exception>
         object ComInterfaces._WebElement.Until(object procedure, object argument, int timeout) {
             if (timeout == -1)
                 timeout = _session.timeouts.timeout_implicitwait;
@@ -664,14 +693,14 @@ namespace Selenium {
         #region Casting properties
 
         /// <summary>
-        /// Cast the WebElement to a Select element
+        /// Cast the WebElement to a <see cref="SelectElement"/>
         /// </summary>
         public SelectElement AsSelect() {
             return new SelectElement(this);
         }
 
         /// <summary>
-        /// Cast the WebElement to a Select element
+        /// Cast the WebElement to a <see cref="TableElement"/>
         /// </summary>
         public TableElement AsTable() {
             return new TableElement(_session, this);
@@ -707,7 +736,7 @@ namespace Selenium {
         /// <param name="script">The JavaScript code to execute.</param>
         /// <param name="arguments">Optional arguments for the script.</param>
         /// <param name="timeout">Optional timeout in milliseconds.</param>
-        /// <returns>The first argument of the callback function.</returns>
+        /// <returns>The first argument of the called function callback() .</returns>
         /// <example>
         /// <code lang="vb">
         ///     href = ele.ExecuteAsyncScript("callback(this.href);");"

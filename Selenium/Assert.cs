@@ -23,7 +23,7 @@ namespace Selenium {
     /// driver.stop
     /// </code>
     /// 
-    /// <code lang="vbs">
+    /// <code lang="VB">
     /// Private Assert As New Selenium.Assert
     /// 
     /// Public Sub TestCase()

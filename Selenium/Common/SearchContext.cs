@@ -4,19 +4,21 @@ using System;
 namespace Selenium {
 
     /// <summary>
-    /// Locators methods for WebDriver and WebElement
+    /// Locators methods for <see cref="WebDriver"/>, <see cref="WebElement"/> and <see cref="Shadow"/>
     /// </summary>
+    /// <remarks>
+    /// If the element was not found on a first attempt, Selenium repeats attempt with the interval which is 1/10th of the specified total timeout
+    /// but not often than 50ms. For example, if the timeout was 30000ms, then the attempts will be repeating every 3000ms.
+    /// If a timeout is not specified <see cref="Timeouts.ImplicitWait"/> will be used by default.
+    /// </remarks>
     public abstract class SearchContext {
-
         internal abstract RemoteSession session { get; }
-
         internal abstract string uri { get; }
 
-
         /// <summary>
-        /// "Verifies that the specified element is somewhere on the page."
+        /// Verifies that the specified element is somewhere on the page.
         /// </summary>
-        /// <param name="by">An element loctor. string or By object</param>
+        /// <param name="by">An element locator. string or By object</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <returns>true if the element is present, false otherwise</returns>
         public bool IsElementPresent(By by, int timeout = 0) {
@@ -96,10 +98,11 @@ namespace Selenium {
         /// <summary>
         /// Finds the first element matching the specified XPath query.
         /// </summary>
-        /// <param name="xpath">XPath</param>
+        /// <param name="xpath"><see href="https://www.w3schools.com/xml/xpath_syntax.asp">XPath</see> expression</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
         /// <returns><see cref="WebElement" /> or null</returns>
+        /// <exception cref="Errors.NoSuchElementError">When the raise param was true and no element was found or appear in the specific time frame</exception>
         public WebElement FindElementByXPath(string xpath, int timeout = -1, bool raise = true) {
             return this.FindElementBy(Strategy.XPath, xpath, timeout, raise);
         }
@@ -219,10 +222,11 @@ namespace Selenium {
         /// <summary>
         /// Finds elements matching the specified XPath query.
         /// </summary>
-        /// <param name="xpath">XPath</param>
+        /// <param name="xpath"><see href="https://www.w3schools.com/xml/xpath_syntax.asp">XPath</see></param>
         /// <param name="minimum">Minimum number of elements to wait for</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <returns><see cref="WebElements" /></returns>
+        /// <exception cref="Errors.NoSuchElementError">When no desired number of specified elements exist or appear in the specific time frame</exception>
         public WebElements FindElementsByXPath(string xpath, int minimum = 0, int timeout = 0) {
             return this.FindElementsBy(Strategy.XPath, xpath, minimum, timeout);
         }
@@ -301,7 +305,7 @@ namespace Selenium {
             string relativeUri = this.uri + "/element";
             Dictionary element;
             try {
-                if( !WebDriver.LEGACY )
+                if( !WebDriver.LEGACY || this is Shadow )
                     TranslateStrategy( ref strategy, ref value );
                 string method = By.FormatStrategy(strategy);
                 element = (Dictionary)session.Send(RequestMethod.POST, relativeUri, "using", method, "value", value);
@@ -328,6 +332,12 @@ namespace Selenium {
 
         private bool TranslateStrategy( ref Strategy strategy, ref string value ) {
             switch( strategy ) {
+            case Strategy.Tag:
+                if( !(this is Shadow) )
+                    return false;
+                strategy = Strategy.Css;
+                value = value;
+                return true;
             case Strategy.Id:
                 strategy = Strategy.Css;
                 value = "#" + value;
@@ -356,7 +366,7 @@ namespace Selenium {
                     try {
                         Strategy strategy = by.Strategy;
                         string value = by.Value.ToString();
-                        if( !WebDriver.LEGACY )
+                        if( !WebDriver.LEGACY || this is Shadow )
                             TranslateStrategy( ref strategy, ref value );
                         string method = By.FormatStrategy(strategy);
                         element = (Dictionary)session.Send(RequestMethod.POST, relativeUri, "using", method, "value", value);
@@ -376,7 +386,7 @@ namespace Selenium {
             RemoteSession session = this.session;
             string uri = this.uri + "/elements";
             try {
-                if( !WebDriver.LEGACY )
+                if( !WebDriver.LEGACY || this is Shadow )
                     TranslateStrategy( ref strategy, ref value );
                 var method = By.FormatStrategy(strategy);
                 List elements = session.SendUntil(timeout,
@@ -400,7 +410,7 @@ namespace Selenium {
                         break;
                     Strategy strategy = by.Strategy;
                     var value = (string)by.Value;
-                    if( !WebDriver.LEGACY )
+                    if( !WebDriver.LEGACY || this is Shadow )
                         TranslateStrategy( ref strategy, ref value );
                     var method = By.FormatStrategy(strategy);
                     List elements = (List)session.Send(RequestMethod.POST, uri, "using", method, "value", value);
@@ -420,7 +430,7 @@ namespace Selenium {
         private void WaitElementNotPresent(Strategy strategy, string value, int timeout) {
             RemoteSession session = this.session;
             string uri = this.uri + "/element";
-            if( !WebDriver.LEGACY )
+            if( !WebDriver.LEGACY || this is Shadow )
                 TranslateStrategy( ref strategy, ref value );
             string method = By.FormatStrategy(strategy);
             DateTime endTime = session.GetEndTime(timeout);
@@ -448,7 +458,7 @@ namespace Selenium {
                 try {
                     Strategy strategy = by.Strategy;
                     string value = by.Value.ToString();
-                    if( !WebDriver.LEGACY )
+                    if( !WebDriver.LEGACY || this is Shadow )
                         TranslateStrategy( ref strategy, ref value );
                     string method = By.FormatStrategy(strategy);
                     session.Send(RequestMethod.POST, uri, "using", method, "value", value);

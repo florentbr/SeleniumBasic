@@ -40,28 +40,29 @@ namespace Selenium.Tests {
         [TestCase]
         public void DemoQAButtons() {
             driver.Get("https://demoqa.com/buttons");
+            driver.Wait( 5000 );
             var mouse = driver.Mouse;
             WebElement ele;
             ele = driver.FindElementByXPath("//button[@type='button' and .='Click Me']");
-            Assert.NotEquals( ele, null, "Left click button" );
+            A.IsNotNull( ele, "Left click button" );
             mouse.MoveTo(ele, 50);
             mouse.Click();
             WebElement e_scm = driver.FindElementById("dynamicClickMessage");
-            Assert.NotEquals( e_scm, null );
+            A.IsNotNull( e_scm, "dynamicClickMessage" );
 
             ele = driver.FindElementById("rightClickBtn");
-            Assert.NotEquals( ele, null, "Right click button" );
+            A.IsNotNull( ele, "Right click button" );
             mouse.MoveTo(ele);
             mouse.Click(MouseButton.Right);
             WebElement e_rcm = driver.FindElementById("rightClickMessage");
-            Assert.NotEquals( e_rcm, null );
+            A.IsNotNull( e_rcm, "rightClickMessage" );
 
             ele = driver.FindElementById("doubleClickBtn");
-            Assert.NotEquals( ele, null, "Double click button" );
+            A.IsNotNull( ele, "Double click button" );
             mouse.MoveTo(ele);
             mouse.ClickDouble();
             WebElement e_dcm = driver.FindElementById("doubleClickMessage");
-            Assert.NotEquals( e_dcm, null );
+            A.IsNotNull( e_dcm, "doubleClickMessage" );
         }
     }
 

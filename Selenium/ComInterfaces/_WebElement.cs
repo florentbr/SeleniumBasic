@@ -48,6 +48,9 @@ namespace Selenium.ComInterfaces {
         [DispId(965), Description("Returns the value attribute")]
         object Value();
 
+        [DispId(967), Description("Returns the shadow root (if exists)")]
+        Shadow Shadow();
+
         #endregion
 
 

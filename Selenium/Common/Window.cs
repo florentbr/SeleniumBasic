@@ -97,7 +97,7 @@ namespace Selenium {
         /// <summary>
         /// Change focus to another window.
         /// </summary>
-        /// <param name="name">Name of the window</param>
+        /// <param name="name">Name or handle of the desired window</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         public Window SwitchToWindowByName(string name, int timeout = -1) {
             return _windows.SwitchToWindowByName(name, timeout);

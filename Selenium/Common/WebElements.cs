@@ -137,7 +137,7 @@ namespace Selenium {
         /// Execute an asynchronous piece of JavaScript against each web element and returns all the results;
         /// </summary>
         /// <param name="script">Javascript script</param>
-        /// <param name="ignoreNulls">Null elements are skiped</param>
+        /// <param name="timeout">Timeout in millisecond</param>
         /// <returns>List</returns>
         /// <example>
         /// <code lang="vbs">

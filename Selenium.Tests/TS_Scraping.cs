@@ -36,7 +36,6 @@ namespace Selenium.Tests {
             var data = elements.Text();
             A.AreEqual(data[0], "Table Heading 1");
         }
-
     }
 
 }

@@ -1,0 +1,95 @@
+﻿<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Import the common properties to support NuGet restore -->
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <!-- The configuration and platform will be used to determine which assemblies to include from solution and
+				 project documentation sources -->
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{f5d9ebff-8b71-4ca9-8357-36c7acef4147}</ProjectGuid>
+    <SHFBSchemaVersion>2017.9.26.0</SHFBSchemaVersion>
+    <!-- AssemblyName, Name, and RootNamespace are not used by SHFB but Visual Studio adds them anyway -->
+    <AssemblyName>Documentation</AssemblyName>
+    <RootNamespace>Documentation</RootNamespace>
+    <Name>Documentation</Name>
+    <!-- SHFB properties -->
+    <FrameworkVersion>.NET Framework 4.0</FrameworkVersion>
+    <OutputPath>Help\</OutputPath>
+    <HtmlHelpName>SeleniumBasic</HtmlHelpName>
+    <Language>en-US</Language>
+    <HelpFileFormat>HtmlHelp1, Website</HelpFileFormat>
+    <SyntaxFilters>Visual Basic, Visual Basic Usage</SyntaxFilters>
+    <PresentationStyle>VS2013</PresentationStyle>
+    <CleanIntermediates>True</CleanIntermediates>
+    <KeepLogFile>True</KeepLogFile>
+    <DisableCodeBlockComponent>False</DisableCodeBlockComponent>
+    <IndentHtml>False</IndentHtml>
+    <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
+    <SaveComponentCacheCapacity>100</SaveComponentCacheCapacity>
+    <DocumentationSources>
+      <DocumentationSource sourceFile="..\Selenium\Selenium.csproj" />
+<DocumentationSource sourceFile="..\Selenium\bin\x64\Debug\Selenium.xml" />
+<DocumentationSource sourceFile="..\Selenium\bin\x64\Debug\Selenium.dll" />
+<DocumentationSource sourceFile="COMs.xml" /></DocumentationSources>
+    <MissingTags>None</MissingTags>
+    <HelpTitle>SeleniumBasic</HelpTitle>
+    <HelpFileVersion>1.0.0.0</HelpFileVersion>
+    <NamingMethod>MemberName</NamingMethod>
+    <ContentPlacement>AboveNamespaces</ContentPlacement>
+    <RootNamespaceContainer>False</RootNamespaceContainer>
+    <NamespaceGrouping>False</NamespaceGrouping>
+    <MaximumGroupParts>2</MaximumGroupParts>
+    <Preliminary>False</Preliminary>
+    <SdkLinkTarget>Blank</SdkLinkTarget>
+    <VisibleItems>ExplicitInterfaceImplementations, InheritedMembers, PublicCompilerGenerated, NonBrowsable</VisibleItems>
+    <PlugInConfigurations>
+    </PlugInConfigurations>
+    <ApiFilter>
+      <Filter entryType="Namespace" fullName="Interop" isExposed="False" />
+<Filter entryType="Namespace" fullName="Interop.Excel" isExposed="False" />
+<Filter entryType="Namespace" fullName="Selenium" isExposed="True">
+  <Filter entryType="Class" fullName="Selenium.NamespaceDoc" filterName="NamespaceDoc" isExposed="False" />
+</Filter>
+<Filter entryType="Namespace" fullName="Selenium.Internal" isExposed="False" /></ApiFilter>
+    <SourceCodeBasePath>..\Selenium\</SourceCodeBasePath>
+    <WarnOnMissingSourceContext>False</WarnOnMissingSourceContext>
+    <ProjectSummary>SeleniumBasic - A Selenium based browser automation framework for VB.Net, Visual Basic Applications and VBScript</ProjectSummary>
+    <NamespaceSummaries>
+      <NamespaceSummaryItem name="Selenium" isDocumented="True">All public methods and properties. Some of them available only from a .NET (i.e. not via COM). To know which are available via COM refer to a corresponding COM interface name. If a method listed as a class member but not a member of a corresponding interface, the method won't be available via COM. Methods with an "S" icon are static and surely not available via COM. However, look for a similar method in the "Explicit Interface Implementations" section.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Selenium.ComInterfaces" isDocumented="True">Only methods of those interfaces are available via COM (Component Object Model) from VBScript, etc.</NamespaceSummaryItem></NamespaceSummaries>
+    <HtmlHelp1xCompilerPath>C:\Program Files (x86)\HTML Help Workshop\</HtmlHelp1xCompilerPath>
+  </PropertyGroup>
+  <!-- There are no properties for these groups.  AnyCPU needs to appear in order for Visual Studio to perform
+			 the build.  The others are optional common platform types that may appear. -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win32' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win32' ">
+  </PropertyGroup>
+  <!-- Import the common build targets during NuGet restore because before the packages are being installed, $(SHFBROOT) is not set yet -->
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="'$(MSBuildRestoreSessionId)' != ''" />
+  <!-- Import the SHFB build targets during build -->
+  <Import Project="$(SHFBROOT)\SandcastleHelpFileBuilder.targets" Condition="'$(MSBuildRestoreSessionId)' == ''" />
+  <!-- The pre-build and post-build event properties must appear *after* the targets file import in order to be
+			 evaluated correctly. -->
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>cd /d $(ProjectDir)
+awk -f COMdescrToXML.awk  ../Selenium/ComInterfaces/*.cs &gt;COMs.xml
+</PostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
+</Project>

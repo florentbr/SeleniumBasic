@@ -78,6 +78,10 @@ namespace Selenium.Tests.Internals {
                     p_info.FileName = "chromedriver.exe";
                     p_info.Arguments = "--port=4444 --verbose";
                     break;
+                case Browser.Edge:
+                    p_info.FileName = "edgedriver.exe";
+                    p_info.Arguments = "--port=4444 --verbose";
+                    break;
             default: throw new Exception("Browser not supported: " + browser.ToString());
             }
             driver_process = Process.Start(p_info); 
