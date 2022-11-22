@@ -121,11 +121,14 @@ namespace Selenium {
         /// <param name="persistant">If true, the browser will be launched without a copy the profile (Firefox only)</param>
         /// <remarks>
         /// The profile directory cannot be a symlink or an UNC path. It has to be a real physical local directory.
-        /// It's possible to create a new Firefox profile by launching firefox with the "-p" switch (firefox.exe -p).</remarks>
+        /// </remarks>
+        /// <remarks>
+        /// It's possible to pre-create a new Firefox profile by launching firefox with the "-p" switch (firefox.exe -p).
+        /// </remarks>
         /// <example>
         /// <code lang="vb">
         ///   Dim driver As New Selenium.FirefoxDriver
-        ///   driver.SetProfile "C:\MyProfil"   ' the directory of a persistant profile
+        ///   driver.SetProfile "C:\MyProfile"   ' the directory of a persistant profile
         ///   driver.Get "http://www.google.com"
         ///   ...
         /// </code>
@@ -205,18 +208,28 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Starts a new Selenium testing session
+        /// Starts a new Selenium session
         /// </summary>
         /// <param name="browser">Name of the browser: chrome, edge, gecko, firefox, ie, phantomjs, opera</param>
         /// <param name="baseUrl">The base URL</param>
+        /// <exception cref="SeleniumException">When the session start failed</exception>
         /// <example>
-        /// <code lang="vbs">	
+        /// <code lang="VB">	
         ///     Dim driver As New WebDriver()
-        ///     driver.Start "firefox", "http://www.google.com"
+        ///     driver.Start "gecko", "http://www.google.com"
         ///     driver.Get "/"
+        /// </code>
+        /// <code lang="vbs">	
+        ///     Dim driver
+        ///     ﻿Set driver = CreateObject("Selenium.WebDriver")
+        ///     driver.Start "gecko"
+        ///     driver.Get "http://www.google.com/"
         /// </code>
         /// </example>
         /// <remarks>
+        /// This method executes the driver process. The driver executable has to be in the same folder as 
+        /// the registered SeleniumBasic.dll assembly
+        /// 
         /// firefox is an old browser version driver which works via the plugin firefoxdriver.xpi
         /// gecko is for a modern FireFox browser.
         /// 
@@ -252,8 +265,10 @@ namespace Selenium {
                     default:
                         throw new Errors.ArgumentError("Invalid browser name: {0}", browser);
                 }
-
-                this.Capabilities.BrowserName = browser;
+                if (string.IsNullOrEmpty(this.Capabilities.BrowserName))
+                    this.Capabilities.BrowserName = browser;
+                if( LEGACY )
+                    this.Capabilities.UnexpectedAlertBehaviour = "ignore";
 
                 RegisterRunningObject();
 
@@ -273,22 +288,22 @@ namespace Selenium {
         /// Starts a new Selenium session attached to a remotely started driver process
         /// </summary>
         /// <param name="executorUri">Remote executor address (ex : "http://localhost:4444/wd/hub")</param>
-        /// <param name="browser">Name of the browser : firefox, ie, chrome, phantomjs, htmlunit, htmlunitwithjavascript, android, ipad, opera</param>
+        /// <param name="browser">Name of the browser: gecko, firefox, chrome, edge, ie, phantomjs, htmlunit, htmlunitwithjavascript, android, ipad, opera</param>
         /// <param name="version">Optional Browser version</param>
         /// <param name="platform">Optional Platform: WINDOWS, LINUX, MAC, ANDROID...</param>
         /// <example>
-        /// <code lang="vbs">
+        /// <code lang="vb">
         ///     Dim driver As New WebDriver()
-        ///     driver.StartRemotely "http://localhost:4444/wd/hub", "ie", 11
+        ///     driver.StartRemotely "http://localhost:4444/wd/hub"
         ///     driver.Get "/"
         /// </code>
         /// </example>
         /// <remarks>
-        /// This could be useful for debugging. Start the driver manually in the verbose mode, like:
+        /// This could be useful for debugging. Start the driver process manually in the verbose mode, like:
         /// geckodriver.exe -vv
         /// or
         /// chromedriver.exe --verbose
-        /// A custom connection port could be specified as a driver command line parameter
+        /// A custom connection port also could be specified as a driver's command line parameter
         /// </remarks>
         public void StartRemotely(string executorUri, string browser = null, string version = null, string platform = null) {
             try {
@@ -318,9 +333,11 @@ namespace Selenium {
                 }
 
                 this.Capabilities.Platform = platform;
-                this.Capabilities.BrowserName = browser;
+                if (string.IsNullOrEmpty(this.Capabilities.BrowserName))
+                    this.Capabilities.BrowserName = browser;
                 if (!string.IsNullOrEmpty(version))
                     this.Capabilities.BrowserVersion = version;
+                this.Capabilities.UnexpectedAlertBehaviour = "ignore";
 
                 _session = new RemoteSession(executorUri, false, this.timeouts);
                 _session.Start(this.Capabilities);
@@ -566,12 +583,6 @@ namespace Selenium {
 
             if (string.IsNullOrEmpty(url))
                 throw new Errors.ArgumentError("Argument 'url' cannot be null.");
-
-            if (timeout > 0){
-                session.timeouts.PageLoad = timeout;
-                session.Send(RequestMethod.POST, "/timeouts", "type", "page load", "ms", timeout);
-            }
-
             int idx = url.IndexOf("/");
             if (idx == 0) {
                 //relative url
@@ -588,6 +599,9 @@ namespace Selenium {
                 }
             }
 
+            if (timeout > 0){
+                Timeouts.SendTimeoutPageLoad(session, timeout);
+            }
             try {
                 session.Send(RequestMethod.POST, "/url", "url", url);
                 return true;
@@ -595,6 +609,10 @@ namespace Selenium {
                 if (raise)
                     throw;
                 return false;
+            } finally {
+                if (timeout > 0){
+                    Timeouts.SendTimeoutPageLoad(session, session.timeouts.timeout_pageload);
+                }
             }
         }
 
@@ -1000,8 +1018,8 @@ namespace Selenium {
         /// <param name="argument">Optional - Argument to send to the function</param>
         /// <param name="timeout">Optional - timeout in milliseconds</param>
         /// <returns>Current WebDriver</returns>
-        /// VBA example:
-        /// <example><code lang="vbs">	
+        /// <example>
+        /// <code lang="VB">	
         /// Sub WaitForTitle(driver, argument, result)
         ///     result = driver.Title = argument
         /// End Sub
@@ -1013,20 +1031,14 @@ namespace Selenium {
         ///     ...
         /// End Sub
         /// </code>
-        /// </example>        
-        /// 
-        /// VBScript example:
-        /// <example><code lang="vbs">	
+        /// <code lang="vbs">	
         /// Function WaitForTitle(driver, argument)
         ///     WaitForTitle = driver.Title = argument
         /// End Function
         /// 
-        /// Sub testSimple()
-        ///     Dim driver As New FirefoxDriver
         ///     driver.Get "http://www.google.com"
         ///     driver.Until GetRef("WaitForTitle"), "Google", 1000
         ///     ...
-        /// End Sub
         /// </code>
         /// </example>
         object _WebDriver.Until(object procedure, object argument, int timeout) {

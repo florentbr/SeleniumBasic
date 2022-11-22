@@ -11,6 +11,7 @@ namespace Selenium.Core {
     class SysWaiter {
 
         const int DEFAULT_WAIT_TIME = 50;
+        const int TIMEOUT_DIVIDER   = 10;
 
         //Modifier keys
         const int MOD_NONE = 0x00;
@@ -86,6 +87,12 @@ namespace Selenium.Core {
             if (signaled)
                 throw new Errors.KeyboardInterruptError();
             HotKeyGlobal.UnsubscribeAll();
+        }
+
+        internal static int GetTimeChunk( int full_timeout ) {
+            int time_chunk = full_timeout / SysWaiter.TIMEOUT_DIVIDER;
+            if( time_chunk < DEFAULT_WAIT_TIME ) time_chunk = DEFAULT_WAIT_TIME;
+            return time_chunk;
         }
 
     }

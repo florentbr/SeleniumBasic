@@ -85,9 +85,13 @@ namespace Selenium.Core {
             string servicePath = Path.Combine(_library_dir, filename);
             if (!File.Exists(servicePath))
                 throw new Errors.FileNotFoundError(servicePath);
-
+#if DEBUG
+            const bool noWindow = false;
+#else
+            const bool noWindow = true;
+#endif
             //Start the process
-            _process = ProcessExt.Start(servicePath, _arguments, null, env, true, true);
+            _process = ProcessExt.Start(servicePath, _arguments, null, env, noWindow, true);
 
             //Waits for the port to be listening
             if (!_endpoint.WaitForListening(10000, 150))

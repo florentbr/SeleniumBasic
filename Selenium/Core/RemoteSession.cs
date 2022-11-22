@@ -41,14 +41,21 @@ namespace Selenium.Core {
         /// <summary>
         /// Starts a new session.
         /// </summary>
-        /// <param name="desired_capabilities">An object describing the session's desired capabilities.</param>
-        /// <param name="requiredCapabilities">An object describing the session's required capabilities (Optional).</param>
-        /// <returns>{object} An object describing the session's capabilities.</returns>
+        /// <param name="desired_capabilities">An object with the session's desired capabilities.</param>
+        /// <param name="requiredCapabilities">An object with the session's required capabilities (Optional).</param>
+        /// <exception cref="SeleniumException">When session start failed</exception>
         public void Start(Dictionary desired_capabilities, Dictionary requiredCapabilities = null) {
             var param = new Dictionary();
-            param.Add("desiredCapabilities", desired_capabilities);
-            if (requiredCapabilities != null)
-                param.Add("requiredCapabilities", requiredCapabilities);
+            if( WebDriver.LEGACY ) {
+                param.Add("desiredCapabilities", desired_capabilities);
+                if (requiredCapabilities != null)
+                    param.Add("requiredCapabilities", requiredCapabilities);
+            } else {
+                // see https://developer.mozilla.org/en-US/docs/Web/WebDriver/Capabilities#Legacy
+                var capabilities = new Dictionary();
+                capabilities.Add( "alwaysMatch", desired_capabilities );
+                param.Add("capabilities", capabilities);
+            }
 
             var response = (Dictionary)server.Send(RequestMethod.POST, "/session", param);
             try {

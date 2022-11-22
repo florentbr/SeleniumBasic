@@ -112,6 +112,7 @@ namespace Selenium {
         /// <param name="procedure">Function's reference. In VBScript use GetRef()</param>
         /// <param name="argument">Function's first argument</param>
         /// <param name="timeout">Timeout in ms</param>
+        /// <param name="reserved">Not in use</param>
         /// <returns>function's actual result</returns>
         /// <exception cref="Errors.TimeoutError">Throws when time out has reached</exception>
         /// <example>

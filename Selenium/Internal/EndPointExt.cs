@@ -17,7 +17,7 @@ namespace Selenium.Internal {
             socket.NoDelay = true;
             socket.ReceiveBufferSize = 0;
             socket.SendBufferSize = 0;
-            socket.Bind(new IPEndPoint(address, 0));
+            socket.Bind(new IPEndPoint(address, 0));    // any available port
 
             //Disable inheritance to the child processes so the main process can close the
             //socket once a child process is launched.
@@ -97,7 +97,7 @@ namespace Selenium.Internal {
         /// </summary>
         /// <param name="timeout">Timeout in milliseconds</param>
         /// <param name="delay">Time to wait in milliseconds to wait before checking again</param>
-        /// <returns></returns>
+        /// <returns>True on detecting the port is being listening</returns>
         public bool WaitForListening(int timeout, int delay) {
             _socket.Close();
 

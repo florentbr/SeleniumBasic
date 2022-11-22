@@ -6,7 +6,7 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 namespace Selenium.Tests {
 
     [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Gecko)]
+    [TestFixture(Browser.Gecko, Category = "InFocus")]
     [TestFixture(Browser.Chrome)]
     [TestFixture(Browser.Edge)]
 /*
@@ -35,6 +35,23 @@ namespace Selenium.Tests {
             var elements = driver.FindElementsByCss("thead th");
             var data = elements.Text();
             A.AreEqual(data[0], "Table Heading 1");
+        }
+
+        [TestCase]
+//        [IgnoreFixture(Browser.Gecko, "Not supported")]
+        public void ShouldGetBrowserLog() {
+            driver.Get("/notexisting.html");
+            Logs l = driver.Manage.Logs;
+            List sl = l.Browser;
+            A.IsNotNull( sl );
+        }
+        [TestCase]
+        [IgnoreFixture(Browser.Gecko, "Not supported")]
+        public void ShouldGetDriverLog() {
+            driver.Get("/notexisting.html");
+            Logs l = driver.Manage.Logs;
+            List sl = l.Driver;
+            A.IsNotNull( sl );
         }
     }
 

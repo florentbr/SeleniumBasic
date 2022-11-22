@@ -10,32 +10,21 @@ using System.Text;
 namespace Selenium {
 
     /// <summary>
-    /// Web driver for Microsoft Edge driver
+    /// Web driver client for Microsoft Edge driver process
     /// </summary>
+    /// <remarks>
+    /// Note, the driver process image name is expected to be edgedriver.exe , not msedgedriver.exe
+    /// </remarks>
     /// 
     /// <example>
-    /// 
-    /// VBScript:
     /// <code lang="vbs">	
-    /// Class Script
-    ///     Dim driver
-    ///     
-    ///     Sub Class_Initialize
+    ///         Dim driver
     ///         Set driver = CreateObject("Selenium.EdgeDriver")
     ///         driver.Get "http://www.google.com"
     ///         ...
-    ///     End Sub
-    /// 
-    ///     Sub Class_Terminate
     ///         driver.Quit
-    ///     End Sub
-    /// End Class
-    /// 
-    /// Set s = New Script
     /// </code>
-    /// 
-    /// VBA:
-    /// <code lang="vbs">	
+    /// <code lang="VB">	
     /// Public Sub Script()
     ///   Dim driver As New EdgeDriver
     ///   driver.Get "http://www.mywebsite.com"

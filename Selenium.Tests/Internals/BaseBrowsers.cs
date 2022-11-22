@@ -84,11 +84,16 @@ namespace Selenium.Tests.Internals {
                     break;
             default: throw new Exception("Browser not supported: " + browser.ToString());
             }
+            try {
             driver_process = Process.Start(p_info); 
             NUnit.Framework.Assert.False( driver_process.HasExited, "Driver process cannot start: " + browser.ToString() );
             WebDriver s = new Selenium.WebDriver();
             s.StartRemotely( "http://localhost:4444/", browser.ToString().ToLower() );
             return s;
+            } catch( Exception e ) {
+                NUnit.Framework.Assert.Fail( "Thrown exception: " + e.Message );
+            }
+            return null;
         }
     }
 }

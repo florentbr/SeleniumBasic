@@ -10,32 +10,19 @@ using System.Text;
 namespace Selenium {
 
     /// <summary>
-    /// Web driver for Gecko driver
+    /// Web driver client for Gecko driver process
     /// </summary>
     /// 
     /// <example>
-    /// 
-    /// VBScript:
     /// <code lang="vbs">	
-    /// Class Script
-    ///     Dim driver
-    ///     
-    ///     Sub Class_Initialize
+    ///         Dim driver
     ///         Set driver = CreateObject("Selenium.GeckoDriver")
     ///         driver.Get "http://www.google.com"
     ///         ...
-    ///     End Sub
-    /// 
-    ///     Sub Class_Terminate
     ///         driver.Quit
-    ///     End Sub
-    /// End Class
     /// 
-    /// Set s = New Script
     /// </code>
-    /// 
-    /// VBA:
-    /// <code lang="vbs">	
+    /// <code lang="VB">	
     /// Public Sub Script()
     ///   Dim driver As New GeckoDriver
     ///   driver.Get "http://www.mywebsite.com"
@@ -70,14 +57,16 @@ namespace Selenium {
             return svc;
         }
 
+        // see https://developer.mozilla.org/en-US/docs/Web/WebDriver/Capabilities/firefoxOptions
         internal static void ExtendCapabilities(WebDriver wd, bool remote) {
             WebDriver.LEGACY = false;
             Capabilities capa = wd.Capabilities;
+            capa.BrowserName = "firefox";  // instead of "gecko"!
 
             Dictionary opts;
-            if (!capa.TryGetValue("moz:firefoxOptions", out opts))
-                capa["moz:firefoxOptions"] = opts = new Dictionary();
-
+            const string KEY_FF_OPTS = "moz:firefoxOptions";
+            if (!capa.TryGetValue(KEY_FF_OPTS, out opts))
+                capa[KEY_FF_OPTS] = opts = new Dictionary();
 
             if (wd.Profile != null) {
                 if (IOExt.IsPath(wd.Profile)) {
@@ -92,6 +81,11 @@ namespace Selenium {
             }
             if (wd.Arguments.Count != 0)
                 opts["args"] = wd.Arguments;
+/*
+            Dictionary log = new Dictionary();
+            log.Add( "level", "trace" );
+            opts.Add( "log", log );
+*/
         }
 
     }

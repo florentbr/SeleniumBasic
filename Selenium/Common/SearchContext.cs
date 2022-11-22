@@ -43,7 +43,7 @@ namespace Selenium {
         /// </summary>
         /// <param name="strategy">The mechanism by which to find the elements.</param>
         /// <param name="value">The value to use to search for the elements.</param>
-        /// <param name="timeout">Optional timeout in milliseconds</param>
+        /// <param name="timeout">Optional timeout in milliseconds. When omitted the Timeouts.ImplicitWait value will be used</param>
         /// <param name="raise"></param>
         /// <returns>WebElement</returns>
         public WebElement FindElementBy(Strategy strategy, string value, int timeout = -1, bool raise = true) {
@@ -313,8 +313,7 @@ namespace Selenium {
                 if (timeout == 0)
                     throw;
                 if( timeout == -1 ) timeout = session.timeouts.timeout_implicitwait;
-                int time_chunk = timeout / 10;
-                if( time_chunk < 50 ) time_chunk = 50;
+                int time_chunk = SysWaiter.GetTimeChunk( timeout );
                 var endTime = session.GetEndTime(timeout);
                 while (true) {
                     SysWaiter.Wait( time_chunk );
