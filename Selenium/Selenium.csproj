@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Selenium</RootNamespace>
     <AssemblyName>Selenium</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -23,7 +23,7 @@
     <WarningLevel>2</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -48,14 +48,64 @@
     <DefineConstants>TRACE;DEBUG;Test</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>SiMX Corporation.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WarningLevel>2</WarningLevel>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <DocumentationFile>bin\x64\Debug\Selenium.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\x64\Release\Selenium.XML</DocumentationFile>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Test\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;Test</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.5.1.0\lib\net35\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -66,8 +116,11 @@
   <ItemGroup>
     <Compile Include="ComInterfaces\_Point.cs" />
     <Compile Include="ComInterfaces\_Size.cs" />
+    <Compile Include="ComInterfaces\_Shadow.cs" />
+    <Compile Include="Common\Shadow.cs" />
     <Compile Include="Core\DriverExtension.cs" />
     <Compile Include="Drivers\EdgeDriver.cs" />
+    <Compile Include="Drivers\GeckoDriver.cs" />
     <Compile Include="Errors\FileNotFoundError.cs" />
     <Compile Include="Internal\COMDisposable.cs" />
     <Compile Include="Internal\ProcessExt.cs" />
@@ -222,6 +275,8 @@
     <Compile Include="Common\WebElement.cs" />
     <Compile Include="Common\WebElements.cs" />
     <Compile Include="Common\Window.cs" />
+    <None Include="packages.config" />
+    <None Include="SiMX Corporation.pfx" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Core\FirefoxPrefs.js" />
@@ -234,10 +289,9 @@
   <PropertyGroup>
     <PostBuildEvent>xcopy /D /Y "$(ProjectDir)\..\References\firefoxdriver.xpi" .
 xcopy /D /Y "$(ProjectDir)\..\References\chromedriver.exe" .
-xcopy /D /Y "$(ProjectDir)\..\References\operadriver.exe" .
-xcopy /D /Y "$(ProjectDir)\..\References\iedriver.exe" .
-xcopy /D /Y "$(ProjectDir)\..\References\iedriver64.exe" .
-xcopy /D /Y "$(ProjectDir)\..\References\phantomjs.exe" .</PostBuildEvent>
+xcopy /D /Y "$(ProjectDir)\..\References\edgedriver.exe" .
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" sign /f "$(ProjectDir)SiMX Corporation.pfx" /p simx2254 /i digicert /t http://timestamp.digicert.com /v $(TargetDir)$(TargetFileName)
+echo "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" sign /f "$(ProjectDir)SiMX Corporation.pfx" /p simx2254 /i digicert /t http://timestamp.digicert.com /v "$(ProjectDir)\obj\$(PlatformName)\$(ConfigurationName)\$(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

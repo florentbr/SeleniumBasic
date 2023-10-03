@@ -1,6 +1,7 @@
 ﻿using Selenium.Core;
 using Selenium.Internal;
 using Selenium.Serializer;
+using Selenium.ComInterfaces;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -15,32 +16,20 @@ namespace Selenium {
     /// <example>
     /// VBScript:
     /// <code lang="vbs">	
-    /// Class Script
-    ///     Dim driver
-    ///     
-    ///     Sub Class_Initialize
-    ///         Set driver = CreateObject("Selenium.WebDriver")
-    ///         driver.Start "firefox", "http://www.google.com"
-    ///         driver.Get "/"
-    ///     End Sub
-    /// 
-    ///     Sub Class_Terminate
-    ///         driver.Quit
-    ///     End Sub
-    /// End Class
-    /// 
-    /// Set s = New Script
+    ///   Dim driver
+    ///   Set driver = CreateObject("Selenium.WebDriver")
+    ///   driver.Start "firefox", "http://www.google.com"
+    ///   driver.Get "/"
+    ///   ...
+    ///   driver.Quit
     /// </code>
     /// 
-    /// VBA:
-    /// <code lang="vbs">	
-    /// Public Sub Script()
+    /// <code lang="VB">	
     ///   Dim driver As New WebDriver
     ///   driver.Start "firefox", "http://www.google.com"
     ///   driver.Get "/"
     ///   ...
     ///   driver.Quit
-    /// End Sub
     /// </code>
     /// </example>
     [ProgId("Selenium.WebDriver")]
@@ -50,6 +39,12 @@ namespace Selenium {
     public class WebDriver : SearchContext, ComInterfaces._WebDriver, IDisposable {
 
         const string RUNNING_OBJECT_NAME = "Selenium.WebDriver";
+        private static readonly NLog.Logger _l = NLog.LogManager.GetCurrentClassLogger();
+
+        // New API https://w3c.github.io/webdriver/#endpoints are used with
+        // Gecko driver which does not support many endpoints and payloads used in previous implementation
+        // Other drivers still used in the legacy mode
+        internal static bool LEGACY = true; 
 
         internal Capabilities Capabilities = new Capabilities();
         internal Dictionary Preferences = new Dictionary();
@@ -70,6 +65,7 @@ namespace Selenium {
         /// Creates a new WebDriver object. 
         /// </summary>
         public WebDriver() {
+            WebDriver.LEGACY = true;
             UnhandledException.Initialize();
             RegisterRunningObject();
             COMDisposable.Subscribe(this, typeof(ComInterfaces._WebDriver));
@@ -120,21 +116,26 @@ namespace Selenium {
 
 
         /// <summary>
-        /// Set a specific profile for the firefox webdriver
+        /// Set a specific profile directory or a named profile for the firefox webdriver
         /// </summary>
-        /// <param name="nameOrDirectory">Profil name (Firefox only) or directory (Firefox and Chrome)</param>
+        /// <param name="nameOrDirectory">Profile name (Firefox only) or directory (Edge, Chrome)</param>
         /// <param name="persistant">If true, the browser will be launched without a copy the profile (Firefox only)</param>
-        /// <remarks>The profile directory can be copied from the user temp folder (run %temp%) before the WebDriver is stopped. It's also possible to create a new Firefox profile by launching firefox with the "-p" switch (firefox.exe -p).</remarks>
+        /// <remarks>
+        /// The profile directory cannot be a symlink or an UNC path. It has to be a real physical local directory.
+        /// </remarks>
+        /// <remarks>
+        /// It's possible to pre-create a new Firefox profile by launching firefox with the "-p" switch (firefox.exe -p).
+        /// </remarks>
         /// <example>
-        /// <code lang="vbs">
+        /// <code lang="vb">
         ///   Dim driver As New Selenium.FirefoxDriver
-        ///   driver.SetProfile "Selenium"  'Firefox only. Profile created by running "..\firefox.exe -p"
+        ///   driver.SetProfile "C:\MyProfile"   ' the directory of a persistant profile
         ///   driver.Get "http://www.google.com"
         ///   ...
         /// </code>
-        /// <code lang="vbs">
+        /// <code lang="vb">
         ///   Dim driver As New Selenium.FirefoxDriver
-        ///   driver.SetProfile "C:\MyProfil"   'For Chrome and Firefox only
+        ///   driver.SetProfile "Selenium"  'Firefox only. Profile created by running "..\firefox.exe -p"
         ///   driver.Get "http://www.google.com"
         ///   ...
         /// </code>
@@ -154,10 +155,17 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Set a specific capability for the webdriver
+        /// Set a specific capability for the webdriver. Should be called before Start() or StartRemotely()
         /// </summary>
-        /// <param name="key">Capability key</param>
-        /// <param name="value">Capability value</param>
+        /// <param name="key">Key name</param>
+        /// <param name="value">JSON value</param>
+        /// <example>
+        /// <code lang="vbs">
+        /// ' setting a FF config option:
+        /// driver.SetCapability "moz:firefoxOptions", "{ ""prefs"": { ""dom.enable_window_print"": false } }"
+        /// </code>
+        /// </example>
+        /// 
         public void SetCapability(string key, object value) {
             Capabilities[key] = JSON.Parse(value);
         }
@@ -208,21 +216,42 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Starts a new Selenium testing session
+        /// Starts a new Selenium session
         /// </summary>
-        /// <param name="browser">Name of the browser : firefox, ie, chrome, phantomjs</param>
+        /// <param name="browser">Name of the browser: chrome, edge, gecko, firefox, ie, phantomjs, opera</param>
         /// <param name="baseUrl">The base URL</param>
+        /// <exception cref="SeleniumException">When the session start failed</exception>
         /// <example>
-        /// <code lang="vbs">	
+        /// <code lang="VB">	
         ///     Dim driver As New WebDriver()
-        ///     driver.Start "firefox", "http://www.google.com"
+        ///     driver.Start "gecko", "http://www.google.com"
         ///     driver.Get "/"
         /// </code>
+        /// <code lang="vbs">	
+        ///     Dim driver
+        ///     ﻿Set driver = CreateObject("Selenium.WebDriver")
+        ///     driver.Start "gecko"
+        ///     driver.Get "http://www.google.com/"
+        /// </code>
         /// </example>
+        /// <remarks>
+        /// This method executes the driver process. The driver executable has to be in the same folder as 
+        /// the registered SeleniumBasic.dll assembly
+        /// 
+        /// firefox is an old browser version driver which works via the plugin firefoxdriver.xpi
+        /// gecko is for a modern FireFox browser.
+        /// 
+        /// edge and chrome require the driver version to be exactly matched the current browser version
+        /// 
+        /// ie, phantomjs, opera drivers were not tested in this release and thus could be considered as not supported
+        /// </remarks>
         public void Start(string browser = null, string baseUrl = null) {
             try {
                 browser = ExpendBrowserName(browser);
                 switch (browser) {
+                    case "gecko":
+                        _service = GeckoDriver.StartService(this);
+                        break;
                     case "firefox":
                         _service = FirefoxDriver.StartService(this);
                         break;
@@ -244,8 +273,10 @@ namespace Selenium {
                     default:
                         throw new Errors.ArgumentError("Invalid browser name: {0}", browser);
                 }
-
-                this.Capabilities.BrowserName = browser;
+                if (string.IsNullOrEmpty(this.Capabilities.BrowserName))
+                    this.Capabilities.BrowserName = browser;
+                if( LEGACY )
+                    this.Capabilities.UnexpectedAlertBehaviour = "ignore";
 
                 RegisterRunningObject();
 
@@ -254,33 +285,51 @@ namespace Selenium {
 
                 if (!string.IsNullOrEmpty(baseUrl))
                     this.BaseUrl = baseUrl;
-            } catch (SeleniumException) {
+            } catch (SeleniumException ex) {
+                _l.Error( ex, "Start threw a SeleniumException" );
                 throw;
             } catch (Exception ex) {
+                _l.Error( ex, "Start fails" );
                 throw new SeleniumException(ex);
             }
         }
 
         /// <summary>
-        /// Starts remotely a new Selenium testing session
+        /// Starts a new Selenium session attached to a remotely started driver process (or Selenium server?)
         /// </summary>
         /// <param name="executorUri">Remote executor address (ex : "http://localhost:4444/wd/hub")</param>
-        /// <param name="browser">Name of the browser : firefox, ie, chrome, phantomjs, htmlunit, htmlunitwithjavascript, android, ipad, opera</param>
-        /// <param name="version">Browser version</param>
-        /// <param name="platform">Platform: WINDOWS, LINUX, MAC, ANDROID...</param>
+        /// <param name="browser">Name of the browser: gecko, firefox, chrome, edge, ie, phantomjs, htmlunit, htmlunitwithjavascript, android, ipad, opera</param>
+        /// <param name="version">Optional Browser version</param>
+        /// <param name="platform">Optional Platform: WINDOWS, LINUX, MAC, ANDROID...</param>
         /// <example>
-        /// <code lang="vbs">
+        /// <code lang="vb">
         ///     Dim driver As New WebDriver()
-        ///     driver.StartRemotely "http://localhost:4444/wd/hub", "ie", 11
+        ///     driver.StartRemotely "http://localhost:4444/wd/hub"
         ///     driver.Get "/"
         /// </code>
+        /// <code lang="vbscript">
+        ///     WScript.CreateObject("WSCript.Shell").Run "geckodriver.exe -vv"
+        ///     Set driver = CreateObject("Selenium.WebDriver")
+        ///     driver.StartRemotely "http://localhost:4444", "gecko"
+        ///     driver.Get "https://localhost/"
+        /// </code>
         /// </example>
-        public void StartRemotely(string executorUri, string browser = null, string version = null, string platform = null) {
+        /// <remarks>
+        /// This could be useful for debugging. Start the driver process manually in the verbose mode, like:
+        /// geckodriver.exe -vv
+        /// or
+        /// chromedriver.exe --verbose
+        /// A custom connection port also could be specified as a driver's command line parameter
+        /// </remarks>
+        public void StartRemotely(string executorUri, string browser, string version = null, string platform = null) {
             try {
                 browser = ExpendBrowserName(browser);
                 switch (browser) {
                     case "firefox":
                         FirefoxDriver.ExtendCapabilities(this, true);
+                        break;
+                    case "gecko":
+                        GeckoDriver.ExtendCapabilities(this, true);
                         break;
                     case "chrome":
                         ChromeDriver.ExtendCapabilities(this, true);
@@ -300,18 +349,22 @@ namespace Selenium {
                 }
 
                 this.Capabilities.Platform = platform;
-                this.Capabilities.BrowserName = browser;
+                if (string.IsNullOrEmpty(this.Capabilities.BrowserName))
+                    this.Capabilities.BrowserName = browser;
                 if (!string.IsNullOrEmpty(version))
                     this.Capabilities.BrowserVersion = version;
+                this.Capabilities.UnexpectedAlertBehaviour = "ignore";
 
                 _session = new RemoteSession(executorUri, false, this.timeouts);
                 _session.Start(this.Capabilities);
 
                 RegisterRunningObject();
 
-            } catch (SeleniumException) {
+            } catch (SeleniumException ex) {
+                _l.Error( ex, "StartRemotely threw a SeleniumException" );
                 throw;
             } catch (Exception ex) {
+                _l.Error( ex, "StartRemotely fails" );
                 throw new SeleniumException(ex);
             }
         }
@@ -346,6 +399,8 @@ namespace Selenium {
                 case "firefox":
                 case "ff":
                     return "firefox";
+                case "gecko":
+                    return "gecko";
                 case "chrome":
                 case "cr":
                     return "chrome";
@@ -370,7 +425,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Sends a customized command
+        /// Sends a custom command to the driver process
         /// </summary>
         /// <param name="method">POST, GET or DELETE</param>
         /// <param name="relativeUri">Relative URI. Ex: "/screenshot"</param>
@@ -385,7 +440,14 @@ namespace Selenium {
         /// <returns>Result</returns>
         /// <example>
         /// <code lang="vbs">
+        ///     ' collect all links of the page
         ///     Set links = driver.Send("POST", "/elements", "using", "css selector", "value", "a")
+        /// </code>
+        /// <code lang="vbs">
+        ///     ' "print" the page and get a binary as a result 
+        ///     ' (works only in Gecko. Chromium based browsers need to be running headless (without the UI) )
+        ///     dim base64
+        ///     base64 = driver.Send( "POST", "/print", "shrinkToFit", true )
         /// </code>
         /// </example>
         public object Send(string method, string relativeUri,
@@ -428,7 +490,7 @@ namespace Selenium {
         #region Interfaces
 
         /// <summary>
-        /// Manage the browser settings. Need to be defined before the browser is launched
+        /// Manage the <see cref="Selenium.Timeouts"/>. Need to be defined before the browser is launched
         /// </summary>
         public Timeouts Timeouts {
             get {
@@ -437,7 +499,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Instructs the driver to change its settings.
+        /// Instructs the driver to <see cref="Selenium.Manage"/> its settings.
         /// </summary>
         public Manage Manage {
             get {
@@ -446,7 +508,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Get the actions class
+        /// Get the <see cref="Selenium.Actions"/> class
         /// </summary>
         /// <example>
         /// <code lang="vbs">	
@@ -463,7 +525,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// TouchActions
+        /// Get the <see cref="Selenium.TouchActions"/> class
         /// </summary>
         public TouchActions TouchActions {
             get {
@@ -473,7 +535,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Keyboard
+        /// <see cref="Selenium.Keyboard"/>Keyboard
         /// </summary>
         public Keyboard Keyboard {
             get {
@@ -482,7 +544,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Mouse
+        /// <see cref="Selenium.Mouse"/>
         /// </summary>
         public Mouse Mouse {
             get {
@@ -491,7 +553,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// TouchScreen
+        /// <see cref="Selenium.TouchScreen"/>
         /// </summary>
         public TouchScreen TouchScreen {
             get {
@@ -500,7 +562,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Keys
+        /// <see cref="Selenium.Keys"/>
         /// </summary>
         public Keys Keys {
             get {
@@ -526,12 +588,13 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Loads a web page in the current browser session. Same as Open method.
+        /// Performs a GET request to load a web page in the current browser session. 
         /// </summary>
-        /// <param name="url">URL</param>
-        /// <param name="timeout">Optional timeout in milliseconds. Infinite=-1</param>
+        /// <param name="url">URL (could be relative, see <see cref="BaseUrl"/>)</param>
+        /// <param name="timeout">Optional timeout in milliseconds. see <see cref="Timeouts.PageLoad"/></param>
         /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
-        /// <returns>Return true if the url was openned within the timeout, false otherwise</returns>
+        /// <exception cref="Errors.WebRequestTimeout">Thrown when the timeout has reached</exception>
+        /// <returns>Return true if the url was openned within the timeout, false otherwise (when the raise param was false)</returns>
         public bool Get(string url, int timeout = -1, bool raise = true) {
             if (_session == null)
                 this.Start();
@@ -539,12 +602,6 @@ namespace Selenium {
 
             if (string.IsNullOrEmpty(url))
                 throw new Errors.ArgumentError("Argument 'url' cannot be null.");
-
-            if (timeout > 0){
-                session.timeouts.PageLoad = timeout;
-                session.Send(RequestMethod.POST, "/timeouts", "type", "page load", "ms", timeout);
-            }
-
             int idx = url.IndexOf("/");
             if (idx == 0) {
                 //relative url
@@ -561,6 +618,9 @@ namespace Selenium {
                 }
             }
 
+            if (timeout > 0){
+                Timeouts.SendTimeoutPageLoad(session, timeout);
+            }
             try {
                 session.Send(RequestMethod.POST, "/url", "url", url);
                 return true;
@@ -568,6 +628,10 @@ namespace Selenium {
                 if (raise)
                     throw;
                 return false;
+            } finally {
+                if (timeout > 0){
+                    Timeouts.SendTimeoutPageLoad(session, session.timeouts.timeout_pageload);
+                }
             }
         }
 
@@ -595,21 +659,30 @@ namespace Selenium {
         /// Goes one step backward in the browser history.
         /// </summary>
         public void GoBack() {
-            this.session.Send(RequestMethod.POST, "/back");
+            if( WebDriver.LEGACY )
+                this.session.Send(RequestMethod.POST, "/back");
+            else
+                this.session.Send(RequestMethod.POST, "/back", new Dictionary());
         }
 
         /// <summary>
         /// Goes one step forward in the browser history.
         /// </summary>
         public void GoForward() {
-            this.session.Send(RequestMethod.POST, "/forward");
+            if( WebDriver.LEGACY )
+                this.session.Send(RequestMethod.POST, "/forward");
+            else
+                this.session.Send(RequestMethod.POST, "/forward", new Dictionary());
         }
 
         /// <summary>
         /// Refreshes the current page.
         /// </summary>
         public void Refresh() {
-            this.session.Send(RequestMethod.POST, "/refresh");
+            if( WebDriver.LEGACY )
+                this.session.Send(RequestMethod.POST, "/refresh");
+            else
+                this.session.Send(RequestMethod.POST, "/refresh", new Dictionary());
         }
 
         #endregion
@@ -629,6 +702,7 @@ namespace Selenium {
         /// <summary>
         /// Gets the window handles of open browser windows.
         /// </summary>
+        /// <remarks>Try to not overuse, since the windows enumeration is a heavy process.</remarks>
         /// <returns><see cref="List" /></returns>
         public List Windows {
             get {
@@ -677,8 +751,8 @@ namespace Selenium {
         /// <summary>
         /// Takes the screenshot of the current window
         /// </summary>
-        /// <param name="delay">Time to wait before taking the screenshot in milliseconds</param>
-        /// <returns><see cref="Image" /></returns>
+        /// <param name="delay">Optional - Time to wait before taking the screenshot in milliseconds</param>
+        /// <returns></returns>
         public Image TakeScreenshot(int delay = 0) {
             if (delay != 0)
                 SysWaiter.Wait(delay);
@@ -694,9 +768,9 @@ namespace Selenium {
         /// <summary>
         /// Execute a piece of JavaScript in the context of the currently selected frame or window
         /// </summary>
-        /// <param name="script">The JavaScript code to execute.</param>
-        /// <param name="arguments">The arguments to the script.</param>
-        /// <returns>The value specified by the return statement.</returns>
+        /// <param name="script">The JavaScript code to execute in the page context.</param>
+        /// <param name="arguments">The arguments array available to the script.</param>
+        /// <returns>The value specified by the script's return statement.</returns>
         /// <example>
         /// <code lang="vb">
         ///     txt = driver.ExecuteScript("return 'xyz' + arguments[0];", "123")
@@ -711,10 +785,10 @@ namespace Selenium {
         /// <summary>
         /// Execute an asynchronous piece of JavaScript in the context of the current frame or window.
         /// </summary>
-        /// <param name="script">Piece of JavaScript code to execute.</param>
-        /// <param name="arguments">Optional arguments for the script.</param>
+        /// <param name="script">JavaScript code which involves asynchronous operations such as promises, etc.</param>
+        /// <param name="arguments">Optional arguments array available for the script.</param>
         /// <param name="timeout">Optional timeout in milliseconds.</param>
-        /// <returns>The first argument of the callback function.</returns>
+        /// <returns>The first argument of the function callback() the script should call to return the result.</returns>
         /// <example>
         /// <code lang="vb">
         ///     txt = driver.ExecuteAsyncScript("callback('xyz')");"
@@ -733,6 +807,9 @@ namespace Selenium {
         /// <param name="arguments">Optional arguments for the script.</param>
         /// <param name="timeout">Optional timeout in milliseconds.</param>
         /// <returns>Value not null</returns>
+        /// <example lang="vb">
+        /// driver.WaitForScript "document.readyState == 'complete';"
+        /// </example>
         public object WaitForScript(string script, object arguments, int timeout = -1) {
             object args_ex = FormatArguments(arguments);
             object result = session.javascript.WaitFor(script, args_ex, timeout);
@@ -838,7 +915,7 @@ namespace Selenium {
         /// <param name="title">The title of the window to activate</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
-        /// <returns>Current web driver</returns>
+        /// <returns><see cref="Selenium.Window"/></returns>
         public Window SwitchToWindowByTitle(string title, int timeout = -1, bool raise = true) {
             try {
                 return session.windows.SwitchToWindowByTitle(title, timeout);
@@ -854,7 +931,7 @@ namespace Selenium {
         /// </summary>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         /// <param name="raise">Optional - Raise an exception after the timeout when true. Default is true.</param>
-        /// <returns>Window</returns>
+        /// <returns><see cref="Selenium.Window"/></returns>
         public Window SwitchToNextWindow(int timeout = -1, bool raise = true) {
             try {
                 return session.windows.SwitchToNextWindow(timeout);
@@ -882,6 +959,18 @@ namespace Selenium {
         /// <returns>Current web driver</returns>
         public bool SwitchToFrame(object identifier, int timeout = -1, bool raise = true) {
             try {
+
+                if( !WebDriver.LEGACY ) {
+                    var name = identifier as string;
+                    if( name != null ) {
+                        string css = "frame[name='" + name + "'],iframe[name='" + name + "'],frame#" + name + ",iframe#" + name;
+                        WebElement fr_elem = FindElementBy(Strategy.Css, css, timeout, raise);
+                        if( fr_elem == null )
+                            throw new Errors.NoSuchFrameError();
+                        identifier = fr_elem;
+                    }
+                }
+
                 this.session.frame.SwitchToFrame(identifier, timeout);
             } catch (Errors.NoSuchFrameError) {
                 if (raise)
@@ -948,8 +1037,8 @@ namespace Selenium {
         /// <param name="argument">Optional - Argument to send to the function</param>
         /// <param name="timeout">Optional - timeout in milliseconds</param>
         /// <returns>Current WebDriver</returns>
-        /// VBA example:
-        /// <example><code lang="vbs">	
+        /// <example>
+        /// <code lang="VB">	
         /// Sub WaitForTitle(driver, argument, result)
         ///     result = driver.Title = argument
         /// End Sub
@@ -961,23 +1050,17 @@ namespace Selenium {
         ///     ...
         /// End Sub
         /// </code>
-        /// </example>        
-        /// 
-        /// VBScript example:
-        /// <example><code lang="vbs">	
+        /// <code lang="vbs">	
         /// Function WaitForTitle(driver, argument)
         ///     WaitForTitle = driver.Title = argument
         /// End Function
         /// 
-        /// Sub testSimple()
-        ///     Dim driver As New FirefoxDriver
         ///     driver.Get "http://www.google.com"
         ///     driver.Until GetRef("WaitForTitle"), "Google", 1000
         ///     ...
-        /// End Sub
         /// </code>
         /// </example>
-        object ComInterfaces._WebDriver.Until(object procedure, object argument, int timeout) {
+        object _WebDriver.Until(object procedure, object argument, int timeout) {
             if (timeout == -1)
                 timeout = session.timeouts.timeout_implicitwait;
             return COMExt.WaitUntilProc(procedure, this, argument, timeout);

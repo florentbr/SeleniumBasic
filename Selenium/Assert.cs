@@ -13,7 +13,6 @@ namespace Selenium {
     /// Testing functions. Throws an exception if the condition is not met
     /// </summary>
     /// <example>
-    /// 
     /// The following example asserts the page title.
     /// <code lang="vbs">	
     /// Set Assert = CreateObject("Selenium.Assert")
@@ -22,8 +21,7 @@ namespace Selenium {
     /// Assert.Equals "Google", driver.Title
     /// driver.stop
     /// </code>
-    /// 
-    /// <code lang="vbs">
+    /// <code lang="VB">
     /// Private Assert As New Selenium.Assert
     /// 
     /// Public Sub TestCase()
@@ -33,8 +31,9 @@ namespace Selenium {
     ///   driver.stop
     /// End Sub
     /// </code>
-    /// 
     /// </example>
+    /// <seealso cref="_Assert"/>
+    /// <seealso cref="Verify"/>
     [ProgId("Selenium.Assert")]
     [Description("Testing functions. Throws an exception if the condition is not met")]
     [Guid("0277FC34-FD1B-4616-BB19-6AAF7EDD33D6")]
@@ -44,7 +43,7 @@ namespace Selenium {
         #region Static API
 
         /// <summary>
-        /// Raise an error if the value is true.
+        /// Raise an error if the value is NOT true.
         /// </summary>
         /// <param name="input"></param>
         /// <param name="failmessage"></param>
@@ -54,7 +53,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Raise an error if the value is false.
+        /// Raise an error if the value is NOT false.
         /// </summary>
         /// <param name="input"></param>
         /// <param name="failmessage"></param>
@@ -139,7 +138,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Raise an error if the value is true.
+        /// Raise an error if the value is NOT true.
         /// </summary>
         /// <param name="input"></param>
         /// <param name="failmessage"></param>
@@ -148,7 +147,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Raise an error if the value is false.
+        /// Raise an error if the value is NOT false.
         /// </summary>
         /// <param name="input"></param>
         /// <param name="failmessage"></param>

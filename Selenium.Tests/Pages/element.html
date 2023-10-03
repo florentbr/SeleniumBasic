@@ -20,16 +20,30 @@
             padding: 3px;
             border: 1px solid gray;
         }
+
+        #blocker {
+            display:none;
+            position: absolute;
+            background-color: gray;
+            opacity: 0.4;
+            width: 100%;
+            height: 100%;
+            left: 0px;
+            top: 0px;
+        }
     </style>
 </head>
 <body>
+    <div id="blocker"></div>
     <form>
 
         <fieldset id="forms__text">
             <legend>Input box</legend>
             <p>
                 <label for="input__search">Search</label>
-                <input id="input__search" type="search" placeholder="Enter Search Term" style="width:300px;height:50px">
+                <input id="input__search" type="search" placeholder="Enter Search Term" 
+                       value=""
+                       style="width:300px;height:50px">
             </p>
         </fieldset>
 
@@ -72,9 +86,9 @@
             <label for="select">Select</label>
             <select id="select">
                 <optgroup label="Option Group">
-                    <option id="select_item2">Option One</option>
+                    <option id="select_item1">Option One</option>
                     <option id="select_item2" selected>Option Two</option>
-                    <option id="select_item2">Option Three</option>
+                    <option id="select_item3">Option Three</option>
                 </optgroup>
             </select>
         </fieldset>

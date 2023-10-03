@@ -22,7 +22,7 @@ namespace Selenium.Zip {
     /// ZipFile.ExtractAll(@"c:\archive.zip", @"c:\archive");
     /// </code>
     /// </example>
-    class ZipFile : IDisposable, IJsonBinary {
+    public class ZipFile : IDisposable, IJsonBinary {
 
         /* "https://en.wikipedia.org/wiki/Zip_(file_format)"
         

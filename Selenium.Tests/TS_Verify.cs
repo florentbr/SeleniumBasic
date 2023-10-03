@@ -19,7 +19,7 @@ namespace Selenium.Tests {
         [Test]
         public void ShouldVerifyTrueKO() {
             var res = verify.True(false);
-            A.AreEqual("KO expected=True was=False", res);
+            A.AreEqual("NOK expected=True was=False", res);
         }
 
         [Test]
@@ -31,7 +31,7 @@ namespace Selenium.Tests {
         [Test]
         public void ShouldVerifyEnumNotEqual() {
             var res = verify.Equals("a;c;b", new string[] { "a", "b", "c" }, null);
-            A.AreEqual("KO expected=\"a;c;b\" was=[a,b,c]", res);
+            A.AreEqual("NOK expected=\"a;c;b\" was=[a,b,c]", res);
         }
 
     }

@@ -5,7 +5,10 @@ using System.Runtime.InteropServices;
 
 namespace Selenium.ComInterfaces {
 #pragma warning disable 1591
-
+    /// <summary>
+    /// Represents a collection of values.
+    /// </summary>
+    /// <seealso cref="List"/>
     [Guid("0277FC34-FD1B-4616-BB19-C539CB44B63F")]
     [ComVisible(true), InterfaceType(ComInterfaceType.InterfaceIsDual)]
     public interface _List {
@@ -40,7 +43,7 @@ namespace Selenium.ComInterfaces {
         [DispId(490), Description("Insert item at index (One based)")]
         void Insert(int index, object value);
 
-        [DispId(492), Description("Remove item at index (One based)")]
+        [DispId(492), Description("Checks if the list contains the vale")]
         bool Contains(object value);
 
         [DispId(496), Description("Returns an array with the values")]

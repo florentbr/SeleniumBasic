@@ -11,14 +11,15 @@ namespace Selenium {
         const string KEY_BROWSER_NAME = "browserName";
         const string KEY_BROWSER_VERSION = "browserVersion";
         const string KEY_PLATFORM = "platform";
+        const string KEY_PLATFORM_NAME = "platformName";
         const string KEY_NATIVE_EVENTS = "nativeEvents";
-        const string KEY_ACCEPT_SSL_CERTIFICATES = "acceptSslCerts";
+        const string KEY_ACCEPT_SSL_CERTS = "acceptSslCerts";
+        const string KEY_ACCEPT_INSECURE_CERTS = "acceptInsecureCerts";
         const string KEY_ALERT_BEHAVIOUR = "unexpectedAlertBehaviour";
         const string KEY_PAGE_LOAD_STRATEGY = "pageLoadStrategy";
 
         public Capabilities(){
             base.Add(KEY_PAGE_LOAD_STRATEGY, "normal");
-            base.Add(KEY_ALERT_BEHAVIOUR, "ignore");
         }
 
         public new object this[string key] {
@@ -64,10 +65,13 @@ namespace Selenium {
         /// </summary>
         public string Platform {
             get {
-                return base.GetValue(KEY_PLATFORM, "ANY");
+                return base.GetValue(WebDriver.LEGACY ? KEY_PLATFORM : KEY_PLATFORM_NAME, "ANY");
             }
             set {
-                base[KEY_PLATFORM] = string.IsNullOrEmpty(value) ? "ANY" : value;
+                if( WebDriver.LEGACY )
+                    base[KEY_PLATFORM] = string.IsNullOrEmpty(value) ? "ANY" : value;
+                else
+                    base[KEY_PLATFORM_NAME] = string.IsNullOrEmpty(value) ? "windows" : value;
             }
         }
 
@@ -88,22 +92,23 @@ namespace Selenium {
         /// </summary>
         public bool AcceptUntrustedCertificates {
             get {
-                return base.GetValue(KEY_ACCEPT_SSL_CERTIFICATES, false);
+                return base.GetValue(WebDriver.LEGACY ? KEY_ACCEPT_SSL_CERTS : KEY_ACCEPT_INSECURE_CERTS, false);
             }
             set {
-                base[KEY_ACCEPT_SSL_CERTIFICATES] = value;
+                base[WebDriver.LEGACY ? KEY_ACCEPT_SSL_CERTS : KEY_ACCEPT_INSECURE_CERTS] = value;
             }
         }
 
         /// <summary>
-        /// Unexpected alert behaviour
+        /// Unexpected alert behaviour. Legacy only
         /// </summary>
         public string UnexpectedAlertBehaviour {
             get {
                 return base.GetValue(KEY_ALERT_BEHAVIOUR, string.Empty);
             }
             set {
-                base[KEY_ALERT_BEHAVIOUR] = value;
+                if( WebDriver.LEGACY )
+                    base[KEY_ALERT_BEHAVIOUR] = value;
             }
         }
 

@@ -13,5 +13,14 @@
     <div id="id-5"><span>Div5</span></div>
     <div id="id-6"><a href="win1.html">Link1</a></div>
     <div id="id-7"><a href="win2.html">Link2</a></div>
+    Shadow root:
+    <div id="shadow-ctr"></div>
+    <script>
+        var sc = document.getElementById( "shadow-ctr" );
+        var sr = sc.attachShadow( { mode: "open" } );
+        var span = document.createElement( 'span' );
+        span.textContent = "shadow content";
+        sr.appendChild( span );
+    </script>
 </body>
 </html>

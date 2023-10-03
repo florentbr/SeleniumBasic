@@ -303,7 +303,7 @@ namespace Selenium {
         /// <summary>
         /// Search by XPath
         /// </summary>
-        /// <param name="xpath">XPath locator</param>
+        /// <param name="xpath"><see href="https://www.w3schools.com/xml/xpath_syntax.asp">XPath</see></param>
         /// <returns>By object</returns>
         By _By.XPath(string xpath) {
             return new By(Strategy.XPath, xpath);

@@ -1,5 +1,6 @@
 ﻿using Selenium.Core;
 using Selenium.Internal;
+using Selenium.ComInterfaces;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -14,7 +15,7 @@ namespace Selenium {
     [Guid("0277FC34-FD1B-4616-BB19-7D30CBC3F6BB")]
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     [Description("Waiting functions to keep the visual basic editor from not responding")]
-    public class Waiter : ComInterfaces._Waiter {
+    public class Waiter : _Waiter {
 
         private DateTime? _endtime;
         private int _timeout = 5000;
@@ -47,7 +48,7 @@ namespace Selenium {
         /// Waits the given time in milliseconds
         /// </summary>
         /// <param name="timems">Time to wait in milliseconde</param>
-        void ComInterfaces._Waiter.Wait(int timems) {
+        void _Waiter.Wait(int timems) {
             SysWaiter.Wait(timems);
         }
 
@@ -106,52 +107,35 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Waits for a procedure to set the result argument to true.
-        /// Procedure: 
+        /// Waits for a function(a,b) to return a true-castable result.
         /// </summary>
-        /// <param name="procedure">Procedure</param>
-        /// <param name="argument">Argument</param>
+        /// <param name="procedure">Function's reference. In VBScript use GetRef()</param>
+        /// <param name="argument">Function's first argument</param>
         /// <param name="timeout">Timeout in ms</param>
-        /// <param name="timeoutMessage">Timeout message</param>
-        /// <returns></returns>
+        /// <param name="reserved">Not in use</param>
+        /// <returns>function's actual result</returns>
+        /// <exception cref="Errors.TimeoutError">Throws when time out has reached</exception>
         /// <example>
-        /// VBA:
         /// <code lang="vbs">
-        /// Public Sub WaitForTitle(driver, arg)
-        ///   WaitForTitle = driver.Title = arg
-        /// End Sub
-        ///  
-        /// Public Sub Script()
-        ///   Dim Waiter As New Waiter
-        ///   Dim driver As New FirefoxDriver
-        ///   driver.Get "http://www.google.com/"
-        ///   Waiter.Until AddressOf WaitForTitle, driver, "Google"
-        ///   ...
-        /// End Sub
-        /// </code>
+        /// Dim driver  ' the called function has access to global variables
         /// 
-        /// VBScript:
-        /// <code lang="vbs">
-        /// Public Sub WaitForTitle(driver, arg)
-        ///   WaitForTitle = driver.Title = arg
-        /// End Sub
+        /// Private Function WaitForTitle(expected_title, always_null)
+        ///   WaitForTitle = driver.Title = expected_title
+        /// End Function
         ///  
         /// Public Sub Script()
         ///   Set Waiter = CreateObject("Selenium.Waiter")
         ///   Set driver = CreateObject("Selenium.FirefoxDriver")
         ///   driver.Get "http://www.google.com/"
-        ///   Waiter.Until GetRef("WaitForTitle"), 5000, driver, "Google"
-        ///   ...
+        ///   Waiter.Until GetRef("WaitForTitle"), "Google", 5000
         /// End Sub
         /// </code>
         /// </example>
-        object ComInterfaces._Waiter.Until(object procedure, object argument, int timeout, string timeoutMessage) {
+        object _Waiter.Until(object procedure, object argument, int timeout, string reserved) {
             if (timeout == -1)
                 timeout = _timeout;
             return COMExt.WaitUntilProc(procedure, argument, null, timeout);
         }
-
-
 
         /// <summary>
         /// Waits the given time in milliseconds

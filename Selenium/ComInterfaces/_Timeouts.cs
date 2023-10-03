@@ -9,8 +9,11 @@ namespace Selenium.ComInterfaces {
     [ComVisible(true), InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
     public interface _Timeouts {
 
-        [DispId(476), Description("Amount of time that Selenium will wait for waiting commands to complete")]
+        [DispId(476), Description("Default amount of time that Selenium waits for search and wait operations.")]
         int ImplicitWait { get; set; }
+
+        [DispId(477), Description("Amount of time the driver waits when locating an element.")]
+        int Implicit { get; set; }
 
         [DispId(459), Description("Amount of time the driver should wait while loading a page before throwing an exception.")]
         int PageLoad { get; set; }

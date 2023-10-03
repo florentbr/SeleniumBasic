@@ -5,12 +5,15 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 using ExpectedException = NUnit.Framework.ExpectedExceptionAttribute;
 
 namespace Selenium.Tests {
-
-    [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Opera)]
-    [TestFixture(Browser.Chrome)]
-    [TestFixture(Browser.IE)]
-    //[TestFixture(Browser.PhantomJS)]
+    [TestFixture(Browser.Firefox, Category="Firefox")]
+    [TestFixture(Browser.Gecko, Category="Gecko")]
+    [TestFixture(Browser.Chrome, Category="Chrome")]
+    [TestFixture(Browser.Edge, Category="Edge")]
+/*
+    [TestFixture(Browser.Opera, Category="Opera")]
+    [TestFixture(Browser.IE, Category="IE")]
+    [TestFixture(Browser.PhantomJS, Category="PhantomJS")]
+*/
     class TS_Alert : BaseBrowsers {
 
         public TS_Alert(Browser browser)
@@ -41,6 +44,7 @@ namespace Selenium.Tests {
         public void ShouldAcceptAlert() {
             driver.Get("/input.html");
             driver.ExecuteScript("window.setTimeout(function(){window.res=window.confirm('test dismiss');}, 100);");
+//            driver.Wait( 2000 );
             var alert = driver.SwitchToAlert();
             A.AreEqual("test dismiss", alert.Text);
             alert.Dismiss();
@@ -72,10 +76,10 @@ namespace Selenium.Tests {
         public void ShouldThrowUnexpectedAlert() {
             driver.Get("/input.html");
             driver.ExecuteScript("window.setTimeout(function(){window.alert('na');}, 0);");
+            driver.Wait( 1000 );
             var ele = driver.FindElementById("input__search");
             ele.Clear();
         }
-
     }
 
 }
