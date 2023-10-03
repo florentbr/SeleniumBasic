@@ -9,6 +9,7 @@ namespace Selenium.Core {
     /// Provides waits methods that can be interrupted with a registered hot key
     /// </summary>
     class SysWaiter {
+        private static readonly NLog.Logger _l = NLog.LogManager.GetCurrentClassLogger();
 
         const int DEFAULT_WAIT_TIME = 50;
         const int TIMEOUT_DIVIDER   = 10;

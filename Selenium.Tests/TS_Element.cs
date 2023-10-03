@@ -7,14 +7,14 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 
 namespace Selenium.Tests {
 
-    [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Gecko)]
-    [TestFixture(Browser.Chrome)]
-    [TestFixture(Browser.Edge)]
+    [TestFixture(Browser.Firefox, Category="Firefox")]
+    [TestFixture(Browser.Gecko, Category="Gecko")]
+    [TestFixture(Browser.Chrome, Category="Chrome")]
+    [TestFixture(Browser.Edge, Category="Edge")]
 /*
-    [TestFixture(Browser.Opera)]
-    [TestFixture(Browser.IE)]
-    [TestFixture(Browser.PhantomJS)]
+    [TestFixture(Browser.Opera, Category="Opera")]
+    [TestFixture(Browser.IE, Category="IE")]
+    [TestFixture(Browser.PhantomJS, Category="PhantomJS")]
 */
     class TS_Element : BaseBrowsers {
 
@@ -44,7 +44,7 @@ namespace Selenium.Tests {
             A.True(ele2.IsSelected);
 
             var ele3 = driver.FindElementById("select_item2");
-            A.True(ele2.IsSelected);
+            A.True(ele3.IsSelected);
         }
 
         [TestCase]

@@ -15,8 +15,20 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_083519FBB1BAA6753BAFD2C3B13D3C23"
+        "OwnerKey" = "8:_25CD48DDBB8544D5AA94A12ADF703BFF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_0A83E45B1B98405F9CCFCFE1F88E58E8"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0C75D2D8A6C42514B265263A099A88A2"
+        "OwnerKey" = "8:_16D1E01573CF4F9A8AE5CA2BD53A3076"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -28,6 +40,12 @@
         "Entry"
         {
         "MsmKey" = "8:_14F710EC4AA54E03A38B3867639E1521"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_16D1E01573CF4F9A8AE5CA2BD53A3076"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -129,6 +147,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B5EEED80E8664F088E1E85F33A3F0B96"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_BC025938A3574073BB1AC362AEAE3238"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -189,14 +213,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_FB0546BF69D6408F8AA8690B0D050895"
-        "OwnerKey" = "8:_UNDEFINED"
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_16D1E01573CF4F9A8AE5CA2BD53A3076"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_FB0546BF69D6408F8AA8690B0D050895"
+        "OwnerKey" = "8:_0C75D2D8A6C42514B265263A099A88A2"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -243,7 +267,7 @@
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
-        "Compression" = "3:2"
+        "Compression" = "3:3"
         "SignOutput" = "11:FALSE"
         "CertificateFile" = "8:"
         "PrivateKeyFile" = "8:"
@@ -271,36 +295,6 @@
     {
         "CustomAction"
         {
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_09B4E2E48D0240D1B4A482DEE9661885"
-            {
-            "Name" = "8:Primary output from Selenium (Release x64)"
-            "Condition" = "8:"
-            "Object" = "8:_FB0546BF69D6408F8AA8690B0D050895"
-            "FileType" = "3:1"
-            "InstallAction" = "3:1"
-            "Arguments" = "8:"
-            "EntryPoint" = "8:"
-            "Sequence" = "3:1"
-            "Identifier" = "8:_6219436D_41A3_44A1_B1EA_A50F753399D0"
-            "InstallerClass" = "11:TRUE"
-            "CustomActionData" = "8:"
-            "Run64Bit" = "11:TRUE"
-            }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_CA1D117765224184B3445C11F047B5D2"
-            {
-            "Name" = "8:Primary output from Selenium (Release x64)"
-            "Condition" = "8:"
-            "Object" = "8:_FB0546BF69D6408F8AA8690B0D050895"
-            "FileType" = "3:1"
-            "InstallAction" = "3:2"
-            "Arguments" = "8:"
-            "EntryPoint" = "8:"
-            "Sequence" = "3:1"
-            "Identifier" = "8:_9A24F737_C985_441D_8593_68CB332E4FFE"
-            "InstallerClass" = "11:TRUE"
-            "CustomActionData" = "8:"
-            "Run64Bit" = "11:TRUE"
-            }
         }
         "DefaultFeature"
         {
@@ -324,6 +318,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_083519FBB1BAA6753BAFD2C3B13D3C23"
+            {
+            "SourcePath" = "8:NLog.xml"
+            "TargetName" = "8:NLog.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_A05A497EE20B4C04AF266C77C7FB80C0"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0A83E45B1B98405F9CCFCFE1F88E58E8"
             {
             "SourcePath" = "8:..\\Examples\\VBScript\\ListLinksToExcel(Firefox).vbs"
@@ -342,6 +356,37 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0C75D2D8A6C42514B265263A099A88A2"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_0C75D2D8A6C42514B265263A099A88A2"
+                    {
+                    "Name" = "8:NLog.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:NLog.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A05A497EE20B4C04AF266C77C7FB80C0"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_10E2A4BC2B8B4FA6819404F0EA718B62"
@@ -684,6 +729,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B5EEED80E8664F088E1E85F33A3F0B96"
+            {
+            "SourcePath" = "8:D:\\Projects\\retriever\\selenium\\SeleniumHelper.wsc"
+            "TargetName" = "8:SeleniumHelper.wsc"
+            "Tag" = "8:"
+            "Folder" = "8:_A05A497EE20B4C04AF266C77C7FB80C0"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:FALSE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BC025938A3574073BB1AC362AEAE3238"
             {
             "SourcePath" = "8:..\\Scripts\\QuickTest.vbs"
@@ -712,7 +777,7 @@
             "Folder" = "8:_A05A497EE20B4C04AF266C77C7FB80C0"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
+            "Vital" = "11:FALSE"
             "ReadOnly" = "11:FALSE"
             "Hidden" = "11:FALSE"
             "System" = "11:FALSE"
@@ -985,7 +1050,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SeleniumBasic"
         "ProductCode" = "8:{06E3B790-33C5-4D6F-B281-43584A1ACFF8}"
-        "PackageCode" = "8:{C3332363-7EDD-4AF4-9108-628084F44ACF}"
+        "PackageCode" = "8:{BB84A827-EBA4-4F48-A352-E827FFB9663E}"
         "UpgradeCode" = "8:{6239A1D5-ADD1-4423-AE46-488AD298074A}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1546,6 +1611,34 @@
                 {
                 }
             }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_16D1E01573CF4F9A8AE5CA2BD53A3076"
+            {
+            "SourcePath" = "8:..\\Selenium\\obj\\x64\\Release\\Selenium.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A05A497EE20B4C04AF266C77C7FB80C0"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:2"
+            "OutputConfiguration" = "8:Release|x64"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{B30CE36F-3653-4610-9519-FAA61E8FC12B}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_25CD48DDBB8544D5AA94A12ADF703BFF"
             {
             "SourcePath" = "8:..\\Selenium\\bin\\x64\\Release\\Selenium.XML"
@@ -1568,34 +1661,6 @@
             "ProjectOutputGroupRegister" = "3:1"
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Documentation"
-            "OutputProjectGuid" = "8:{B30CE36F-3653-4610-9519-FAA61E8FC12B}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FB0546BF69D6408F8AA8690B0D050895"
-            {
-            "SourcePath" = "8:..\\Selenium\\obj\\x64\\Release\\Selenium.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_A05A497EE20B4C04AF266C77C7FB80C0"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:2"
-            "OutputConfiguration" = "8:Release|x64"
-            "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{B30CE36F-3653-4610-9519-FAA61E8FC12B}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"

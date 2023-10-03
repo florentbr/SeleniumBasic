@@ -93,7 +93,7 @@ namespace Selenium {
         public bool Secure { get { return _secure; } }
 
         /// <summary>
-        /// 
+        /// Expiration time in the ISO 8601 format
         /// </summary>
         public string Expiry {
             get {

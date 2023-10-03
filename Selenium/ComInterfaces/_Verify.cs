@@ -5,6 +5,10 @@ using System.Runtime.InteropServices;
 namespace Selenium.ComInterfaces {
 #pragma warning disable 1591
 
+    /// <summary>
+    /// Testing functions. Return the résult of the verification
+    /// </summary>
+    /// <seealso cref="Verify"/>
     [Guid("0277FC34-FD1B-4616-BB19-495CC9DBFB96")]
     [ComVisible(true), InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
     public interface _Verify {

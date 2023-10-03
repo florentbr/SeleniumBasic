@@ -58,7 +58,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>SiMX Corporation.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -101,7 +101,11 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.5.1.0\lib\net35\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -271,6 +275,8 @@
     <Compile Include="Common\WebElement.cs" />
     <Compile Include="Common\WebElements.cs" />
     <Compile Include="Common\Window.cs" />
+    <None Include="packages.config" />
+    <None Include="SiMX Corporation.pfx" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Core\FirefoxPrefs.js" />
@@ -284,7 +290,8 @@
     <PostBuildEvent>xcopy /D /Y "$(ProjectDir)\..\References\firefoxdriver.xpi" .
 xcopy /D /Y "$(ProjectDir)\..\References\chromedriver.exe" .
 xcopy /D /Y "$(ProjectDir)\..\References\edgedriver.exe" .
-</PostBuildEvent>
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" sign /f "$(ProjectDir)SiMX Corporation.pfx" /p simx2254 /i digicert /t http://timestamp.digicert.com /v $(TargetDir)$(TargetFileName)
+echo "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" sign /f "$(ProjectDir)SiMX Corporation.pfx" /p simx2254 /i digicert /t http://timestamp.digicert.com /v "$(ProjectDir)\obj\$(PlatformName)\$(ConfigurationName)\$(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -4,6 +4,11 @@ using System.Runtime.InteropServices;
 namespace Selenium.ComInterfaces {
 #pragma warning disable 1591
 
+    /// <summary>
+    /// Defines special keyboard commands
+    /// </summary>
+    /// <seealso cref="_Application.Keys"/>
+    /// <seealso cref="Keys"/>
     [Guid("0277FC34-FD1B-4616-BB19-637431245D48")]
     [ComVisible(true), InterfaceType(ComInterfaceType.InterfaceIsDual)]
     public interface _Keys {

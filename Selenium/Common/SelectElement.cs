@@ -89,9 +89,11 @@ namespace Selenium {
         /// <exception cref="Errors.NoSuchElementError">Thrown if there is no element with the given text present.</exception>
         public void SelectByText(string text) {
             if (text == null)
-                throw new Errors.ArgumentError("text argument must not be null");
-            var options = _element.FindElementsByXPath(".//option[normalize-space(.) = " + EscapeString(text) + "]");
-
+                throw new Errors.ArgumentError("Text argument must not be null");
+            string es = EscapeString(text);
+            var options = _element.FindElementsByXPath(".//option[normalize-space(.) = " + es + "]");
+            if (options.Count == 0)
+                options = _element.FindElementsByXPath(".//option[contains(., " + es + ")]");
             bool matched = false;
             foreach (WebElement option in options) {
                 SetSelected(option);
@@ -99,25 +101,6 @@ namespace Selenium {
                     return;
                 matched = true;
             }
-
-            if (options.Count == 0 && text.Contains(" ")) {
-                string substringWithoutSpace = GetLongestToken(text);
-                WebElements candidates;
-                if (string.IsNullOrEmpty(substringWithoutSpace)) {
-                    candidates = _element.FindElementsByTag("option");
-                } else {
-                    candidates = _element.FindElementsByXPath(".//option[contains(., " + EscapeString(substringWithoutSpace) + ")]");
-                }
-                foreach (WebElement option in candidates) {
-                    if (text == option.Text()) {
-                        SetSelected(option);
-                        if (!this.IsMultiple)
-                            return;
-                        matched = true;
-                    }
-                }
-            }
-
             if (!matched)
                 throw new Errors.NoSuchElementError("Cannot locate element with text: " + text);
         }

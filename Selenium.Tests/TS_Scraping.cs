@@ -5,19 +5,19 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 
 namespace Selenium.Tests {
 
-    [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Gecko, Category = "InFocus")]
-    [TestFixture(Browser.Chrome)]
-    [TestFixture(Browser.Edge)]
+    [TestFixture(Browser.Firefox, Category="Firefox")]
+    [TestFixture(Browser.Gecko, Category="Gecko")]
+    [TestFixture(Browser.Chrome, Category="Chrome")]
+    [TestFixture(Browser.Edge, Category="Edge")]
 /*
-    [TestFixture(Browser.Opera)]
-    [TestFixture(Browser.IE)]
-    [TestFixture(Browser.PhantomJS)]
+    [TestFixture(Browser.Opera, Category="Opera")]
+    [TestFixture(Browser.IE, Category="IE")]
+    [TestFixture(Browser.PhantomJS, Category="PhantomJS")]
 */
     class TS_Scraping : BaseBrowsers {
 
-        public TS_Scraping(Browser browser)
-            : base(browser) { }
+        public TS_Scraping(Browser b)
+            : base(b) { }
 
         [TestCase]
         public void ShouldScrapTextFromTable() {
@@ -35,23 +35,6 @@ namespace Selenium.Tests {
             var elements = driver.FindElementsByCss("thead th");
             var data = elements.Text();
             A.AreEqual(data[0], "Table Heading 1");
-        }
-
-        [TestCase]
-//        [IgnoreFixture(Browser.Gecko, "Not supported")]
-        public void ShouldGetBrowserLog() {
-            driver.Get("/notexisting.html");
-            Logs l = driver.Manage.Logs;
-            List sl = l.Browser;
-            A.IsNotNull( sl );
-        }
-        [TestCase]
-        [IgnoreFixture(Browser.Gecko, "Not supported")]
-        public void ShouldGetDriverLog() {
-            driver.Get("/notexisting.html");
-            Logs l = driver.Manage.Logs;
-            List sl = l.Driver;
-            A.IsNotNull( sl );
         }
     }
 

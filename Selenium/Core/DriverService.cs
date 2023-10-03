@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 namespace Selenium.Core {
 
     class DriverService : IDriverService {
+        private static readonly NLog.Logger _l = NLog.LogManager.GetCurrentClassLogger();
 
         const string TEMP_FOLDER = @"Selenium";
 
@@ -90,13 +91,16 @@ namespace Selenium.Core {
 #else
             const bool noWindow = true;
 #endif
+            _l.Debug( "Starting: " + servicePath );
             //Start the process
             _process = ProcessExt.Start(servicePath, _arguments, null, env, noWindow, true);
+
+            _l.Debug( "Waiting for: " + _endpoint.ToString() );
 
             //Waits for the port to be listening
             if (!_endpoint.WaitForListening(10000, 150))
                 throw new Errors.TimeoutError("The driver failed to open the listening port {0} within 10s", _endpoint);
-
+            _l.Info( "Started: " + filename );
         }
 
     }

@@ -5,7 +5,11 @@ using System.Runtime.InteropServices;
 
 namespace Selenium.ComInterfaces {
 #pragma warning disable 1591
-
+    /// <summary>
+    /// Defines the web element context for element-centric commands
+    /// </summary>
+    /// <seealso cref="WebElement"/>
+    /// <seealso cref="SearchContext"/>
     [Guid("0277FC34-FD1B-4616-BB19-8B145197B76C")]
     [ComVisible(true), InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
     public interface _WebElement {

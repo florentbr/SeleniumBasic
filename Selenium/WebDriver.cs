@@ -39,6 +39,7 @@ namespace Selenium {
     public class WebDriver : SearchContext, ComInterfaces._WebDriver, IDisposable {
 
         const string RUNNING_OBJECT_NAME = "Selenium.WebDriver";
+        private static readonly NLog.Logger _l = NLog.LogManager.GetCurrentClassLogger();
 
         // New API https://w3c.github.io/webdriver/#endpoints are used with
         // Gecko driver which does not support many endpoints and payloads used in previous implementation
@@ -154,10 +155,17 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Set a specific capability for the webdriver
+        /// Set a specific capability for the webdriver. Should be called before Start() or StartRemotely()
         /// </summary>
-        /// <param name="key">Capability key</param>
-        /// <param name="value">Capability value</param>
+        /// <param name="key">Key name</param>
+        /// <param name="value">JSON value</param>
+        /// <example>
+        /// <code lang="vbs">
+        /// ' setting a FF config option:
+        /// driver.SetCapability "moz:firefoxOptions", "{ ""prefs"": { ""dom.enable_window_print"": false } }"
+        /// </code>
+        /// </example>
+        /// 
         public void SetCapability(string key, object value) {
             Capabilities[key] = JSON.Parse(value);
         }
@@ -277,15 +285,17 @@ namespace Selenium {
 
                 if (!string.IsNullOrEmpty(baseUrl))
                     this.BaseUrl = baseUrl;
-            } catch (SeleniumException) {
+            } catch (SeleniumException ex) {
+                _l.Error( ex, "Start threw a SeleniumException" );
                 throw;
             } catch (Exception ex) {
+                _l.Error( ex, "Start fails" );
                 throw new SeleniumException(ex);
             }
         }
 
         /// <summary>
-        /// Starts a new Selenium session attached to a remotely started driver process
+        /// Starts a new Selenium session attached to a remotely started driver process (or Selenium server?)
         /// </summary>
         /// <param name="executorUri">Remote executor address (ex : "http://localhost:4444/wd/hub")</param>
         /// <param name="browser">Name of the browser: gecko, firefox, chrome, edge, ie, phantomjs, htmlunit, htmlunitwithjavascript, android, ipad, opera</param>
@@ -297,6 +307,12 @@ namespace Selenium {
         ///     driver.StartRemotely "http://localhost:4444/wd/hub"
         ///     driver.Get "/"
         /// </code>
+        /// <code lang="vbscript">
+        ///     WScript.CreateObject("WSCript.Shell").Run "geckodriver.exe -vv"
+        ///     Set driver = CreateObject("Selenium.WebDriver")
+        ///     driver.StartRemotely "http://localhost:4444", "gecko"
+        ///     driver.Get "https://localhost/"
+        /// </code>
         /// </example>
         /// <remarks>
         /// This could be useful for debugging. Start the driver process manually in the verbose mode, like:
@@ -305,7 +321,7 @@ namespace Selenium {
         /// chromedriver.exe --verbose
         /// A custom connection port also could be specified as a driver's command line parameter
         /// </remarks>
-        public void StartRemotely(string executorUri, string browser = null, string version = null, string platform = null) {
+        public void StartRemotely(string executorUri, string browser, string version = null, string platform = null) {
             try {
                 browser = ExpendBrowserName(browser);
                 switch (browser) {
@@ -344,9 +360,11 @@ namespace Selenium {
 
                 RegisterRunningObject();
 
-            } catch (SeleniumException) {
+            } catch (SeleniumException ex) {
+                _l.Error( ex, "StartRemotely threw a SeleniumException" );
                 throw;
             } catch (Exception ex) {
+                _l.Error( ex, "StartRemotely fails" );
                 throw new SeleniumException(ex);
             }
         }
@@ -426,7 +444,8 @@ namespace Selenium {
         ///     Set links = driver.Send("POST", "/elements", "using", "css selector", "value", "a")
         /// </code>
         /// <code lang="vbs">
-        ///     ' "print" the page and get a binary as a result (works only in gecko)
+        ///     ' "print" the page and get a binary as a result 
+        ///     ' (works only in Gecko. Chromium based browsers need to be running headless (without the UI) )
         ///     dim base64
         ///     base64 = driver.Send( "POST", "/print", "shrinkToFit", true )
         /// </code>
@@ -572,9 +591,9 @@ namespace Selenium {
         /// Performs a GET request to load a web page in the current browser session. 
         /// </summary>
         /// <param name="url">URL (could be relative, see <see cref="BaseUrl"/>)</param>
-        /// <param name="timeout">Optional timeout in milliseconds. see </param>
+        /// <param name="timeout">Optional timeout in milliseconds. see <see cref="Timeouts.PageLoad"/></param>
         /// <param name="raise">Optional - Raise an exception after the timeout when true</param>
-        /// <exception cref="Exception">Thrown when the timeout has reached</exception>
+        /// <exception cref="Errors.WebRequestTimeout">Thrown when the timeout has reached</exception>
         /// <returns>Return true if the url was openned within the timeout, false otherwise (when the raise param was false)</returns>
         public bool Get(string url, int timeout = -1, bool raise = true) {
             if (_session == null)
@@ -732,8 +751,8 @@ namespace Selenium {
         /// <summary>
         /// Takes the screenshot of the current window
         /// </summary>
-        /// <param name="delay">Time to wait before taking the screenshot in milliseconds</param>
-        /// <returns><see cref="Image" /></returns>
+        /// <param name="delay">Optional - Time to wait before taking the screenshot in milliseconds</param>
+        /// <returns></returns>
         public Image TakeScreenshot(int delay = 0) {
             if (delay != 0)
                 SysWaiter.Wait(delay);

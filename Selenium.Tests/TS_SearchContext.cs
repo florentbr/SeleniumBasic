@@ -8,14 +8,14 @@ using ExpectedException = NUnit.Framework.ExpectedExceptionAttribute;
 
 namespace Selenium.Tests {
 
-    [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Gecko)]
-    [TestFixture(Browser.Chrome)]
-    [TestFixture(Browser.Edge)]
+    [TestFixture(Browser.Firefox, Category="Firefox")]
+    [TestFixture(Browser.Gecko, Category="Gecko")]
+    [TestFixture(Browser.Chrome, Category="Chrome")]
+    [TestFixture(Browser.Edge, Category="Edge")]
 /*
-    [TestFixture(Browser.Opera)]
-    [TestFixture(Browser.IE)]
-    [TestFixture(Browser.PhantomJS)]
+    [TestFixture(Browser.Opera, Category="Opera")]
+    [TestFixture(Browser.IE, Category="IE")]
+    [TestFixture(Browser.PhantomJS, Category="PhantomJS")]
 */
     class TS_SearchContext : BaseBrowsers {
 
@@ -165,7 +165,7 @@ namespace Selenium.Tests {
         public void ShouldFindWithDriverImplicit() {
             const int implicit_timeout = 500;
             driver.Timeouts.Implicit = implicit_timeout;
-            if( Fixture.Equals( Browser.Firefox ) )
+            if( FixtureParam.Equals( Browser.Firefox ) )
                 A.Ignore( "Timeout can be only set but not get" );
             else
                 A.AreEqual( implicit_timeout, driver.Timeouts.Implicit, "Cannot set the implicit timeout to the driver" );
@@ -191,9 +191,9 @@ namespace Selenium.Tests {
             var sc = driver.FindElementByCss("div#shadow-ctr");
             var sr = sc.Shadow();
             A.IsNotNull( sr, "Element has no Shadow " );
-            if( Fixture.Equals( Browser.Gecko ) )
+            if( FixtureParam.Equals( Browser.Gecko ) )
                 A.Ignore( "DNW in gecko. See https://bugzilla.mozilla.org/show_bug.cgi?id=1700097" );
-            if( !( Fixture.Equals( Browser.Chrome ) || Fixture.Equals( Browser.Edge ) ) )
+            if( !( FixtureParam.Equals( Browser.Chrome ) || FixtureParam.Equals( Browser.Edge ) ) )
                 A.Ignore("Old browsers are not supported");
             A.IsNotNull(sr.FindElementByCss("span"));
             A.IsNotNull(sr.FindElementByTag("span"));

@@ -5,14 +5,18 @@ using System.Runtime.InteropServices;
 namespace Selenium.ComInterfaces {
 #pragma warning disable 1591
 
+    /// <summary>
+    ///  Testing methods. Throws an exception if the condition is not met
+    /// </summary>
+    /// <seealso cref="Assert"/>
     [Guid("0277FC34-FD1B-4616-BB19-0EA52ACB97D1")]
     [ComVisible(true), InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
     public interface _Assert {
 
-        [DispId(564), Description("Raise an error if the value is true.")]
+        [DispId(564), Description("Raise an error if the value is not true.")]
         void True(bool value, string failmessage = null);
 
-        [DispId(567), Description("Raise an error if the value is false.")]
+        [DispId(567), Description("Raise an error if the value is not false.")]
         void False(bool value, string failmessage = null);
 
         [DispId(574), Description("Raise an error if the objects are not equal.")]

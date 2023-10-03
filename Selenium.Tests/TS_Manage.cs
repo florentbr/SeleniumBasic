@@ -7,14 +7,14 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 
 namespace Selenium.Tests {
 
-    [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Gecko)]
-    [TestFixture(Browser.Chrome)]
-    [TestFixture(Browser.Edge)]
+    [TestFixture(Browser.Firefox, Category="Firefox")]
+    [TestFixture(Browser.Gecko, Category="Gecko")]
+    [TestFixture(Browser.Chrome, Category="Chrome")]
+    [TestFixture(Browser.Edge, Category="Edge")]
 /*
-    [TestFixture(Browser.Opera)]
-    [TestFixture(Browser.IE)]
-    [TestFixture(Browser.PhantomJS)]
+    [TestFixture(Browser.Opera, Category="Opera")]
+    [TestFixture(Browser.IE, Category="IE")]
+    [TestFixture(Browser.PhantomJS, Category="PhantomJS")]
 */
     class TS_Manage : BaseBrowsers {
 
@@ -50,6 +50,22 @@ namespace Selenium.Tests {
             A.AreEqual(0, manage.Cookies.Count);
         }
 
+        [TestCase]
+//        [IgnoreFixture(Browser.Gecko, "Not supported")]
+        public void ShouldGetBrowserLog() {
+            driver.Get("/notexisting.html");
+            Logs l = driver.Manage.Logs;
+            List sl = l.Browser;
+            A.IsNotNull( sl );
+        }
+        [TestCase]
+        [IgnoreFixture(Browser.Gecko, "Not supported")]
+        public void ShouldGetDriverLog() {
+            driver.Get("/notexisting.html");
+            Logs l = driver.Manage.Logs;
+            List sl = l.Driver;
+            A.IsNotNull( sl );
+        }
     }
 
 }

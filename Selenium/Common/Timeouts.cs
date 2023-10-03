@@ -49,12 +49,14 @@ namespace Selenium {
         /// Amount of time that Selenium will wait for commands to complete. Default is 3000ms
         /// </summary>
         /// <remarks>
-        /// This timeout is not linked to the driver process 
+        /// Note: 
+        /// This timeout is not related to the driver process'
         /// <see href="https://w3c.github.io/webdriver/#timeouts">implicit timeout</see>.
-        /// It just a SeleniumBasic's default time for an element search operation would continue repeating a search requests
+        /// It just a SeleniumBasic's default time for an element search or wait operation would continue repeating a requests
         /// until the timeout is reached.
         /// </remarks>
         /// <remarks>Default is 3000ms</remarks>
+        /// <seealso cref="Timeouts.Implicit"/>
         public int ImplicitWait {
             get {
                 return timeout_implicitwait;

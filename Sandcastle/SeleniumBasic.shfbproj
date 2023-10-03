@@ -18,7 +18,7 @@
     <OutputPath>Help\</OutputPath>
     <HtmlHelpName>SeleniumBasic</HtmlHelpName>
     <Language>en-US</Language>
-    <HelpFileFormat>HtmlHelp1, Website</HelpFileFormat>
+    <HelpFileFormat>HtmlHelp1</HelpFileFormat>
     <SyntaxFilters>Visual Basic, Visual Basic Usage</SyntaxFilters>
     <PresentationStyle>VS2013</PresentationStyle>
     <CleanIntermediates>True</CleanIntermediates>
@@ -29,9 +29,10 @@
     <SaveComponentCacheCapacity>100</SaveComponentCacheCapacity>
     <DocumentationSources>
       <DocumentationSource sourceFile="..\Selenium\Selenium.csproj" />
-<DocumentationSource sourceFile="..\Selenium\bin\x64\Debug\Selenium.xml" />
-<DocumentationSource sourceFile="..\Selenium\bin\x64\Debug\Selenium.dll" />
-<DocumentationSource sourceFile="COMs.xml" /></DocumentationSources>
+      <DocumentationSource sourceFile="..\Selenium\bin\x64\Debug\Selenium.xml" />
+      <DocumentationSource sourceFile="..\Selenium\bin\x64\Debug\Selenium.dll" />
+      <DocumentationSource sourceFile="COMs.xml" />
+    </DocumentationSources>
     <MissingTags>None</MissingTags>
     <HelpTitle>SeleniumBasic</HelpTitle>
     <HelpFileVersion>1.0.0.0</HelpFileVersion>
@@ -47,17 +48,21 @@
     </PlugInConfigurations>
     <ApiFilter>
       <Filter entryType="Namespace" fullName="Interop" isExposed="False" />
-<Filter entryType="Namespace" fullName="Interop.Excel" isExposed="False" />
-<Filter entryType="Namespace" fullName="Selenium" isExposed="True">
-  <Filter entryType="Class" fullName="Selenium.NamespaceDoc" filterName="NamespaceDoc" isExposed="False" />
-</Filter>
-<Filter entryType="Namespace" fullName="Selenium.Internal" isExposed="False" /></ApiFilter>
+      <Filter entryType="Namespace" fullName="Interop.Excel" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Selenium" isExposed="True">
+        <Filter entryType="Class" fullName="Selenium.NamespaceDoc" filterName="NamespaceDoc" isExposed="False" />
+      </Filter>
+      <Filter entryType="Namespace" fullName="Selenium.Internal" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Selenium.Serializer" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Selenium.Zip" isExposed="False" />
+    </ApiFilter>
     <SourceCodeBasePath>..\Selenium\</SourceCodeBasePath>
     <WarnOnMissingSourceContext>False</WarnOnMissingSourceContext>
     <ProjectSummary>SeleniumBasic - A Selenium based browser automation framework for VB.Net, Visual Basic Applications and VBScript</ProjectSummary>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="Selenium" isDocumented="True">All public methods and properties. Some of them available only from a .NET (i.e. not via COM). To know which are available via COM refer to a corresponding COM interface name. If a method listed as a class member but not a member of a corresponding interface, the method won't be available via COM. Methods with an "S" icon are static and surely not available via COM. However, look for a similar method in the "Explicit Interface Implementations" section.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="Selenium.ComInterfaces" isDocumented="True">Only methods of those interfaces are available via COM (Component Object Model) from VBScript, etc.</NamespaceSummaryItem></NamespaceSummaries>
+      <NamespaceSummaryItem name="Selenium.ComInterfaces" isDocumented="True">Only methods of those interfaces are available via COM (Component Object Model) from VBScript, etc.</NamespaceSummaryItem>
+    </NamespaceSummaries>
     <HtmlHelp1xCompilerPath>C:\Program Files (x86)\HTML Help Workshop\</HtmlHelp1xCompilerPath>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in order for Visual Studio to perform
@@ -87,8 +92,7 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>cd /d $(ProjectDir)
-awk -f COMdescrToXML.awk  ../Selenium/ComInterfaces/*.cs &gt;COMs.xml
+    <PostBuildEvent>gawk -f COMdescrToXML.awk  ../Selenium/ComInterfaces/*.cs &gt;COMs.xml
 </PostBuildEvent>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>

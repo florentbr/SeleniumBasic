@@ -10,6 +10,12 @@ namespace Selenium {
     /// <summary>
     /// Represents a collection of values.
     /// </summary>
+    /// <remarks>
+    /// Please note:
+    /// When accessed via the COM interface it uses the base 1 index. 
+    /// When used as a .NET object, the index is zero based.
+    /// </remarks>
+    /// <seealso cref="ComInterfaces._List"/>
     [ProgId("Selenium.List")]
     [Guid("0277FC34-FD1B-4616-BB19-5DB46A739EEA")]
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
@@ -49,7 +55,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Returns the number of itens
+        /// Returns the number of items
         /// </summary>
         public int Count {
             get {
@@ -65,10 +71,10 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Return the item at index
+        /// Return the item at Zero based index
         /// </summary>
         /// <param name="index">Zero based index</param>
-        /// <returns></returns>
+        /// <returns>An item</returns>
         public object this[int index] {
             get {
                 return _items[index];
@@ -78,6 +84,11 @@ namespace Selenium {
             }
         }
 
+        /// <summary>
+        /// Return or assign the item at One based index
+        /// </summary>
+        /// <param name="index">One based index</param>
+        /// <returns>An item</returns>
         object ComInterfaces._List.this[int index] {
             get {
                 return _items[index - 1];
@@ -87,10 +98,21 @@ namespace Selenium {
             }
         }
 
+        /// <summary>
+        /// Set a value to the item at one based index
+        /// </summary>
+        /// <param name="index">One based index</param>
+        /// <param name="value">Item's value</param>
+        /// <returns>An item</returns>
         void ComInterfaces._List.Set(int index, object value) {
             _items[index - 1] = value;
         }
 
+        /// <summary>
+        /// Return the item value at One based index
+        /// </summary>
+        /// <param name="index">One based index</param>
+        /// <returns>An item</returns>
         object ComInterfaces._List.Get(int index) {
             return _items[index - 1];
         }
@@ -108,7 +130,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        ///  Adds a value in the list
+        ///  Adds a value to the list
         /// </summary>
         /// <param name="value"></param>
         /// <returns>Index</returns>
@@ -120,6 +142,11 @@ namespace Selenium {
             return _count++;
         }
 
+        /// <summary>
+        ///  Adds a value to the list
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>Index</returns>
         int ComInterfaces._List.Add(object value) {
             Add(value);
             return _count;
@@ -221,7 +248,7 @@ namespace Selenium {
         /// <returns></returns>
         public bool Contains(object value) {
             for (int i = 0; i < _count; i++) {
-                if (_items[i] == value)
+                if (ObjExt.AreEqual(_items[i],value))
                     return true;
             }
             return false;
@@ -234,7 +261,7 @@ namespace Selenium {
         /// <returns></returns>
         public int LastIndexOf(object value) {
             int i = _count;
-            while (i-- > 0 && _items[i] != value) ;
+            while (i-- > 0 && !ObjExt.AreEqual(_items[i],value)) ;
             return i;
         }
 
@@ -245,12 +272,12 @@ namespace Selenium {
         /// <returns></returns>
         public int IndexOf(object value) {
             int i = -1;
-            while (++i < _count && _items[i] != value) ;
+            while (++i < _count && !ObjExt.AreEqual(_items[i],value)) ;
             return i == _count ? -1 : i;
         }
 
         /// <summary>
-        /// Insert a value at index
+        /// Insert a value at a zero based index
         /// </summary>
         /// <param name="index">Index (Zero based)</param>
         /// <param name="value">Value</param>
@@ -269,6 +296,11 @@ namespace Selenium {
             _items[index] = value;
         }
 
+        /// <summary>
+        /// Insert a value at a one based index
+        /// </summary>
+        /// <param name="index">Index (One based)</param>
+        /// <param name="value">Value</param>
         void ComInterfaces._List.Insert(int index, object value) {
             Insert(index - 1, value);
         }
@@ -292,7 +324,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Remove the value
+        /// Find and remove an item with given value
         /// </summary>
         /// <param name="value">Value</param>
         public void Remove(object value) {
@@ -303,7 +335,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Remove the value at index
+        /// Remove the value at zero based index
         /// </summary>
         /// <param name="index">Index (Zero based)</param>
         public void RemoveAt(int index) {
@@ -314,6 +346,10 @@ namespace Selenium {
             _items[--_count] = null;
         }
 
+        /// <summary>
+        /// Remove the value at an one based index
+        /// </summary>
+        /// <param name="index">Index (One based)</param>
         void ComInterfaces._List.RemoveAt(int index) {
             RemoveAt(index - 1);
         }

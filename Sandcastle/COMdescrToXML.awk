@@ -7,6 +7,24 @@ BEGIN {
     print "    <members>"
 }
 
+function TranslateType( par ) {
+#print par
+    gsub(/^\s+/,"",par)
+    gsub(/\s.+$/,"",par)
+    gsub(/^\[MarshalAs\(UnmanagedType.Struct\)(, In)?\]/,"",par)
+    gsub(/^By/,      "Selenium.By",      par)
+    gsub(/^Strategy/,"Selenium.Strategy",par)
+    gsub(/^WebEleme/,"Selenium.WebEleme",par)
+    gsub(/^string/,  "System.String",    par)
+    gsub(/^object/,  "System.Object",    par)
+    gsub(/^bool/,    "System.Boolean",   par)
+    gsub(/^double/,  "System.Double",    par)
+    gsub(/^float/,   "System.Single",    par)
+    gsub(/^int/,     "System.Int32",     par)
+    gsub(/^short/,   "System.Int16",     par)
+    return par
+}
+
 {
     if( match($0,/Description\("(.+?)"\)/,d) ) {
         descr = d[1]
@@ -20,21 +38,7 @@ BEGIN {
             split(m[2],pars,",")
             ps = ""
             for( pi in pars ) {
-                par = pars[pi]
-#print par
-                gsub(/^\s+/,"",par)
-                gsub(/\s.+$/,"",par)
-                gsub(/^\[MarshalAs\(UnmanagedType.Struct\)(, In)?\]/,"",par)
-                gsub(/^By/,      "Selenium.By",      par)
-                gsub(/^Strategy/,"Selenium.Strategy",par)
-                gsub(/^WebEleme/,"Selenium.WebEleme",par)
-                gsub(/^string/,  "System.String",    par)
-                gsub(/^object/,  "System.Object",    par)
-                gsub(/^bool/,    "System.Boolean",   par)
-                gsub(/^double/,  "System.Double",    par)
-                gsub(/^float/,   "System.Single",    par)
-                gsub(/^int/,     "System.Int32",     par)
-                gsub(/^short/,   "System.Int16",     par)
+                par = TranslateType( pars[pi] )
                 ps = ps ? ps "," par : par
             }
             if( ps ) ps = "(" ps ")"
@@ -42,6 +46,9 @@ BEGIN {
         } else
         if( match(NL,/\s([A-Z][A-z]+)\s*{\s*[gs]et/,m) ) {
             mn = "P:Selenium.ComInterfaces." f[1] "." m[1]
+        } else
+        if( match(NL,/this\[([a-z]+) [A-z]+\]/,m) ) {
+            mn = "P:Selenium.ComInterfaces." f[1] ".Item(" TranslateType( m[1] ) ")"
         }
         if( mn ) {
             print "        <member name=\"" mn "\">"

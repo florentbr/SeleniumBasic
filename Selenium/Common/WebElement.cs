@@ -11,8 +11,10 @@ using System.Text.RegularExpressions;
 namespace Selenium {
 
     /// <summary>
-    /// Defines the interface through which the user controls elements on the page. 
+    /// Defines the interface through which the user controls elements on the page.
     /// </summary>
+    /// <seealso cref="ComInterfaces._WebElement"/>
+    /// <seealso cref="SearchContext"/>
     [ProgId("Selenium.WebElement")]
     [Guid("0277FC34-FD1B-4616-BB19-A693991646BE")]
     [Description("Defines the interface through which the user controls elements on the page.")]
@@ -223,17 +225,30 @@ namespace Selenium {
         /// <summary>
         /// Returns the value of a CSS property
         /// </summary>
-        /// <param name="property">Property name</param>
+        /// <param name="property">CSS property name</param>
         /// <returns>CSS value</returns>
+        /// <example>
+        /// <code lang="vbs">
+        /// elem.CssValue("background-color")
+        /// </code>
+        /// </example>
+        /// <remarks>
+        /// Chromium based browsers return a color as "rgba(220, 53, 69, 1)"
+        /// However, Gecko returns "rgb(220, 53, 69)"
+        /// </remarks>
         public object CssValue(string property) {
             var value = (string)Send(RequestMethod.GET, "/css/" + property);
             return value;
         }
 
         /// <summary>
-        /// Returns the value attribute
+        /// Returns the value of an input control element
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Current value</returns>
+        /// <remarks>
+        /// Note: Legacy drivers return the current value of the "value" attribute. 
+        /// Gecko returns the actual value which could be different from the "value" attribute.
+        /// </remarks>
         public object Value() {
             if( WebDriver.LEGACY ) {
                 var value = Send(RequestMethod.GET, "/attribute/value");
@@ -304,6 +319,9 @@ namespace Selenium {
         /// <summary>
         /// Clears the text if it’s a text entry element.
         /// </summary>
+        /// <remarks>
+        /// Note: In a Selenium based browser, this will not fire the element's onchange event 
+        /// </remarks>
         public WebElement Clear() {
             Send(RequestMethod.POST, "/clear", "id", Id);
             return this;
@@ -400,11 +418,11 @@ namespace Selenium {
         /// <param name="keys">Optional - Sequence of keys if keysToSend contains modifier key(Control,Shift...)</param>
         /// <returns></returns>
         /// <example>
-        /// To Send mobile to an element :
+        /// To Send "mobile" to an element :
         /// <code lang="vbs">
         ///     driver.FindElementsById("id").sendKeys "mobile"
         /// </code>
-        /// To Send ctrl+a to an element :
+        /// To Send ctrl+A to an element :
         /// <code lang="vbs">
         ///     driver.FindElementsById("id").sendKeys Keys.Control, "a"
         /// </code>
@@ -529,9 +547,19 @@ namespace Selenium {
         /// </summary>
         /// <param name="procedure">Function reference. In VBScript use GetRef()</param>
         /// <param name="argument">Optional - the function's second argument</param>
-        /// <param name="timeout">Optional - timeout in milliseconds</param>
+        /// <param name="timeout">Optional. See <see cref="Timeouts.ImplicitWait"/></param>
         /// <returns>function's actual result</returns>
         /// <exception cref="Errors.TimeoutError">Throws when time out has reached</exception>
+        /// <example>
+        /// <code lang="vbs">
+        /// function CheckButtonColor(element, wait_for)
+        ///     CheckButtonColor = element.CssValue("color") = wait_for
+        /// end function
+        /// 
+        /// driver.Get "https://demoqa.com/dynamic-properties"
+        /// driver.FindElementByCss("button#colorChange").Until GetRef("CheckButtonColor"), "rgba(220, 53, 69, 1)", 8000
+        /// </code>
+        /// </example>
         object ComInterfaces._WebElement.Until(object procedure, object argument, int timeout) {
             if (timeout == -1)
                 timeout = _session.timeouts.timeout_implicitwait;
@@ -541,9 +569,9 @@ namespace Selenium {
         /// <summary>
         /// Waits for an attribute
         /// </summary>
-        /// <param name="attribute"></param>
-        /// <param name="pattern"></param>
-        /// <param name="timeout"></param>
+        /// <param name="attribute">Name</param>
+        /// <param name="pattern">RegEx</param>
+        /// <param name="timeout">Optional. See <see cref="Timeouts.ImplicitWait"/></param>
         /// <returns></returns>
         public WebElement WaitAttribute(string attribute, string pattern, int timeout = -1) {
             var regex = new Regex(pattern, RegexOptions.IgnoreCase);
@@ -571,11 +599,18 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Waits for a CSS property
+        /// Waits for a CSS property to change
         /// </summary>
         /// <param name="propertyName">Property name</param>
-        /// <param name="value">Value</param>
-        /// <param name="timeout"></param>
+        /// <param name="value">Value expected to be changed to</param>
+        /// <param name="timeout">Optional. See <see cref="Timeouts.ImplicitWait"/></param>
+        /// <example>
+        /// <code lang="vbs">
+        /// if TypeName(driver) = "GeckoDriver" then red = "rgb(220, 53, 69)" else red = "rgba(220, 53, 69, 1)"
+        /// ' wait until the color becomes red:
+        /// driver.FindElementByCss("button#colorChange").WaitCssValue "color",red
+        /// </code>
+        /// </example>
         public WebElement WaitCssValue(string propertyName, string value, int timeout = -1) {
             _session.SendUntil(timeout,
                 () => this.CssValue(propertyName),
@@ -588,9 +623,16 @@ namespace Selenium {
         /// Waits for a different CSS property
         /// </summary>
         /// <param name="propertyName">Property name</param>
-        /// <param name="value">Value</param>
-        /// <param name="timeout"></param>
+        /// <param name="value">Original value expected to be changed</param>
+        /// <param name="timeout">Optional. See <see cref="Timeouts.ImplicitWait"/></param>
         /// <returns></returns>
+        /// <example>
+        /// <code lang="vbs">
+        /// if TypeName(driver) = "GeckoDriver" then white = "rgb(255, 255, 255)" else white = "rgba(255, 255, 255, 1)"
+        /// ' originally the text is white, wait while it remains white:
+        /// driver.FindElementByCss("button#colorChange").WaitNotCssValue "color",white
+        /// </code>
+        /// </example>
         public WebElement WaitNotCssValue(string propertyName, string value, int timeout = -1) {
             _session.SendUntil(timeout,
                 () => this.CssValue(propertyName),

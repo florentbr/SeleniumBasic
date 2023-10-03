@@ -6,8 +6,19 @@ using System.Runtime.InteropServices;
 namespace Selenium {
 
     /// <summary>
-    /// Selenium base class to access objects
+    /// Selenium base class to access other useful objects
     /// </summary>
+    /// <seealso cref="_Application"/>
+    /// <remarks>
+    /// The object accessed via a property (Waiter,Verify,Assert,Utils,Keys, and By) are singletons.
+    /// For those are accessed via a method a new instance will be created each time the method is called.
+    /// </remarks>
+    /// <example>
+    /// <code lang="vbs">	
+    /// set sa = CreateObject("Selenium.Application")
+    /// ad = sa.Keys.ArrowDown
+    /// </code>
+    /// </example>
     [ProgId("Selenium.Application")]
     [Guid("0277FC34-FD1B-4616-BB19-E9AAFA695FFB")]
     [Description("Base object class")]

@@ -1,5 +1,6 @@
 ﻿using Selenium.Core;
 using System;
+using System.Globalization;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -8,6 +9,7 @@ using System.Runtime.InteropServices;
 namespace Selenium.Internal {
 
     class EndPointExt : IDisposable {
+        private static readonly NLog.Logger _l = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Lock a new TCP end point that can be unlocked later.
@@ -99,22 +101,29 @@ namespace Selenium.Internal {
         /// <param name="delay">Time to wait in milliseconds to wait before checking again</param>
         /// <returns>True on detecting the port is being listening</returns>
         public bool WaitForListening(int timeout, int delay) {
+            _l.Debug( "WaitForListening()" );
             _socket.Close();
 
             DateTime endtime = DateTime.UtcNow.AddMilliseconds(timeout);
             int portLE = _ipEndPoint.Port;
             int portBE = (portLE & 0xFF) << 8 | (portLE & 0xFF00) >> 8;  //Convert port to big endian
 
-            int bufferSize = 1024;
+            int bufferSize = 4096;
             IntPtr buffer = Marshal.AllocHGlobal(bufferSize);
             int[] tcpTable = new int[bufferSize / sizeof(int)];
+            _l.Debug( "Buffers allocated" );
             try {
                 while (true) {
+                    if( _l.IsTraceEnabled ) _l.Trace( "Trying to get TCP table..." );
                     int result = 0;
-                    while (122 == (result = Native.GetTcpTable(buffer, ref bufferSize, false))) {
+                    const long ERROR_INSUFFICIENT_BUFFER = 122L;
+                    while (ERROR_INSUFFICIENT_BUFFER == (result = Native.GetTcpTable(buffer, ref bufferSize, false))) {
+                        if( _l.IsDebugEnabled ) _l.Debug( "Allocated buffer too small, need " + bufferSize );
                         Marshal.FreeHGlobal(buffer);
                         buffer = Marshal.AllocHGlobal(bufferSize);
                         tcpTable = new int[bufferSize / sizeof(int)];
+                        if( _l.IsTraceEnabled ) _l.Trace( "Waiting after reallocation..." );
+                        SysWaiter.Wait(delay);
                     }
                     if (result != 0)
                         throw new NetworkInformationException(result);
@@ -129,7 +138,9 @@ namespace Selenium.Internal {
                     // int dwState      //MIB_TCPROW entry 2
                     // ...
 
+                    if( _l.IsTraceEnabled ) _l.Trace( "Copying buffer..." );     // last message in the log!!!!!!!!!!!!!!!11
                     Marshal.Copy(buffer, tcpTable, 0, bufferSize / sizeof(int));
+                    if( _l.IsTraceEnabled ) _l.Trace( "Buffer copied..." );
                     int dwNumEntries = tcpTable[0];
                     int tcpTableLength = 1 + dwNumEntries * 5;
 
@@ -146,12 +157,16 @@ namespace Selenium.Internal {
                             }
                         }
                     }
-
-                    if (DateTime.UtcNow > endtime)
+                    if (DateTime.UtcNow > endtime) {
+                        _l.Error( "WaitForListening timed out" );
                         return false;
-
-                    SysWaiter.Wait(delay);
+                    }
+                    System.Threading.Thread.Sleep(delay);
+//                    SysWaiter.Wait(delay);    // stucks!!!!
                 }
+            } catch( Exception ex ) {
+                _l.Error( ex, "WaitForListening failed" );
+                throw;
             } finally {
                 Marshal.FreeHGlobal(buffer);
             }

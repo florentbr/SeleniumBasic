@@ -3,7 +3,7 @@
 namespace Selenium.Core {
 
     class RemoteSession {
-
+        private static readonly NLog.Logger _l = NLog.LogManager.GetCurrentClassLogger();
         public readonly bool IsLocal;
         public readonly RemoteServer server;
         public readonly Mouse mouse;
@@ -56,7 +56,7 @@ namespace Selenium.Core {
                 capabilities.Add( "alwaysMatch", desired_capabilities );
                 param.Add("capabilities", capabilities);
             }
-
+            _l.Debug( "Creating a new session" );
             var response = (Dictionary)server.Send(RequestMethod.POST, "/session", param);
             try {
                 if( response.ContainsKey("sessionId") ) {
@@ -68,6 +68,7 @@ namespace Selenium.Core {
                     this.capabilities = (Dictionary)value["capabilities"];
                 }
                 _uri = "/session/" + _id;
+                _l.Debug( "Got a new session: " + _id );
             } catch (Errors.KeyNotFoundError ex) {
                 throw new DeserializeException(typeof(RemoteSession), ex);
             }
@@ -218,6 +219,8 @@ namespace Selenium.Core {
         /// <param name="predicate">Predicate function</param>
         /// <returns>Result of the send function</returns>
         internal T SendUntil<T>(int timeout, Func<T> sendfn, Func<T, bool> predicate) {
+            if( timeout == -1 ) timeout = timeouts.timeout_implicitwait;
+            int time_chunk = SysWaiter.GetTimeChunk( timeout );
             DateTime endTime = GetEndTime(timeout);
             bool retry = false;
             while (true) {
@@ -232,7 +235,7 @@ namespace Selenium.Core {
                     return result;
                 if (DateTime.UtcNow > endTime)
                     throw new Errors.TimeoutError(timeout);
-                SysWaiter.Wait();
+                SysWaiter.Wait( time_chunk );
             }
         }
 

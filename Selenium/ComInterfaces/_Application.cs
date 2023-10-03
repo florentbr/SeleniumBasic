@@ -6,6 +6,10 @@ using System.Runtime.InteropServices;
 namespace Selenium.ComInterfaces {
 #pragma warning disable 1591
 
+    /// <summary>
+    /// Provides easy access to other useful objects
+    /// </summary>
+    /// <seealso cref="Application"/>
     [Guid("0277FC34-FD1B-4616-BB19-6E0522EA435E")]
     [ComVisible(true), InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
     public interface _Application {
@@ -22,14 +26,11 @@ namespace Selenium.ComInterfaces {
         [DispId(27), Description("")]
         Utils Utils { get; }
 
-
-
         [DispId(42), Description("")]
         By By { get; }
 
         [DispId(46), Description("")]
         Keys Keys { get; }
-
 
         [DispId(63), Description("")]
         WebDriver WebDriver();
@@ -49,8 +50,6 @@ namespace Selenium.ComInterfaces {
         [DispId(78), Description("")]
         WebDriver PhantomJSDriver();
 
-
-
         [DispId(92), Description("")]
         Dictionary Dictionary();
 
@@ -65,7 +64,6 @@ namespace Selenium.ComInterfaces {
 
         [DispId(105), Description("")]
         Table Table();
-
 
         [DispId(120), Description("")]
         PdfFile PdfFile();

@@ -10,6 +10,8 @@ namespace Selenium {
     /// <summary>
     /// Collection of web elements
     /// </summary>
+    /// <seealso cref="ComInterfaces._WebElements"/>
+    /// <seealso cref="List"/>
     [ProgId("Selenium.WebElements")]
     [Guid("0277FC34-FD1B-4616-BB19-460D25F4D2B3")]
     [Description("Collection of Web elements (One-based)")]
@@ -17,7 +19,6 @@ namespace Selenium {
     public class WebElements : List, ComInterfaces._WebElements {
 
         internal WebElements() {
-
         }
 
         internal WebElements(List webElements)
@@ -76,7 +77,7 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Get the WebElement at the provided index
+        /// Get the WebElement at the provided one based index
         /// </summary>
         /// <param name="index">Base one index</param>
         /// <returns>WebElement</returns>
@@ -136,14 +137,15 @@ namespace Selenium {
         /// <summary>
         /// Execute an asynchronous piece of JavaScript against each web element and returns all the results;
         /// </summary>
-        /// <param name="script">Javascript script</param>
-        /// <param name="timeout">Timeout in millisecond</param>
-        /// <returns>List</returns>
+        /// <param name="script">JavaScript code to execute</param>
+        /// <param name="timeout">Optional Timeout in millisecond</param>
+        /// <returns>List of the execution result</returns>
         /// <example>
         /// <code lang="vbs">
         /// Set driver = CreateObject("Selenium.FirefoxDriver")
         /// driver.Get "https://www.google.co.uk/search?q=Eiffel+tower"
-        /// Set links = driver.FindElementsByTagName("a").ExecuteScript("var e=this; setTimeout(function(){callback(e.getAttribute('href'))}, 100);")
+        /// js = "var e=this; setTimeout(function(){callback(e.getAttribute('href'))}, 100);"
+        /// Set links = driver.FindElementsByTagName("a").ExecuteScript(js)
         /// WScript.Echo "Count:" &amp; links.Count &amp; " Values:" &amp; vbCr &amp; Join(links.Values, vbCr)
         /// </code>
         /// </example>
@@ -167,7 +169,7 @@ namespace Selenium {
         /// <param name="offsetStart"></param>
         /// <param name="offsetEnd"></param>
         /// <param name="trim"></param>
-        /// <returns></returns>
+        /// <returns>List of text strings</returns>
         public List Text(int offsetStart = 0, int offsetEnd = 0, bool trim = true) {
             int size = base.Count;
             int imax = size + offsetEnd - 1;
