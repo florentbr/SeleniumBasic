@@ -7,11 +7,15 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 
 namespace Selenium.Tests {
 
-    [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Opera)]
-    [TestFixture(Browser.Chrome)]
-    [TestFixture(Browser.IE)]
-    //[TestFixture(Browser.PhantomJS)]
+    [TestFixture(Browser.Firefox, Category="Firefox")]
+    [TestFixture(Browser.Gecko, Category="Gecko")]
+    [TestFixture(Browser.Chrome, Category="Chrome")]
+    [TestFixture(Browser.Edge, Category="Edge")]
+/*
+    [TestFixture(Browser.Opera, Category="Opera")]
+    [TestFixture(Browser.IE, Category="IE")]
+    [TestFixture(Browser.PhantomJS, Category="PhantomJS")]
+*/
     class TS_Windows : BaseBrowsers {
 
         public TS_Windows(Browser browser)
@@ -47,6 +51,8 @@ namespace Selenium.Tests {
             driver.Get("/win1.html");
             A.AreEqual("Window1", driver.Title);
 
+            var win1_handle = driver.Window.Handle;
+
             driver.FindElementByLinkText("Window2").Click();
             driver.SwitchToWindowByTitle("Window2");
             A.AreEqual("Window2", driver.Title);
@@ -60,6 +66,9 @@ namespace Selenium.Tests {
 
             driver.SwitchToWindowByName("win3");
             A.AreEqual("Window3", driver.Title);
+
+            driver.SwitchToWindowByName(win1_handle);
+            A.AreEqual("Window1", driver.Title);
         }
 
         [TestCase]

@@ -297,7 +297,10 @@ namespace Selenium {
                 return items;
             }
         }
-
+        /// <summary>
+        /// see the Values property
+        /// </summary>
+        /// <returns></returns>
         object[] ComInterfaces._Dictionary.Values() {
             return this.Values;
         }

@@ -6,11 +6,13 @@ using System.Threading;
 namespace Selenium.Core {
 
     /// <summary>
-    /// Provides waits methods that can be interrupted with a regitered hot key
+    /// Provides waits methods that can be interrupted with a registered hot key
     /// </summary>
     class SysWaiter {
+        private static readonly NLog.Logger _l = NLog.LogManager.GetCurrentClassLogger();
 
         const int DEFAULT_WAIT_TIME = 50;
+        const int TIMEOUT_DIVIDER   = 10;
 
         //Modifier keys
         const int MOD_NONE = 0x00;
@@ -38,11 +40,11 @@ namespace Selenium.Core {
             bool createdNew;
             _signal_interrupt = new EventWaitHandle(false,
                                                     EventResetMode.ManualReset,
-                                                    @"Global\InterruptKey",
+                                                    @"Global\InterruptKey"+ Environment.UserName,
                                                     out createdNew,
                                                     security);
 
-            HotKeyGlobal.DefineHotKey(MOD_NONE, VK_ESCAPE, ProcInterrupt);
+            HotKeyGlobal.DefineHotKey(MOD_ALT, VK_ESCAPE, ProcInterrupt);
         }
 
         public static Action OnInterrupt {
@@ -86,6 +88,12 @@ namespace Selenium.Core {
             if (signaled)
                 throw new Errors.KeyboardInterruptError();
             HotKeyGlobal.UnsubscribeAll();
+        }
+
+        internal static int GetTimeChunk( int full_timeout ) {
+            int time_chunk = full_timeout / SysWaiter.TIMEOUT_DIVIDER;
+            if( time_chunk < DEFAULT_WAIT_TIME ) time_chunk = DEFAULT_WAIT_TIME;
+            return time_chunk;
         }
 
     }

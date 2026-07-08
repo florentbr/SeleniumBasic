@@ -3,12 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Selenium.Internal {
 
     public class ProcessExt : IDisposable {
+        private static readonly NLog.Logger _l = NLog.LogManager.GetCurrentClassLogger();
 
         #region Standard Environemnt Variables
 
@@ -36,12 +38,12 @@ namespace Selenium.Internal {
         /// <param name="noWindow">Hides the window if true</param>
         /// <param name="createJob">Creates a Job if true</param>
         /// <returns></returns>
-        public static ProcessExt Start(string filepath, IEnumerable args
-            , string dir, Hashtable env, bool noWindow, bool createJob) {
-
+        public static ProcessExt Start(string filepath, IEnumerable args, string dir, Hashtable env, bool noWindow, bool createJob) {
+            bool dl = _l.IsDebugEnabled;
             string cmd = ProcessExt.BuildCommandLine(filepath, args);
             StringBuilder envVars = BuildEnvironmentVars(env);
-
+            
+            if( dl ) _l.Debug( "Starting command: " + cmd );
             var si = new Native.STARTUPINFO();
             var pi = new Native.PROCESS_INFORMATION();
 
@@ -52,7 +54,6 @@ namespace Selenium.Internal {
             IntPtr hJob = IntPtr.Zero;
             bool success = false;
             if (createJob) {
-
                 IntPtr curProc = Native.GetCurrentProcess();
 
                 bool isProcessInJob = false;
@@ -63,7 +64,7 @@ namespace Selenium.Internal {
                     int createFlagsJob = createFlags | Native.CREATE_SUSPENDED;
                     if (isProcessInJob)
                         createFlagsJob |= Native.CREATE_BREAKAWAY_FROM_JOB;
-
+                    if( dl ) _l.Debug( "Creating process" );
                     success = Native.CreateProcess(null
                         , cmd
                         , IntPtr.Zero
@@ -74,6 +75,7 @@ namespace Selenium.Internal {
                         , dir, si, pi);
 
                     if (success) {
+                        if( dl ) _l.Debug( "Assigning process to new job" );
                         success = AssignProcessToNewJob(pi.hProcess, null, out hJob);
                         if (success) {
                             if (-1 == Native.ResumeThread(pi.hThread))
@@ -90,6 +92,7 @@ namespace Selenium.Internal {
             }
 
             if (!success) {
+                if( dl ) _l.Debug( "Failed. Creating process again." );
                 success = Native.CreateProcess(null
                     , cmd
                     , IntPtr.Zero
@@ -100,9 +103,9 @@ namespace Selenium.Internal {
                     , dir, si, pi);
 
                 if (!success)
-                    throw new Win32Exception();
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "Cannot start: " + cmd);
             }
-
+            if( dl ) _l.Debug( CultureInfo.CurrentCulture, "Process {0} created", pi.dwProcessId );
             return new ProcessExt(pi.dwProcessId, pi.hProcess, hJob);
         }
 

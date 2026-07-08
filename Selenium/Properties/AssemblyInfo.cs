@@ -11,10 +11,10 @@ using Selenium.Internal;
 [assembly: AssemblyTitle("Selenium .Net/COM binding")]
 [assembly: AssemblyDescription("Selenium Type Library")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Florent BREHERET")]
+[assembly: AssemblyCompany("SiMX corp.")]
 [assembly: AssemblyProduct("SeleniumBasic")]
 [assembly: AssemblyCopyright("")]
-[assembly: AssemblyURL(@"https://github.com/florentbr/SeleniumBasic")]
+[assembly: AssemblyURL(@"https://github.com/zc2com/SeleniumBasic")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -36,8 +36,8 @@ using Selenium.Internal;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.9.0")]
-[assembly: AssemblyFileVersion("2.0.9.0")]
+[assembly: AssemblyVersion("3.0.0.1")]
+[assembly: AssemblyFileVersion("3.0.0.1")]
 [assembly: TypeLibVersion(2, 0)]
 
 [assembly: NeutralResourcesLanguage("en-US")]

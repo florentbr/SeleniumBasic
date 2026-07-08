@@ -9,21 +9,20 @@ using System.Text.RegularExpressions;
 namespace Selenium {
 
     /// <summary>
-    /// Testing functions. Return the résult of the verification
+    /// Testing functions. Return the résult string value of the verification
     /// </summary>
     /// <example>
-    /// 
     /// The following example asserts the page title.
     /// <code lang="vbs">	
     /// Set driver = CreateObject("Selenium.WebDriver")
     /// Set Verify = CreateObject("Selenium.Verify")
     /// driver.start "firefox", "http://www.google.com"
     /// driver.get "/"
-    /// wscript.echo Verify.Equals("Google", driver.Title)
+    /// WScript.Echo Verify.Equals("Google", driver.Title)
     /// driver.stop
     /// </code>
     /// 
-    /// <code lang="vbs">
+    /// <code lang="VB">
     /// Private Verify As New Selenium.Verify
     /// 
     /// Public Sub TestCase()
@@ -35,8 +34,7 @@ namespace Selenium {
     /// </code>
     /// 
     /// </example>
-    ///
-
+    /// <seealso cref="Assert"/>
     [ProgId("Selenium.Verify")]
     [Guid("0277FC34-FD1B-4616-BB19-B0C8C528C673")]
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]

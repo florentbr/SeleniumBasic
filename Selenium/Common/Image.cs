@@ -127,8 +127,8 @@ namespace Selenium {
         /// <summary>
         /// Save the image to a file. Supported format: png, bmp, gif and jpg.
         /// </summary>
-        /// <param name="filePath">File path. Ex: "C:\capture_{yyyyMMdd-HHmmss}.png"</param>
-        /// <param name="autoDispose">Release the image resources once done</param>
+        /// <param name="filePath">File path template, like: "C:\capture_{yyyyMMdd-HHmmss}.png"</param>
+        /// <param name="autoDispose">Optional - Release the image resources once done. Default is true. </param>
         /// <returns>Full file path</returns>
         public string SaveAs(string filePath, bool autoDispose = true) {
             EnsureNotDisposed();

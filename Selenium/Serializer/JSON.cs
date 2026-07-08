@@ -18,7 +18,7 @@ using JsonObjectItem = Selenium.DictionaryItem;
 namespace Selenium.Serializer {
 
     [DebuggerDisplay("{ToString(),nq}")]
-    internal class JSON {
+    public class JSON {
 
         public static int DEPTH_MAX = 8;        // maximum depth for arrays and dictionaries
         public static int BUFFER_SIZE = 1024;
@@ -46,14 +46,11 @@ namespace Selenium.Serializer {
             return json;
         }
 
-
         public static void Serialize(object value, Stream target) {
             var json = new JSON();
             json.Write(DEPTH_MAX, value);
             target.Write(json._buffer, 0, json._length);
         }
-
-
 
         byte[] _buffer = new byte[BUFFER_SIZE];
         int _length = 0;
@@ -190,7 +187,6 @@ namespace Selenium.Serializer {
             throw new JsonException(string.Format("Object of type {0} is not serializable.", objType.Name));
         }
 
-
         private void WriteBinary(IJsonBinary binary) {
             MemoryStream stream = new MemoryStream();
             binary.Save(stream);
@@ -213,16 +209,13 @@ namespace Selenium.Serializer {
             WriteLiteral(value.ToString(CultureInfo.InvariantCulture));
         }
 
-
         private void WriteNumber(IFormattable value) {
             WriteLiteral(value.ToString("r", CultureInfo.InvariantCulture));
         }
 
-
         private void WriteBool(bool value) {
             WriteLiteral(value ? "true" : "false");
         }
-
 
         private void WriteDateTime(DateTime value) {
             WriteByte((byte)'"');
@@ -239,13 +232,11 @@ namespace Selenium.Serializer {
             WriteByte((byte)'"');
         }
 
-
         private void WriteQuotedString(char c) {
             WriteByte((byte)'"');
             WriteWideString(c);
             WriteByte((byte)'"');
         }
-
 
         private void WriteArray<T>(int depth, T[] values, Action<T> write) {
             if (depth-- < 0)
@@ -262,6 +253,11 @@ namespace Selenium.Serializer {
             WriteByte((byte)']');
         }
 
+        private void Write(int depth, string key, object obj) {
+            WriteQuotedString(key);
+            WriteByte((byte)':');
+            Write(depth, obj);
+        }
 
         private void WriteDictionary(int depth, JsonObject dict) {
             if (depth-- < 0)

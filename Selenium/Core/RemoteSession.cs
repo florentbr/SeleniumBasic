@@ -3,7 +3,7 @@
 namespace Selenium.Core {
 
     class RemoteSession {
-
+        private static readonly NLog.Logger _l = NLog.LogManager.GetCurrentClassLogger();
         public readonly bool IsLocal;
         public readonly RemoteServer server;
         public readonly Mouse mouse;
@@ -41,20 +41,34 @@ namespace Selenium.Core {
         /// <summary>
         /// Starts a new session.
         /// </summary>
-        /// <param name="desired_capabilities">An object describing the session's desired capabilities.</param>
-        /// <param name="requiredCapabilities">An object describing the session's required capabilities (Optional).</param>
-        /// <returns>{object} An object describing the session's capabilities.</returns>
+        /// <param name="desired_capabilities">An object with the session's desired capabilities.</param>
+        /// <param name="requiredCapabilities">An object with the session's required capabilities (Optional).</param>
+        /// <exception cref="SeleniumException">When session start failed</exception>
         public void Start(Dictionary desired_capabilities, Dictionary requiredCapabilities = null) {
             var param = new Dictionary();
-            param.Add("desiredCapabilities", desired_capabilities);
-            if (requiredCapabilities != null)
-                param.Add("requiredCapabilities", requiredCapabilities);
-
+            if( WebDriver.LEGACY ) {
+                param.Add("desiredCapabilities", desired_capabilities);
+                if (requiredCapabilities != null)
+                    param.Add("requiredCapabilities", requiredCapabilities);
+            } else {
+                // see https://developer.mozilla.org/en-US/docs/Web/WebDriver/Capabilities#Legacy
+                var capabilities = new Dictionary();
+                capabilities.Add( "alwaysMatch", desired_capabilities );
+                param.Add("capabilities", capabilities);
+            }
+            _l.Debug( "Creating a new session" );
             var response = (Dictionary)server.Send(RequestMethod.POST, "/session", param);
             try {
-                _id = (string)response["sessionId"];
+                if( response.ContainsKey("sessionId") ) {
+                    _id = (string)response["sessionId"];
+                    this.capabilities = (Dictionary)response["value"];
+                } else { 
+                    Dictionary value = (Dictionary)response["value"];
+                    _id = (string)value["sessionId"];
+                    this.capabilities = (Dictionary)value["capabilities"];
+                }
                 _uri = "/session/" + _id;
-                this.capabilities = (Dictionary)response["value"];
+                _l.Debug( "Got a new session: " + _id );
             } catch (Errors.KeyNotFoundError ex) {
                 throw new DeserializeException(typeof(RemoteSession), ex);
             }
@@ -205,6 +219,8 @@ namespace Selenium.Core {
         /// <param name="predicate">Predicate function</param>
         /// <returns>Result of the send function</returns>
         internal T SendUntil<T>(int timeout, Func<T> sendfn, Func<T, bool> predicate) {
+            if( timeout == -1 ) timeout = timeouts.timeout_implicitwait;
+            int time_chunk = SysWaiter.GetTimeChunk( timeout );
             DateTime endTime = GetEndTime(timeout);
             bool retry = false;
             while (true) {
@@ -219,7 +235,7 @@ namespace Selenium.Core {
                     return result;
                 if (DateTime.UtcNow > endTime)
                     throw new Errors.TimeoutError(timeout);
-                SysWaiter.Wait();
+                SysWaiter.Wait( time_chunk );
             }
         }
 

@@ -8,7 +8,7 @@ namespace Selenium.Internal {
     static class ObjExt {
 
         /// <summary>
-        /// Compares 2 objets
+        /// Compares 2 objects
         /// </summary>
         internal static bool AreEqual(object a, object b) {
             if (a == null){

@@ -9,18 +9,24 @@ namespace Selenium {
     /// Selenium base exception class.
     /// </summary>
     public class SeleniumException : Exception {
+        private static readonly NLog.Logger _l = NLog.LogManager.GetCurrentClassLogger();
 
         internal SeleniumException()
-            : base() {}
+            : base() {
+        }
 
         internal SeleniumException(Exception exception)
             : base(exception.Message, exception) {
-            EventLog.WriteEntry("SeleniumBasic", this.Message, EventLogEntryType.Error);
+            _l.Error( exception, "1) " + exception.Message );
+            //EventLog.WriteEntry("SeleniumBasic", this.Message, EventLogEntryType.Error);
+            //Console.WriteLine( this.Message );
         }
 
         internal SeleniumException(string message, params object[] args)
             : base(args.Length > 0 ? string.Format(message, args) : message) {
-            EventLog.WriteEntry("SeleniumBasic", this.Message, EventLogEntryType.Error);
+            _l.Error( this, "2) " + message );
+            //EventLog.WriteEntry("SeleniumBasic", this.Message, EventLogEntryType.Error);
+            //Console.WriteLine( this.Message );
         }
 
         /// <summary>

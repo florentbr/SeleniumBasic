@@ -2,6 +2,9 @@
 using Selenium;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Selenium.Serializer;
+using System;
+using System.Collections.Generic;
 
 namespace Selenium {
 
@@ -36,15 +39,24 @@ namespace Selenium {
         /// <param name="xoffset">{number} X offset to move to, relative to the top-left corner of the element. If not specified, the mouse will move to the middle of the element.</param>
         /// <param name="yoffset"> {number} Y offset to move to, relative to the top-left corner of the element. If not specified, the mouse will move to the middle of the element.</param>
         public Mouse MoveTo(WebElement element, int xoffset = 0, int yoffset = 0) {
-            var data = new Dictionary();
-            if (element != null)
-                data.Add("element", element.Id);
+            if( WebDriver.LEGACY ) {
+                var data = new Dictionary();
+                if (element != null)
+                    data.Add("element", element.Id);
 
-            if (xoffset != 0 || yoffset != 0) {
-                data.Add("xoffset", xoffset);
-                data.Add("yoffset", yoffset);
+                if (xoffset != 0 || yoffset != 0) {
+                    data.Add("xoffset", xoffset);
+                    data.Add("yoffset", yoffset);
+                }
+                _session.Send(RequestMethod.POST, "/moveto", data);
+            } else {
+                Actions.ActionSequence m_s = new Actions.ActionSequence( Actions.SequenceType.Mouse );
+                if (element != null)
+                    m_s.Add( new Actions.ActionMove( element.Id, 0, 0 ) );
+                else if (xoffset != 0 || yoffset != 0)
+                    m_s.Add( new Actions.ActionMove( xoffset, yoffset ) );
+                Actions.SendActions( _session, m_s );
             }
-            _session.Send(RequestMethod.POST, "/moveto", data);
             return this;
         }
 
@@ -53,7 +65,14 @@ namespace Selenium {
         /// </summary>
         /// <param name="button">{number} Which button, enum: {LEFT = 0, MIDDLE = 1 , RIGHT = 2}. Defaults to the left mouse button if not specified.</param>
         public Mouse Click(MouseButton button = MouseButton.Left) {
-            _session.Send(RequestMethod.POST, "/click", "button", (int)button);
+            if( WebDriver.LEGACY ) {
+                _session.Send(RequestMethod.POST, "/click", "button", (int)button);
+            } else {
+                Actions.ActionSequence m_s = new Actions.ActionSequence( Actions.SequenceType.Mouse );
+                m_s.Add( new Actions.ActionPtrDownUp( true,  button ) );
+                m_s.Add( new Actions.ActionPtrDownUp( false, button ) );
+                Actions.SendActions( _session, m_s );
+            }
             return this;
         }
 
@@ -62,7 +81,13 @@ namespace Selenium {
         /// </summary>
         /// <param name="button">{number} Which button, enum: {LEFT = 0, MIDDLE = 1 , RIGHT = 2}. Defaults to the left mouse button if not specified.</param>
         public Mouse ClickAndHold(MouseButton button = MouseButton.Left) {
-            _session.Send(RequestMethod.POST, "/buttondown", "button", (int)button);
+            if( WebDriver.LEGACY ) {
+                _session.Send(RequestMethod.POST, "/buttondown", "button", (int)button);
+            } else {
+                Actions.ActionSequence m_s = new Actions.ActionSequence( Actions.SequenceType.Mouse );
+                m_s.Add( new Actions.ActionPtrDownUp( true,  button ) );
+                Actions.SendActions( _session, m_s );
+            }
             return this;
         }
 
@@ -71,7 +96,13 @@ namespace Selenium {
         /// </summary>
         /// <param name="button">{number} Which button, enum: {LEFT = 0, MIDDLE = 1 , RIGHT = 2}. Defaults to the left mouse button if not specified.</param>
         public Mouse Release(MouseButton button = MouseButton.Left) {
-            _session.Send(RequestMethod.POST, "/buttonup", "button", (int)button);
+            if( WebDriver.LEGACY ) {
+                _session.Send(RequestMethod.POST, "/buttonup", "button", (int)button);
+            } else {
+                Actions.ActionSequence m_s = new Actions.ActionSequence( Actions.SequenceType.Mouse );
+                m_s.Add( new Actions.ActionPtrDownUp( false, button ) );
+                Actions.SendActions( _session, m_s );
+            }
             return this;
         }
 
@@ -79,7 +110,16 @@ namespace Selenium {
         /// Double-clicks at the current mouse coordinates (set by moveto).
         /// </summary>
         public Mouse ClickDouble() {
-            _session.Send(RequestMethod.POST, "/doubleclick");
+            if( WebDriver.LEGACY ) {
+                _session.Send(RequestMethod.POST, "/doubleclick");
+            } else {
+                Actions.ActionSequence m_s = new Actions.ActionSequence( Actions.SequenceType.Mouse );
+                m_s.Add( new Actions.ActionPtrDownUp( true,  MouseButton.Left ) );
+                m_s.Add( new Actions.ActionPtrDownUp( false, MouseButton.Left ) );
+                m_s.Add( new Actions.ActionPtrDownUp( true,  MouseButton.Left ) );
+                m_s.Add( new Actions.ActionPtrDownUp( false, MouseButton.Left ) );
+                Actions.SendActions( _session, m_s );
+            }
             return this;
         }
 

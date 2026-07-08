@@ -25,7 +25,7 @@ namespace Selenium.Internal {
 
         /// <summary>
         /// Returns the directory that serves as a common repository for application-specific
-        //  data for the current roaming user.
+        /// data for the current roaming user.
         /// </summary>
         public static string AppDataFolder {
             get {

@@ -42,10 +42,31 @@ namespace Selenium {
         /// <param name="keys">Keys</param>
         /// <returns>Self</returns>
         public Keyboard SendKeys(string keysOrModifiers, string keys = null) {
-            if (keys != null)
-                keysOrModifiers = string.Concat(keysOrModifiers, keys, keysOrModifiers);
-            _session.Send(RequestMethod.POST, "/keys", "value", new string[] { keysOrModifiers });
-            //_session.Send(RequestMethod.POST, "/keys", "value", keysOrModifiers.ToCharArray() );
+            if( WebDriver.LEGACY ) {
+                if (keys != null)
+                    keysOrModifiers = string.Concat(keysOrModifiers, keys, keysOrModifiers);
+                _session.Send(RequestMethod.POST, "/keys", "value", new string[] { keysOrModifiers });
+                //_session.Send(RequestMethod.POST, "/keys", "value", keysOrModifiers.ToCharArray() );
+            } else {
+                bool shift_down = false, ctrl_down = false, alt_down = false;
+                Actions.ActionSequence k_s = new Actions.ActionSequence( Actions.SequenceType.Keyboard );
+                Actions.AddKeys(k_s, keysOrModifiers, ref shift_down, ref ctrl_down, ref alt_down);
+                if( keys != null ) {
+                    bool shift_down_ = false, ctrl_down_ = false, alt_down_ = false;
+                    Actions.AddKeys(k_s, keys, ref shift_down_, ref ctrl_down_, ref alt_down_);
+                }
+/*
+                if (shift_down)
+                    k_s.Add( new Actions.ActionKeyDownUp( false, KEY_SHIFT ) );
+                if (ctrl_down)
+                    k_s.Add( new Actions.ActionKeyDownUp( false, KEY_CTRL ) );
+                if (alt_down)
+                    k_s.Add( new Actions.ActionKeyDownUp( false, KEY_ALT ) );
+*/
+                Actions.SendActions( _session, k_s );
+                if( shift_down || ctrl_down || alt_down )
+                    Actions.ReleaseActions( _session );
+            }
             return this;
         }
 
@@ -55,8 +76,17 @@ namespace Selenium {
         /// <param name="modifierKeys">The modifier key to Send. Values are defined in Keys class.</param>
         /// <returns>Self</returns>
         public Keyboard KeyDown(string modifierKeys) {
-            check_keys_are_modifiers(modifierKeys);
-            _session.Send(RequestMethod.POST, "/keys", "value", new string[] { modifierKeys });
+            if( WebDriver.LEGACY ) {
+                check_keys_are_modifiers(modifierKeys);
+                _session.Send(RequestMethod.POST, "/keys", "value", new string[] { modifierKeys });
+            } else {
+                if( modifierKeys == null || modifierKeys.Length == 0 )
+                    throw new Errors.InvalideModifierKeyError();
+                Actions.ActionSequence k_s = new Actions.ActionSequence( Actions.SequenceType.Keyboard );
+                bool shift_down_ = false, ctrl_down_ = false, alt_down_ = false;
+                Actions.AddKeys(k_s, modifierKeys, ref shift_down_, ref ctrl_down_, ref alt_down_);
+                Actions.SendActions( _session, k_s );
+            }
             return this;
         }
 
@@ -66,8 +96,17 @@ namespace Selenium {
         /// <param name="modifierKeys">The modifier key to Send. Values are defined in Keys class.</param>
         /// <returns>Self</returns>
         public Keyboard KeyUp(string modifierKeys) {
-            check_keys_are_modifiers(modifierKeys);
-            _session.Send(RequestMethod.POST, "/keys", "value", new string[] { modifierKeys });
+            if( WebDriver.LEGACY ) {
+                check_keys_are_modifiers(modifierKeys);
+                _session.Send(RequestMethod.POST, "/keys", "value", new string[] { modifierKeys });
+            } else {
+                if( modifierKeys == null || modifierKeys.Length == 0 )
+                    throw new Errors.InvalideModifierKeyError();
+                Actions.ActionSequence k_s = new Actions.ActionSequence( Actions.SequenceType.Keyboard );
+                bool shift_down_ = true, ctrl_down_ = true, alt_down_ = true;
+                Actions.AddKeys(k_s, modifierKeys, ref shift_down_, ref ctrl_down_, ref alt_down_);
+                Actions.SendActions( _session, k_s );
+            }
             return this;
         }
 

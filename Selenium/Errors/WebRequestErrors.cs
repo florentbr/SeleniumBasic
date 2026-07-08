@@ -14,16 +14,16 @@ namespace Selenium.Errors {
         internal WebRequestError(int code, string message, params object[] args)
             : base(code, message, args) { }
 
-        internal WebRequestError(string message, int code = 0)
+        internal WebRequestError(string message, int code = 1)
             : base(message, code) { }
 
 
         internal static SeleniumError Select(int statusCode, string message) {
             switch (statusCode) {
-                case 6: return new Errors.NoSuchDriverError(message);
-                case 7: return new Errors.NoSuchElementError(message);
-                case 8: return new Errors.NoSuchFrameError(message);
-                case 9: return new Errors.UnknownCommandError(message);
+                case  6: return new Errors.NoSuchDriverError(message);
+                case  7: return new Errors.NoSuchElementError(message);
+                case  8: return new Errors.NoSuchFrameError(message);
+                case  9: return new Errors.UnknownCommandError(message);
                 case 10: return new Errors.StaleElementReferenceError(message);
                 case 11: return new Errors.ElementNotVisibleError(message);
                 case 12: return new Errors.InvalidElementStateError(message);
@@ -44,19 +44,38 @@ namespace Selenium.Errors {
                 case 32: return new Errors.InvalidSelectorError(message);
                 case 33: return new Errors.SessionNotCreatedError(message);
                 case 34: return new Errors.MoveTargetOutOfBoundsError(message);
+                case 64: return new Errors.ElementNotClickableError(message);
                 default: return new SeleniumError(message);
             }
         }
 
-    }
+        // see https://w3c.github.io/webdriver/#errors
+        internal static SeleniumError Select(string error, string message) {
+#if DEBUG
+            Console.WriteLine( "! " + error + ": " + message );
+#endif                
+            switch (error) {
+                case "element click intercepted": return new Errors.ElementNotClickableError(message);
+                case "element not interactable":  return new Errors.ElementNotInteractableError(message);
+                case "invalid element state":     return new Errors.InvalidElementStateError(message);
+                case "invalid cookie domain":     return new Errors.InvalidCookieDomainError(message);
+                case "invalid selector":          return new Errors.InvalidSelectorError(message);
+                case "move target out of bounds": return new Errors.MoveTargetOutOfBoundsError(message);
+                case "no such alert":             return new Errors.NoAlertPresentError(message);
+                case "no such element":           return new Errors.NoSuchElementError(message);
+                case "unexpected alert open":     return new Errors.UnexpectedAlertOpenError(message);
+                case "no such frame":             return new Errors.NoSuchFrameError(message);
+                case "no such window":            return new Errors.NoSuchWindowError(message);
+                case "script timeout":            return new Errors.ScriptTimeoutError(message);
+                case "session not created":       return new Errors.SessionNotCreatedError(message);
+                case "stale element reference":   return new Errors.StaleElementReferenceError(message);
+                case "timeout":                   return new Errors.TimeoutError(message);
+                case "unknown error":             return new Errors.UnknownError(message);
+                case "unknown method":            return new Errors.UnknownCommandError(message);
+                default: return new SeleniumError(message);
+            }
+        }
 
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class WebRequestTimeout : WebRequestError {
-        internal WebRequestTimeout(WebRequest request)
-            : base(101, "No response from the server within {0} seconds ({1}).", request.Timeout / 1000, request.RequestUri) { }
     }
 
     /// <summary>
@@ -68,7 +87,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 7 An element could not be located
     /// </summary>
     public class NoSuchElementError : WebRequestError {
         internal NoSuchElementError(string message)
@@ -82,7 +101,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 8 The frame could not be found
     /// </summary>
     public class NoSuchFrameError : WebRequestError {
         internal NoSuchFrameError()
@@ -93,7 +112,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 9 Unknown Command
     /// </summary>
     public class UnknownCommandError : WebRequestError {
         internal UnknownCommandError(string message = null)
@@ -101,7 +120,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 10 Referenced element is no longer attached
     /// </summary>
     public class StaleElementReferenceError : WebRequestError {
         internal StaleElementReferenceError(string message = null)
@@ -109,18 +128,18 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 11 An element command could not be completed because the element is not visible on the page.
     /// </summary>
     public class ElementNotVisibleError : WebRequestError {
         internal ElementNotVisibleError(string message = null)
             : base(11, message ?? "An element command could not be completed because the element is not visible on the page.") { }
 
         internal ElementNotVisibleError(By by)
-            : base(7, "Element not visible for {0}", by.ToString()) { }
+            : base(11, "Element not visible for {0}", by.ToString()) { }
     }
 
     /// <summary>
-    /// 
+    /// 12
     /// </summary>
     public class InvalidElementStateError : WebRequestError {
         internal InvalidElementStateError(string message = null)
@@ -128,7 +147,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 13          An unknown server-side error
     /// </summary>
     public class UnknownError : WebRequestError {
         internal UnknownError(string message = null)
@@ -136,7 +155,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 15 Element that cannot be selected.
     /// </summary>
     public class ElementIsNotSelectableError : WebRequestError {
         internal ElementIsNotSelectableError(string message = null)
@@ -144,7 +163,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 17 JavaScript error
     /// </summary>
     public class JavaScriptError : WebRequestError {
         internal JavaScriptError(string message = null)
@@ -152,7 +171,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 19 XPath Lookup Error
     /// </summary>
     public class XPathLookupError : WebRequestError {
         internal XPathLookupError(string message = null)
@@ -160,7 +179,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 21 
     /// </summary>
     public class TimeoutError : WebRequestError {
         internal TimeoutError(int timeout)
@@ -170,7 +189,15 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 21 No response from the server
+    /// </summary>
+    public class WebRequestTimeout : WebRequestError {
+        internal WebRequestTimeout(WebRequest request)
+            : base(21, "No response from the server within {0} seconds ({1}).", request.Timeout / 1000, request.RequestUri) { }
+    }
+
+    /// <summary>
+    /// 23 Window not found.
     /// </summary>
     public class NoSuchWindowError : WebRequestError {
         internal NoSuchWindowError()
@@ -181,7 +208,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 24 Invalid Cookie Domain
     /// </summary>
     public class InvalidCookieDomainError : WebRequestError {
         internal InvalidCookieDomainError(string message = null)
@@ -189,7 +216,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 25 Failed request to set a cookie
     /// </summary>
     public class UnableToSetCookieError : WebRequestError {
         internal UnableToSetCookieError(string message = null)
@@ -197,7 +224,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 26
     /// </summary>
     public class UnexpectedAlertOpenError : WebRequestError {
         internal UnexpectedAlertOpenError(string message = null)
@@ -205,7 +232,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 27
     /// </summary>
     public class NoAlertPresentError : WebRequestError {
         internal NoAlertPresentError(string message = null)
@@ -213,7 +240,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 28
     /// </summary>
     public class ScriptTimeoutError : WebRequestError {
         internal ScriptTimeoutError(string message = null)
@@ -221,7 +248,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 29
     /// </summary>
     public class InvalidElementCoordinatesError : WebRequestError {
         internal InvalidElementCoordinatesError(string message = null)
@@ -229,7 +256,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 30
     /// </summary>
     public class IMENotAvailableError : WebRequestError {
         internal IMENotAvailableError(string message = null)
@@ -237,7 +264,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 31
     /// </summary>
     public class IMEEngineActivationFailedError : WebRequestError {
         internal IMEEngineActivationFailedError(string message = null)
@@ -245,7 +272,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 32
     /// </summary>
     public class InvalidSelectorError : WebRequestError {
         internal InvalidSelectorError(string message = null)
@@ -261,7 +288,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 34
     /// </summary>
     public class MoveTargetOutOfBoundsError : WebRequestError {
         internal MoveTargetOutOfBoundsError(string message = null)
@@ -271,7 +298,7 @@ namespace Selenium.Errors {
 
 
     /// <summary>
-    /// 
+    /// 57
     /// </summary>
     public class BrowserNotStartedError : WebRequestError {
         internal BrowserNotStartedError()
@@ -279,7 +306,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 59
     /// </summary>
     public class UnexpectedTagNameError : WebRequestError {
         internal UnexpectedTagNameError(string expected, string got)
@@ -287,7 +314,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 60
     /// </summary>
     public class NoSuchCookieError : WebRequestError {
         internal NoSuchCookieError(string message = null)
@@ -295,7 +322,7 @@ namespace Selenium.Errors {
     }
 
     /// <summary>
-    /// 
+    /// 77
     /// </summary>
     public class ElementPresentError : WebRequestError {
         internal ElementPresentError(By by)
@@ -304,5 +331,30 @@ namespace Selenium.Errors {
             : base(77, "Element still present for {0}={1}", strategy, value) { }
     }
 
+    // New ones
+
+    /// <summary>
+    /// 64 The Element Click command could not be completed because the element is obscured. 
+    /// </summary>
+    public class ElementNotClickableError : WebRequestError {
+        internal ElementNotClickableError(string message = null)
+            : base(64, message ?? "The Element Click command could not be completed because the element is obscured by an other element.") { }
+    }
+
+    /// <summary>
+    /// 102 The element is not pointer- or keyboard interactable. 
+    /// </summary>
+    public class ElementNotInteractableError : WebRequestError {
+        internal ElementNotInteractableError(string message = null)
+            : base(102, message ?? "A command could not be completed because the element is not pointer- or keyboard interactable. ") { }
+    }
+
+    /// <summary>
+    /// 9 A command cannot be supported. 
+    /// </summary>
+    public class UnsupportedOperationError : WebRequestError {
+        internal UnsupportedOperationError(string message = null)
+            : base(9, message ?? "A command that should have executed properly cannot be supported for some reason.") { }
+    }
 
 }

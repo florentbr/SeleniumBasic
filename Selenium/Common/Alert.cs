@@ -26,7 +26,10 @@ namespace Selenium {
         internal static Alert SwitchToAlert(RemoteSession session, int timeout) {
             string text;
             try {
-                text = (string)session.Send(RequestMethod.GET, "/alert_text");
+                if( WebDriver.LEGACY )
+                    text = (string)session.Send(RequestMethod.GET, "/alert_text");
+                else
+                    text = (string)session.Send(RequestMethod.GET, "/alert/text");
             } catch (Errors.NoAlertPresentError) {
                 if (timeout == 0)
                     throw;
@@ -67,14 +70,20 @@ namespace Selenium {
         /// Dismisses the alert.
         /// </summary>
         public void Dismiss() {
-            _session.Send(RequestMethod.POST, "/dismiss_alert");
+            if( WebDriver.LEGACY )
+                _session.Send(RequestMethod.POST, "/dismiss_alert");
+            else
+                _session.Send(RequestMethod.POST, "/alert/dismiss", new Dictionary());
         }
 
         /// <summary>
         /// Accepts the alert.
         /// </summary>
         public void Accept() {
-            _session.Send(RequestMethod.POST, "/accept_alert");
+            if( WebDriver.LEGACY )
+                _session.Send(RequestMethod.POST, "/accept_alert");
+            else
+                _session.Send(RequestMethod.POST, "/alert/accept", new Dictionary());
         }
 
         /// <summary>
@@ -82,7 +91,10 @@ namespace Selenium {
         /// </summary>
         /// <param name="keysToSend"></param>
         public void SendKeys(string keysToSend) {
-            _session.Send(RequestMethod.POST, "/alert_text", "text", keysToSend);
+            if( WebDriver.LEGACY )
+                _session.Send(RequestMethod.POST, "/alert_text", "text", keysToSend);
+            else
+                _session.Send(RequestMethod.POST, "/alert/text", "text", keysToSend);
         }
 
         /// <summary>

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading;
-using TestFixtureSetUp = NUnit.Framework.TestFixtureSetUpAttribute;
-using TestFixtureTearDown = NUnit.Framework.TestFixtureTearDownAttribute;
+using OneTimeSetUp=NUnit.Framework.TestFixtureSetUpAttribute;
+using OneTimeTearDown=NUnit.Framework.TestFixtureTearDownAttribute;
 
 namespace Selenium.Tests.Internals {
 
@@ -14,7 +14,7 @@ namespace Selenium.Tests.Internals {
         protected COM worksheets;
         protected COM worksheet;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void TestFixtureSetUp() {
 
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");   
@@ -28,7 +28,7 @@ namespace Selenium.Tests.Internals {
             worksheet = workbook.get("ActiveSheet");
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TestFixtureTearDown() {
             workbook.invoke("Close", false, Type.Missing, Type.Missing);
             excel.invoke("Quit");

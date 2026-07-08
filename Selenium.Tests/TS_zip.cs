@@ -1,6 +1,7 @@
 ﻿using Selenium.Zip;
 using System;
 using System.IO;
+using System.ComponentModel;
 using A = NUnit.Framework.Assert;
 using Test = NUnit.Framework.TestAttribute;
 using TestFixture = NUnit.Framework.TestFixtureAttribute;

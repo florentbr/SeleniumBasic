@@ -5,15 +5,19 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 
 namespace Selenium.Tests {
 
-    [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Opera)]
-    [TestFixture(Browser.Chrome)]
-    [TestFixture(Browser.IE)]
-    [TestFixture(Browser.PhantomJS)]
+    [TestFixture(Browser.Firefox, Category="Firefox")]
+    [TestFixture(Browser.Gecko, Category="Gecko")]
+    [TestFixture(Browser.Chrome, Category="Chrome")]
+    [TestFixture(Browser.Edge, Category="Edge")]
+/*
+    [TestFixture(Browser.Opera, Category="Opera")]
+    [TestFixture(Browser.IE, Category="IE")]
+    [TestFixture(Browser.PhantomJS, Category="PhantomJS")]
+*/
     class TS_Scraping : BaseBrowsers {
 
-        public TS_Scraping(Browser browser)
-            : base(browser) { }
+        public TS_Scraping(Browser b)
+            : base(b) { }
 
         [TestCase]
         public void ShouldScrapTextFromTable() {
@@ -32,7 +36,6 @@ namespace Selenium.Tests {
             var data = elements.Text();
             A.AreEqual(data[0], "Table Heading 1");
         }
-
     }
 
 }

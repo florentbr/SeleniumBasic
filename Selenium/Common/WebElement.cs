@@ -11,28 +11,32 @@ using System.Text.RegularExpressions;
 namespace Selenium {
 
     /// <summary>
-    /// Defines the interface through which the user controls elements on the page. 
+    /// Defines the interface through which the user controls elements on the page.
     /// </summary>
+    /// <seealso cref="ComInterfaces._WebElement"/>
+    /// <seealso cref="SearchContext"/>
     [ProgId("Selenium.WebElement")]
     [Guid("0277FC34-FD1B-4616-BB19-A693991646BE")]
     [Description("Defines the interface through which the user controls elements on the page.")]
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     public class WebElement : SearchContext, ComInterfaces._WebElement, IJsonObject {
+        internal const string ELEMENT    = "ELEMENT";
+        internal const string IDENTIFIER = "element-6066-11e4-a52e-4f735466cecf";
 
         /// <summary>
         /// Returns the element with focus, or BODY if nothing has focus.
         /// </summary>
         internal static WebElement GetActiveWebElement(RemoteSession session) {
-            var result = (Dictionary)session.Send(RequestMethod.POST, "/element/active");
+            RequestMethod method = WebDriver.LEGACY ? RequestMethod.POST : RequestMethod.GET;
+            var result = (Dictionary)session.Send(method, "/element/active");
             return new WebElement(session, result);
         }
 
         internal static bool TryParse(Dictionary dict, out string id) {
-            return dict.TryGetValue("ELEMENT", out id);
-            //TODO: Change the key once implemented on the server side
-            //return dict.TryGetValue("ELEMENT-6066-11e4-a52e-4f735466cecf", out id);
+            if( WebDriver.LEGACY && dict.TryGetValue(ELEMENT, out id) )
+                return true;
+            return dict.TryGetValue(IDENTIFIER, out id);
         }
-
 
         internal readonly RemoteSession _session;
         internal readonly string Id;
@@ -65,9 +69,9 @@ namespace Selenium {
         /// <returns></returns>
         public Dictionary SerializeJson() {
             var dict = new Dictionary();
-            dict.Add("ELEMENT", this.Id);
-            //TODO: Change the key once implemented on the server side
-            //dict.Add("ELEMENT-6066-11e4-a52e-4f735466cecf", id);
+            if( !WebDriver.LEGACY )
+                dict.Add(IDENTIFIER, this.Id); // Selenium.NET sends both. Let's do the same.
+            dict.Add( ELEMENT, this.Id);
             return dict;
         }
 
@@ -123,26 +127,42 @@ namespace Selenium {
         /// <summary>
         /// Returns the location of the element in the renderable canvas
         /// </summary>
-        /// <returns>Point</returns>
+        /// <returns>Point object</returns>
         public Point Location() {
-            var dict = (Dictionary)Send(RequestMethod.GET, "/location");
-            return new Point(dict);
+            if( WebDriver.LEGACY ) {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/location");
+                return new Point(dict);
+            } else {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/rect");
+                return new Point(dict);
+            }
         }
 
         /// <summary>
         /// Gets the location of an element relative to the origin of the view port.
         /// </summary>
+        /// <remarks>In the modern mode (not legacy), same as Location()</remarks>
         public Point LocationInView() {
-            var dict = (Dictionary)Send(RequestMethod.GET, "/location_in_view");
-            return new Point(dict);
+            if( WebDriver.LEGACY ) {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/location_in_view");
+                return new Point(dict);
+            } else {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/rect");
+                return new Point(dict);
+            }
         }
 
         /// <summary>
         /// Returns the size of the element
         /// </summary>
         public Size Size() {
-            var dict = (Dictionary)Send(RequestMethod.GET, "/size");
-            return new Size(dict);
+            if( WebDriver.LEGACY ) {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/size");
+                return new Size(dict);
+            } else {
+                var dict = (Dictionary)Send(RequestMethod.GET, "/rect");
+                return new Size(dict);
+            }
         }
 
         /// <summary>
@@ -158,6 +178,10 @@ namespace Selenium {
         /// <summary>
         /// Whether the element would be visible to a user
         /// </summary>
+        /// <returns>False if the element is is scrolled out of view, obscured and not visible to the user by any other reasons</returns>
+        /// <remarks>
+        /// The result does not relate to the visibility or display style properties!
+        /// </remarks>
         public bool IsDisplayed {
             get {
                 return (bool)Send(RequestMethod.GET, "/displayed");
@@ -189,22 +213,59 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Returns the value of a CSS property
+        /// Gets the property value.
         /// </summary>
         /// <param name="property">Property name</param>
+        /// <returns>Property</returns>
+        public object Property(string property) {
+            var value = Send(RequestMethod.GET, "/property/" + property);
+            return value;
+        }
+
+        /// <summary>
+        /// Returns the value of a CSS property
+        /// </summary>
+        /// <param name="property">CSS property name</param>
         /// <returns>CSS value</returns>
+        /// <example>
+        /// <code lang="vbs">
+        /// elem.CssValue("background-color")
+        /// </code>
+        /// </example>
+        /// <remarks>
+        /// Chromium based browsers return a color as "rgba(220, 53, 69, 1)"
+        /// However, Gecko returns "rgb(220, 53, 69)"
+        /// </remarks>
         public object CssValue(string property) {
             var value = (string)Send(RequestMethod.GET, "/css/" + property);
             return value;
         }
 
         /// <summary>
-        /// Returns the value attribute
+        /// Returns the value of an input control element
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Current value</returns>
+        /// <remarks>
+        /// Note: Legacy drivers return the current value of the "value" attribute. 
+        /// Gecko returns the actual value which could be different from the "value" attribute.
+        /// </remarks>
         public object Value() {
-            var value = Send(RequestMethod.GET, "/attribute/value");
-            return value;
+            if( WebDriver.LEGACY ) {
+                var value = Send(RequestMethod.GET, "/attribute/value");
+                return value;
+            }
+            return Send(RequestMethod.GET, "/property/value");
+        }
+
+        /// <summary>
+        /// Returns the attached shadow root (if exists)
+        /// Note: Searching elements from a shadow root is not supported in gecko.
+        /// Also, the XPath strategy cannot be used.
+        /// </summary>
+        /// <returns>Shadow instance</returns>
+        public Shadow Shadow() {
+            var result = (Dictionary)Send(RequestMethod.GET, "/shadow");
+            return new Shadow(session, result);
         }
 
         /// <summary>
@@ -258,8 +319,11 @@ namespace Selenium {
         /// <summary>
         /// Clears the text if it’s a text entry element.
         /// </summary>
+        /// <remarks>
+        /// Note: In a Selenium based browser, this will not fire the element's onchange event 
+        /// </remarks>
         public WebElement Clear() {
-            Send(RequestMethod.POST, "/clear");
+            Send(RequestMethod.POST, "/clear", "id", Id);
             return this;
         }
 
@@ -354,11 +418,11 @@ namespace Selenium {
         /// <param name="keys">Optional - Sequence of keys if keysToSend contains modifier key(Control,Shift...)</param>
         /// <returns></returns>
         /// <example>
-        /// To Send mobile to an element :
+        /// To Send "mobile" to an element :
         /// <code lang="vbs">
         ///     driver.FindElementsById("id").sendKeys "mobile"
         /// </code>
-        /// To Send ctrl+a to an element :
+        /// To Send ctrl+A to an element :
         /// <code lang="vbs">
         ///     driver.FindElementsById("id").sendKeys Keys.Control, "a"
         /// </code>
@@ -371,7 +435,7 @@ namespace Selenium {
             if (!_session.IsLocal && text.IndexOf(":/") != -1 && File.Exists(text)) {
                 text = _session.UploadFile(text);
             }
-            Send(RequestMethod.POST, "/value", "value", new string[] { text });
+            Send(RequestMethod.POST, "/value", "value", new string[] { text }, "text", text);
             return this;
         }
 
@@ -386,17 +450,35 @@ namespace Selenium {
         /// Clicks the element.
         /// </summary>
         /// <param name="keys">Optional - Modifier Keys to press</param>
+        /// <exception cref="Exception">Throws if the element is blocked by another element</exception>
         public void Click(string keys = null) {
-            if (keys != null)
+            if (keys != null) {
+                if( WebDriver.LEGACY )
+                    _session.keyboard.SendKeys(keys);
+                else {
+                    new Actions( _session )
+                    .KeyDown(keys, this)
+                    .Click(this)
+                    .KeyUp(keys)
+                    .Perform();
+                    return;
+                }
+            }
+            Send(RequestMethod.POST, "/click", "id", Id );
+            if (keys != null) {
                 _session.keyboard.SendKeys(keys);
-            Send(RequestMethod.POST, "/click");
-            if (keys != null)
-                _session.keyboard.SendKeys(keys);
+            }
         }
 
         /// <summary>
         /// Scrolls the current element into the visible area of the browser window.
         /// </summary>
+        /// <param name="alignTop">Optional - desired position of the element</param>
+        /// <remarks>This method just executes the element's JavaScript method scrollIntoView(alignTop)
+        /// Sometimes, calling this won't make the element visible (or clickable)
+        /// because of other absolute positioned headers or footers.
+        /// To scroll into the center, execute a script like "this.scrollIntoView({block: "center"});"
+        /// </remarks>
         public WebElement ScrollIntoView(bool alignTop = false) {
             string script = "arguments[0].scrollIntoView("
                           + (alignTop ? "true);" : "false);");
@@ -461,12 +543,23 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Waits for a procesult to set result to true. VBScript: Function WaitEx(webdriver), VBA: Function WaitEx(webdriver As WebDriver) As Boolean 
+        /// Waits until a function(element, argument) returns a true-castable result.
         /// </summary>
-        /// <param name="procedure">Function reference.  Sub Procedure(element, result)  waitFor AddressOf Procedure</param>
-        /// <param name="argument">Optional - Argument: Sub Procedure(element, argument, result) waitFor AddressOf Procedure, "argument"</param>
-        /// <param name="timeout">Optional - timeout in milliseconds</param>
-        /// <returns>Current WebDriver</returns>
+        /// <param name="procedure">Function reference. In VBScript use GetRef()</param>
+        /// <param name="argument">Optional - the function's second argument</param>
+        /// <param name="timeout">Optional. See <see cref="Timeouts.ImplicitWait"/></param>
+        /// <returns>function's actual result</returns>
+        /// <exception cref="Errors.TimeoutError">Throws when time out has reached</exception>
+        /// <example>
+        /// <code lang="vbs">
+        /// function CheckButtonColor(element, wait_for)
+        ///     CheckButtonColor = element.CssValue("color") = wait_for
+        /// end function
+        /// 
+        /// driver.Get "https://demoqa.com/dynamic-properties"
+        /// driver.FindElementByCss("button#colorChange").Until GetRef("CheckButtonColor"), "rgba(220, 53, 69, 1)", 8000
+        /// </code>
+        /// </example>
         object ComInterfaces._WebElement.Until(object procedure, object argument, int timeout) {
             if (timeout == -1)
                 timeout = _session.timeouts.timeout_implicitwait;
@@ -476,9 +569,9 @@ namespace Selenium {
         /// <summary>
         /// Waits for an attribute
         /// </summary>
-        /// <param name="attribute"></param>
-        /// <param name="pattern"></param>
-        /// <param name="timeout"></param>
+        /// <param name="attribute">Name</param>
+        /// <param name="pattern">RegEx</param>
+        /// <param name="timeout">Optional. See <see cref="Timeouts.ImplicitWait"/></param>
         /// <returns></returns>
         public WebElement WaitAttribute(string attribute, string pattern, int timeout = -1) {
             var regex = new Regex(pattern, RegexOptions.IgnoreCase);
@@ -506,11 +599,18 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Waits for a CSS property
+        /// Waits for a CSS property to change
         /// </summary>
         /// <param name="propertyName">Property name</param>
-        /// <param name="value">Value</param>
-        /// <param name="timeout"></param>
+        /// <param name="value">Value expected to be changed to</param>
+        /// <param name="timeout">Optional. See <see cref="Timeouts.ImplicitWait"/></param>
+        /// <example>
+        /// <code lang="vbs">
+        /// if TypeName(driver) = "GeckoDriver" then red = "rgb(220, 53, 69)" else red = "rgba(220, 53, 69, 1)"
+        /// ' wait until the color becomes red:
+        /// driver.FindElementByCss("button#colorChange").WaitCssValue "color",red
+        /// </code>
+        /// </example>
         public WebElement WaitCssValue(string propertyName, string value, int timeout = -1) {
             _session.SendUntil(timeout,
                 () => this.CssValue(propertyName),
@@ -523,9 +623,16 @@ namespace Selenium {
         /// Waits for a different CSS property
         /// </summary>
         /// <param name="propertyName">Property name</param>
-        /// <param name="value">Value</param>
-        /// <param name="timeout"></param>
+        /// <param name="value">Original value expected to be changed</param>
+        /// <param name="timeout">Optional. See <see cref="Timeouts.ImplicitWait"/></param>
         /// <returns></returns>
+        /// <example>
+        /// <code lang="vbs">
+        /// if TypeName(driver) = "GeckoDriver" then white = "rgb(255, 255, 255)" else white = "rgba(255, 255, 255, 1)"
+        /// ' originally the text is white, wait while it remains white:
+        /// driver.FindElementByCss("button#colorChange").WaitNotCssValue "color",white
+        /// </code>
+        /// </example>
         public WebElement WaitNotCssValue(string propertyName, string value, int timeout = -1) {
             _session.SendUntil(timeout,
                 () => this.CssValue(propertyName),
@@ -628,14 +735,14 @@ namespace Selenium {
         #region Casting properties
 
         /// <summary>
-        /// Cast the WebElement to a Select element
+        /// Cast the WebElement to a <see cref="SelectElement"/>
         /// </summary>
         public SelectElement AsSelect() {
             return new SelectElement(this);
         }
 
         /// <summary>
-        /// Cast the WebElement to a Select element
+        /// Cast the WebElement to a <see cref="TableElement"/>
         /// </summary>
         public TableElement AsTable() {
             return new TableElement(_session, this);
@@ -671,7 +778,7 @@ namespace Selenium {
         /// <param name="script">The JavaScript code to execute.</param>
         /// <param name="arguments">Optional arguments for the script.</param>
         /// <param name="timeout">Optional timeout in milliseconds.</param>
-        /// <returns>The first argument of the callback function.</returns>
+        /// <returns>The first argument of the called function callback() .</returns>
         /// <example>
         /// <code lang="vb">
         ///     href = ele.ExecuteAsyncScript("callback(this.href);");"

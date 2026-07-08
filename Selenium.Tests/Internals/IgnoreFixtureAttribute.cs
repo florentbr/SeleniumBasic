@@ -17,7 +17,7 @@ namespace Selenium.Tests.Internals {
 
         public void BeforeTest(TestDetails testDetails) {
             BaseBrowsers tb = testDetails.Fixture as BaseBrowsers;
-            if (tb != null && _fixture.Equals(tb.Fixture))
+            if (tb != null && _fixture.Equals(tb.FixtureParam))
                 A.Ignore(string.Format("{0}: {1}", _fixture, _reason));
         }
 

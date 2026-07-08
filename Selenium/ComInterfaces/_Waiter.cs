@@ -18,8 +18,8 @@ namespace Selenium.ComInterfaces {
         [DispId(798), Description("Waits the given time in milliseconds")]
         void Wait(int timems);
 
-        [DispId(830), Description("Waits for the given function to return true. Ex: Waiter.Until addressOf MyFunction")]
-        object Until(object function, object argument = null, int timeout = -1, string timeoutMessage = null);
+        [DispId(830), Description("Waits for a function(a,b) to return true.")]
+        object Until(object function, object argument = null, int timeout = -1, string reserved = null);
 
         [DispId(876), Description("Waits for a file to be ready.")]
         void WaitForFile(string path, int timeout = -1);

@@ -25,7 +25,6 @@ namespace Selenium.Core {
         public void SwitchToFrame(object identifier, int timeout) {
             if (identifier == null)
                 throw new Errors.ArgumentError("Invalid type for argument identifier");
-
             var element = identifier as WebElement;
             if (element != null) {
                 identifier = element.SerializeJson();
@@ -54,7 +53,7 @@ namespace Selenium.Core {
         /// Select the parent frame of the currently selected frame.
         /// </summary>
         public void SwitchToParentFrame() {
-            _session.Send(RequestMethod.POST, "/frame/parent");
+            _session.Send(RequestMethod.POST, "/frame/parent", new Dictionary());
         }
 
         /// <summary>

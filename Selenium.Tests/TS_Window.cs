@@ -6,11 +6,15 @@ using TestFixture = NUnit.Framework.TestFixtureAttribute;
 
 namespace Selenium.Tests {
 
-    [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Opera)]
-    [TestFixture(Browser.Chrome)]
-    [TestFixture(Browser.IE)]
-    [TestFixture(Browser.PhantomJS)]
+    [TestFixture(Browser.Firefox, Category="Firefox")]
+    [TestFixture(Browser.Gecko, Category="Gecko")]
+    [TestFixture(Browser.Chrome, Category="Chrome")]
+    [TestFixture(Browser.Edge, Category="Edge")]
+/*
+    [TestFixture(Browser.Opera, Category="Opera")]
+    [TestFixture(Browser.IE, Category="IE")]
+    [TestFixture(Browser.PhantomJS, Category="PhantomJS")]
+*/
     class TS_Window : BaseBrowsers {
 
         public TS_Window(Browser browser)
@@ -18,7 +22,14 @@ namespace Selenium.Tests {
 
         [SetUp]
         public void SetUp() {
-            driver.Get("/win1.html");
+            driver.Get("/win1.html?param1=1&param2=2");
+        }
+
+        [TestCase]
+        public void Refresh() {
+            string url = driver.Url;
+            driver.Refresh();
+            A.AreEqual( url, driver.Url );
         }
 
         [TestCase]

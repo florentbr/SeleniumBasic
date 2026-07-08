@@ -8,11 +8,15 @@ using ExpectedException = NUnit.Framework.ExpectedExceptionAttribute;
 
 namespace Selenium.Tests {
 
-    [TestFixture(Browser.Firefox)]
-    [TestFixture(Browser.Opera)]
-    [TestFixture(Browser.Chrome)]
-    [TestFixture(Browser.IE)]
-    [TestFixture(Browser.PhantomJS)]
+    [TestFixture(Browser.Firefox, Category="Firefox")]
+    [TestFixture(Browser.Gecko, Category="Gecko")]
+    [TestFixture(Browser.Chrome, Category="Chrome")]
+    [TestFixture(Browser.Edge, Category="Edge")]
+/*
+    [TestFixture(Browser.Opera, Category="Opera")]
+    [TestFixture(Browser.IE, Category="IE")]
+    [TestFixture(Browser.PhantomJS, Category="PhantomJS")]
+*/
     class TS_SearchContext : BaseBrowsers {
 
         public TS_SearchContext(Browser browser)
@@ -134,23 +138,45 @@ namespace Selenium.Tests {
             A.AreEqual(3, elts.Count);
         }
 
+        private void AddNewElementAfter( int delay ) {
+            driver.ExecuteScript(@"setTimeout(function(){
+                var e = document.createElement('div');
+                e.id = 'id-append';
+                e.innerHTML = 'DivAppend';
+                document.body.appendChild(e);
+            }, " + delay + ");");
+        }
+
+        [TestCase]
+        public void ShouldFindWithExplicitWait() {
+            AddNewElementAfter( 200 );
+            var ele = driver.FindElementById("id-append", 1500, true);
+        }
+
         [TestCase]
         public void ShouldFindWithImplicitWait() {
-            driver.ExecuteScript(@"
-setTimeout(function(){
-    var e = document.createElement('div');
-    e.id = 'id-append';
-    e.innerHTML = 'DivAppend';
-    document.body.appendChild(e);
-}, 100);
-            ");
-            var ele = driver.FindElementById("id-append", 500, true);
+            AddNewElementAfter( 200 );
+            var ele = driver.FindElementById("id-append");
+            A.IsNotNull(ele);
+        }
+
+        [TestCase]
+        [IgnoreFixture(Browser.Gecko, "Implicit timeout is always 0 and cannot be changed")]
+        public void ShouldFindWithDriverImplicit() {
+            const int implicit_timeout = 500;
+            driver.Timeouts.Implicit = implicit_timeout;
+            if( FixtureParam.Equals( Browser.Firefox ) )
+                A.Ignore( "Timeout can be only set but not get" );
+            else
+                A.AreEqual( implicit_timeout, driver.Timeouts.Implicit, "Cannot set the implicit timeout to the driver" );
+            AddNewElementAfter( 200 );
+            var ele = driver.FindElementById("id-append", 1, true); 
         }
 
         [TestCase]
         [ExpectedException(typeof(Selenium.Errors.NoSuchElementError))]
         public void ShouldNotFind() {
-            var ele = driver.FindElementById("id-append", 50, true);
+            var ele = driver.FindElementById("id-missing", 5000, true);
         }
 
         [TestCase]
@@ -159,6 +185,19 @@ setTimeout(function(){
             A.Null(ele);
         }
 
+        [TestCase]
+        [IgnoreFixture(Browser.Firefox, "Shadow is not supported")]
+        public void ShouldGetThroughShadow() {
+            var sc = driver.FindElementByCss("div#shadow-ctr");
+            var sr = sc.Shadow();
+            A.IsNotNull( sr, "Element has no Shadow " );
+            if( FixtureParam.Equals( Browser.Gecko ) )
+                A.Ignore( "DNW in gecko. See https://bugzilla.mozilla.org/show_bug.cgi?id=1700097" );
+            if( !( FixtureParam.Equals( Browser.Chrome ) || FixtureParam.Equals( Browser.Edge ) ) )
+                A.Ignore("Old browsers are not supported");
+            A.IsNotNull(sr.FindElementByCss("span"));
+            A.IsNotNull(sr.FindElementByTag("span"));
+            A.Throws<SeleniumError>( () => sr.FindElementByXPath(".//span") );  // apparently not supported
+        }
     }
-
 }

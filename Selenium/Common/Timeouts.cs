@@ -1,16 +1,21 @@
-﻿using Selenium.Core;
+﻿using System;
+using Selenium.Core;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace Selenium {
 
     /// <summary>
-    /// Timeouts object
+    /// Timeouts used in in waiting
     /// </summary>
     /// <example>
-    /// Sets the implicit timout to 1 second
+    /// Sets the deault operational time out to 1 second:
     /// <code lang="vb">
     /// driver.Timeouts.ImplicitWait = 1000
+    /// </code>
+    /// Tells the driver process to set its element location timeout to 1 second:
+    /// <code lang="vb">
+    /// driver.Timeouts.Implicit = 1000
     /// </code>
     /// </example>
     [ProgId("Selenium.Timeouts")]
@@ -18,17 +23,18 @@ namespace Selenium {
     [Description("Timeouts management")]
     [ComVisible(true), ClassInterface(ClassInterfaceType.None)]
     public class Timeouts : ComInterfaces._Timeouts {
+        private const String ENDPOINT = "/timeouts";
 
-        private static void SendTimeoutScript(RemoteSession session, int timeout) {
-            session.Send(RequestMethod.POST, "/timeouts", "type", "script", "ms", timeout);
+        internal static void SendTimeoutScript(RemoteSession session, int timeout) {
+            session.Send(RequestMethod.POST, ENDPOINT, "type", "script", "ms", timeout);
         }
 
-        private static void SendTimeoutPageLoad(RemoteSession session, int timeout) {
-            session.Send(RequestMethod.POST, "/timeouts", "type", "page load", "ms", timeout);
+        internal static void SendTimeoutPageLoad(RemoteSession session, int timeout) {
+            session.Send(RequestMethod.POST, ENDPOINT, "type", "page load", "ms", timeout);
         }
 
-        private static void SendTimeoutImplicit(RemoteSession session, int timeout) {
-            session.Send(RequestMethod.POST, "/timeouts", "type", "implicit", "ms", timeout);
+        internal static void SendTimeoutImplicit(RemoteSession session, int timeout) {
+            session.Send(RequestMethod.POST, ENDPOINT, "type", "implicit", "ms", timeout);
         }
 
 
@@ -40,8 +46,17 @@ namespace Selenium {
         internal int timeout_script = 15000;       // 15 seconds
 
         /// <summary>
-        /// Amount of time that Selenium will wait for waiting commands to complete
+        /// Amount of time that Selenium will wait for commands to complete. Default is 3000ms
         /// </summary>
+        /// <remarks>
+        /// Note: 
+        /// This timeout is not related to the driver process'
+        /// <see href="https://w3c.github.io/webdriver/#timeouts">implicit timeout</see>.
+        /// It just a SeleniumBasic's default time for an element search or wait operation would continue repeating a requests
+        /// until the timeout is reached.
+        /// </remarks>
+        /// <remarks>Default is 3000ms</remarks>
+        /// <seealso cref="Timeouts.Implicit"/>
         public int ImplicitWait {
             get {
                 return timeout_implicitwait;
@@ -53,10 +68,36 @@ namespace Selenium {
         }
 
         /// <summary>
+        /// Amount of time the driver process should wait to complete when locating an element.
+        /// </summary>
+        /// <remarks>
+        /// Default is 0ms. See <see href="https://w3c.github.io/webdriver/#timeouts">implicit timeout</see>
+        /// </remarks>
+        public int Implicit {
+            get {
+                try {
+                    Dictionary dict = (Dictionary)_session.Send(RequestMethod.GET, ENDPOINT);
+                    if( dict != null )
+                        return Convert.ToInt32(dict["implicit"]);
+                } catch { }
+                return -1;
+            }
+            set {
+                if (_session != null)
+                    SendTimeoutImplicit(_session, value);
+            }
+        }
+
+        /// <summary>
         /// Amount of time the driver should wait while loading a page before throwing an exception.
         /// </summary>
+        /// <remarks>Default is 60000ms</remarks>
         public int PageLoad {
             get {
+                Dictionary dict = (Dictionary)_session.Send(RequestMethod.GET, ENDPOINT);
+                if( dict != null ) {
+                    timeout_pageload = Convert.ToInt32(dict["pageLoad"]);
+                }
                 return timeout_pageload;
             }
             set {
@@ -70,8 +111,13 @@ namespace Selenium {
         /// <summary>
         /// Amount of time the driver should wait while executing an asynchronous script before throwing an error.
         /// </summary>
+        /// <remarks>Default is 15000ms</remarks>
         public int Script {
             get {
+                Dictionary dict = (Dictionary)_session.Send(RequestMethod.GET, ENDPOINT);
+                if( dict != null ) {
+                    timeout_script = Convert.ToInt32(dict["script"]);
+                }
                 return timeout_script;
             }
             set {
@@ -83,8 +129,9 @@ namespace Selenium {
         }
 
         /// <summary>
-        /// Maximum amount of time the driver should wait while waiting for a response from the server.
+        /// Maximum amount of time the driver should wait while waiting for a response from the server. 
         /// </summary>
+        /// <remarks>Default is 90000ms</remarks>
         public int Server {
             get {
                 return timeout_server;
@@ -98,7 +145,7 @@ namespace Selenium {
         internal void SetSession(RemoteSession session) {
             _session = session;
             SendTimeoutPageLoad(_session, timeout_pageload);
-            SendTimeoutScript(_session, timeout_pageload);
+            SendTimeoutScript(_session, timeout_script);
         }
 
     }

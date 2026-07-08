@@ -23,7 +23,10 @@ namespace Selenium {
     public class Window : ComInterfaces._Window {
 
         internal static string GetWindowHandle(RemoteSession session) {
-            return (string)session.Send(RequestMethod.GET, "/window_handle");
+            if( WebDriver.LEGACY )
+                return (string)session.Send(RequestMethod.GET, "/window_handle");
+            else
+                return (string)session.Send(RequestMethod.GET, "/window");
         }
 
         private readonly RemoteSession _session;
@@ -94,7 +97,7 @@ namespace Selenium {
         /// <summary>
         /// Change focus to another window.
         /// </summary>
-        /// <param name="name">Name of the window</param>
+        /// <param name="name">Name or handle of the desired window</param>
         /// <param name="timeout">Optional timeout in milliseconds</param>
         public Window SwitchToWindowByName(string name, int timeout = -1) {
             return _windows.SwitchToWindowByName(name, timeout);
@@ -142,7 +145,8 @@ namespace Selenium {
         /// </summary>
         /// <remarks>When setting this property, it should act as the JavaScript window.moveTo() method.</remarks>
         public Point Position() {
-            var result = (Dictionary)_session.Send(RequestMethod.GET, uri() + "/position");
+            string endpoint = WebDriver.LEGACY ? uri() + "/position" : "/window/rect";
+            var result = (Dictionary)_session.Send(RequestMethod.GET, endpoint);
             return new Point(result);
         }
 
@@ -152,7 +156,8 @@ namespace Selenium {
         /// <param name="x">X</param>
         /// <param name="y">Y</param>
         public void SetPosition(int x, int y) {
-            _session.Send(RequestMethod.POST, uri() + "/position", "x", x, "y", y);
+            string endpoint = WebDriver.LEGACY ? uri() + "/position" : "/window/rect";
+            _session.Send(RequestMethod.POST, endpoint, "x", x, "y", y);
         }
 
         /// <summary>
@@ -160,7 +165,8 @@ namespace Selenium {
         /// </summary>
         /// <remarks>When setting this property, it should act as the JavaScript window.resizeTo() method.</remarks>
         public Size Size() {
-            var dict = (Dictionary)_session.Send(RequestMethod.GET, uri() + "/size");
+            string endpoint = WebDriver.LEGACY ? uri() + "/size" : "/window/rect";
+            var dict = (Dictionary)_session.Send(RequestMethod.GET, endpoint);
             return new Size(dict);
         }
 
@@ -170,30 +176,31 @@ namespace Selenium {
         /// <param name="width"></param>
         /// <param name="height"></param>
         public void SetSize(int width, int height) {
-            _session.Send(RequestMethod.POST, uri() + "/size", "width", width, "height", height);
+            string endpoint = WebDriver.LEGACY ? uri() + "/size" : "/window/rect";
+            _session.Send(RequestMethod.POST, endpoint, "width", width, "height", height);
         }
 
         /// <summary>
         /// Maximizes the current window if it is not already maximized.
         /// </summary>
         public void Maximize() {
-            _session.Send(RequestMethod.POST, uri() + "/maximize");
+            string endpoint = WebDriver.LEGACY ? uri() + "/maximize" : "/window/maximize";
+            _session.Send(RequestMethod.POST, endpoint, new Dictionary());
         }
 
         /// <summary>
         /// Set the current window full screen.
         /// </summary>
         public void FullScreen() {
-            _session.Send(RequestMethod.POST, uri() + "/fullscreen");
+            string endpoint = WebDriver.LEGACY ? uri() + "/fullscreen" : "/window/fullscreen";
+            _session.Send(RequestMethod.POST, endpoint, new Dictionary());
         }
 
         /// <summary>
         /// Closes the current window.
         /// </summary>
         public void Close() {
-            if (this != _windows.CurrentWindow)
-                this.Activate();
-            _session.Send(RequestMethod.DELETE, "/window");
+            _windows.Close( this );
         }
 
     }

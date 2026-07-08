@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 namespace Selenium.Core {
 
     class RemoteServer {
+        private static readonly NLog.Logger _l = NLog.LogManager.GetCurrentClassLogger();
 
         const string JSON_MIME_TYPE = "application/json";
         const string HEADER_CONTENT_TYPE = "application/json;charset=UTF-8";
@@ -60,7 +61,8 @@ namespace Selenium.Core {
         }
 
         public void ShutDown() {
-            Send(RequestMethod.GET, @"/shutdown", null);
+            if( WebDriver.LEGACY )
+                Send(RequestMethod.GET, @"/shutdown", null);
         }
 
         /// <summary>
@@ -111,7 +113,8 @@ namespace Selenium.Core {
             _request_method = method;
             _request_uri = uri;
             _request_data = data;
-
+            if( _l.IsTraceEnabled )
+                _l.Trace( "Sending: " + method.ToString() + " " + uri );
             HttpWebRequest request = CreateHttpWebRequest(method, uri, data);
             SysWaiter.OnInterrupt = request.Abort;
             HttpWebResponse response = null;
@@ -121,12 +124,19 @@ namespace Selenium.Core {
             try {
                 asyncResult = request.BeginGetResponse(null, null);
                 if(!asyncResult.AsyncWaitHandle.WaitOne(_response_timeout)){
+                    _l.Error( "Request aborted on a timeout of " + _response_timeout + "ms" );
                     request.Abort();
                     throw new WebException(null, WebExceptionStatus.Timeout);
                 }
                 response = (HttpWebResponse)request.EndGetResponse(asyncResult);
                 responseDict = GetHttpWebResponseContent(response);
             } catch (WebException ex) {
+                _l.Error( ex, uri );
+#if DEBUG
+                Console.WriteLine( ex.Message );
+                if( data != null )
+                    Console.WriteLine( data.ToString() );
+#endif                
                 if (ex.Status == WebExceptionStatus.RequestCanceled) {
                     throw new Errors.KeyboardInterruptError();
                 } else if (ex.Status == WebExceptionStatus.Timeout) {
@@ -147,22 +157,36 @@ namespace Selenium.Core {
                 if (response != null)
                     response.Close();
             }
-
-            if (responseDict != null) {
-                //Evaluate the status and error
-                int statusCode = (int)responseDict["status"];
-                if (statusCode != 0) {
-                    object errorObject = responseDict["value"];
-                    Dictionary errorAsDict = errorObject as Dictionary;
-                    string errorMessage;
-                    if (errorAsDict != null) {
-                        errorMessage = errorAsDict["message"] as string;
-                    } else {
-                        errorMessage = errorObject as string;
+            if (responseDict != null ) {
+                if( _l.IsTraceEnabled )
+                    _l.Trace( "Got response values: " + responseDict._count );
+                if(responseDict.ContainsKey("status")) {
+                    //Evaluate the status and error
+                    int statusCode = (int)responseDict["status"];
+                    if (statusCode != 0) {
+                        object errorObject = responseDict["value"];
+                        Dictionary errorAsDict = errorObject as Dictionary;
+                        string errorMessage;
+                        if (errorAsDict != null) {
+                            errorMessage = errorAsDict["message"] as string;
+                        } else {
+                            errorMessage = errorObject as string;
+                        }
+                        SeleniumError error = Errors.WebRequestError.Select(statusCode, errorMessage);
+                        error.ResponseData = responseDict;
+                        throw error;
                     }
-                    SeleniumError error = Errors.WebRequestError.Select(statusCode, errorMessage);
-                    error.ResponseData = responseDict;
-                    throw error;
+                }
+                if( !WebDriver.LEGACY && response.StatusCode != HttpStatusCode.OK && responseDict.ContainsKey("value")) {
+                    object errorObject = responseDict["value"];
+                    if( errorObject is Dictionary ) {
+                        Dictionary errorAsDict = errorObject as Dictionary;
+                        if (errorAsDict != null) {
+                            string errorMessage = errorAsDict["message"] as string;
+                            string errorStr = errorAsDict["error"] as string;
+                            throw Errors.WebRequestError.Select(errorStr, errorMessage);
+                        }
+                    }
                 }
             }
             return responseDict;
@@ -206,7 +230,7 @@ namespace Selenium.Core {
                         case 404: throw new Exception("Unknown Commands: " + bodyText);
                         case 405: throw new Exception("Invalid Command Method: " + bodyText);
                         case 501: throw new Exception("Unimplemented Commands: " + bodyText);
-                        default: throw new Exception(response.StatusDescription);
+                        default:  throw new Exception(response.StatusCode + " " + response.StatusDescription + " " + bodyText);
                     }
                 }
             }
