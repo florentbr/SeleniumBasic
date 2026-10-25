@@ -75,11 +75,11 @@ Source: "VbsConsole\bin\Release\vbsc.exe"; DestDir: "{app}"; Flags: ignoreversio
 ;drivers
 Source: "References\firefoxdriver.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ff;
 Source: "References\chromedriver.exe";  DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cr;
-Source: "References\operadriver.exe";   DestDir: "{app}"; Flags: ignoreversion; Components: pkg_op;
+Source: "References\operadriver.exe";   DestDir: "{app}"; Flags: skipifsourcedoesntexist ignoreversion; Components: pkg_op;
 Source: "References\phantomjs.exe";     DestDir: "{app}"; Flags: ignoreversion; Components: pkg_pjs;
-Source: "References\iedriver.exe";      DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;
+Source: "References\iedriver.exe";      DestDir: "{app}"; Flags: skipifsourcedoesntexist ignoreversion; Components: pkg_ie;
 ;Source: "References\iedriver64.exe";    DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;  Check: IsWin64;
-Source: "References\edgedriver.exe";    DestDir: "{app}"; Flags: ignoreversion; Components: pkg_edg;
+Source: "References\msedgedriver.exe";  DestDir: "{app}"; Flags: ignoreversion; Components: pkg_edg;
 
 ;Firefox extensions
 Source: "FirefoxAddons\bin\extensions.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ide;
@@ -87,24 +87,24 @@ Source: "FirefoxAddons\bin\extensions.xpi"; DestDir: "{app}"; Flags: ignoreversi
 ;examples                                                                                                                                                     
 Source: "Scripts\*.*" ;               DestDir: "{app}\Scripts";             Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_core;
 Source: "Templates\*.vbs" ;           DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Templates\Xlbin\*.xlt";      DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
+Source: "Templates\Xlbin\*.xlt";      DestDir: "{app}\Templates";           Flags: skipifsourcedoesntexist ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
 Source: "Templates\*.xltm" ;          DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasNewExcel
 Source: "Templates\*.au3" ;           DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasAutoIt
 Source: "Examples\VBScript\*.vbs";    DestDir: "{app}\Examples\VBScript";   Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; 
 Source: "Examples\JavaScript\*.js";   DestDir: "{app}\Examples\JavaScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Examples\Excel\Xlbin\*.xls"; DestDir: "{app}\Examples\Excel";      Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
+Source: "Examples\Excel\Xlbin\*.xls"; DestDir: "{app}\Examples\Excel";      Flags: skipifsourcedoesntexist ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
 Source: "Examples\Excel\*.xlsm";      DestDir: "{app}\Examples\Excel";      Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasNewExcel
 Source: "Examples\AutoIt\*.au3";      DestDir: "{app}\Examples\AutoIt";     Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasAutoIt
 
 ;copy config file
-Source: "References\exe.config" ; DestDir: "{sys}";      DestName: "wscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
-Source: "References\exe.config" ; DestDir: "{sys}";      DestName: "cscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
-Source: "References\exe.config" ; DestDir: "{syswow64}"; DestName: "wscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: IsWin64 And HasPrivileges;
-Source: "References\exe.config" ; DestDir: "{syswow64}"; DestName: "cscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: IsWin64 And HasPrivileges;
-Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|excel.exe}";    DestName: "EXCEL.EXE.CONFIG";    Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('excel.exe');
-Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|winword.exe}";  DestName: "WINWORD.EXE.CONFIG";  Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('winword.exe');
-Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|msaccess.exe}"; DestName: "MSACCESS.EXE.CONFIG"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('msaccess.exe');
-Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|outlook.exe}";  DestName: "OUTLOOK.EXE.CONFIG";  Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('outlook.exe');
+Source: "References\exe.config" ; DestDir: "{sys}";      DestName: "wscript.exe.config"; Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges;
+Source: "References\exe.config" ; DestDir: "{sys}";      DestName: "cscript.exe.config"; Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges;
+Source: "References\exe.config" ; DestDir: "{syswow64}"; DestName: "wscript.exe.config"; Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: IsWin64 And HasPrivileges;
+Source: "References\exe.config" ; DestDir: "{syswow64}"; DestName: "cscript.exe.config"; Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: IsWin64 And HasPrivileges;
+Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|excel.exe}";    DestName: "EXCEL.EXE.CONFIG";    Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('excel.exe');
+Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|winword.exe}";  DestName: "WINWORD.EXE.CONFIG";  Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('winword.exe');
+Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|msaccess.exe}"; DestName: "MSACCESS.EXE.CONFIG"; Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('msaccess.exe');
+Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|outlook.exe}";  DestName: "OUTLOOK.EXE.CONFIG";  Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('outlook.exe');
 
 [Icons]
 Name: "{group}\Project Home Page";  Filename: {#AppURL};                      WorkingDir: "{app}";
@@ -516,7 +516,7 @@ Procedure RegClass(Const lib : TNetLib; Const guid, progid, typename: String);
     If Not IsUninstaller Then Begin
       RegString(HK, key, '', progid);
       RegString(HK, key + '\CLSID', '', guid);
-    End
+    End;
 
     RegClsid(lib, HK, guid, progid, typename, '{sys}');
     If IsWin64 Then

@@ -22,7 +22,7 @@ End Sub
 
 'Terminates all the drivers and all the child processes
 Sub TerminateDrivers()
-    names = Array("chromedriver.exe", "iedriver.exe", "operadriver.exe", "phantomjs.exe", "edgedriver.exe")
+    names = Array("chromedriver.exe", "iedriver.exe", "operadriver.exe", "phantomjs.exe", "edgedriver.exe", "msedgedriver.exe")
     Set mgt = GetObject("winmgmts:")
     On Error Resume Next
     For Each p In mgt.ExecQuery("Select * from Win32_Process Where Name='" & Join(names, "' Or Name='") & "'")

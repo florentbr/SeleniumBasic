@@ -12,13 +12,14 @@ namespace Selenium.Internal {
 
         public static object WaitUntilProc(object function, object argument1, object argument2, int timeout) {
             DateTime endtime = DateTime.UtcNow.AddMilliseconds(timeout);
+            object result = null;
             try {
                 if (function is int) {
                     //handles AddressOf
                     var ptr = new IntPtr((int)function);
                     CallBack callback0 = (CallBack)Marshal.GetDelegateForFunctionPointer(ptr, typeof(CallBack));
                     while (true) {
-                        object result = null;
+                        result = null;
                         callback0(out result, ref argument1, ref argument2);
                         if (result != null && !false.Equals(result))
                             return result;
@@ -30,7 +31,7 @@ namespace Selenium.Internal {
                     Type t = function.GetType();
                     object[] args = new object[] { argument1, argument2 };
                     while (true) {
-                        object result = t.InvokeMember(string.Empty, BindingFlags.InvokeMethod, null, function, args);
+                        result = t.InvokeMember(string.Empty, BindingFlags.InvokeMethod, null, function, args);
                         if (result != null && !false.Equals(result))
                             return result;
                         if (DateTime.UtcNow > endtime)
@@ -44,7 +45,21 @@ namespace Selenium.Internal {
                 throw new Errors.ArgumentError("The procedure has an invalide signature.");
             } catch (COMException ex) {
                 throw new SeleniumError(ex.Message);
+            } finally {
+                //releases the COM objects provided by the caller so they don't keep
+                //the host (Access, Excel...) alive until the next garbage collection
+                ReleaseCallerObject(function, result);
+                ReleaseCallerObject(argument1, result);
+                ReleaseCallerObject(argument2, result);
             }
+        }
+
+        private static void ReleaseCallerObject(object obj, object result) {
+            if (obj == null || object.ReferenceEquals(obj, result) || !Marshal.IsComObject(obj))
+                return;
+            try {
+                Marshal.ReleaseComObject(obj);
+            } catch { }
         }
 
     }
