@@ -62,7 +62,7 @@ namespace Selenium {
             var svc = new DriverService();
             svc.AddArgument("--host=localhost");
             svc.AddArgument("--port=" + svc.IPEndPoint.Port.ToString());
-            svc.Start("edgedriver.exe", true);
+            svc.Start("msedgedriver.exe", true);
             return svc;
         }
 

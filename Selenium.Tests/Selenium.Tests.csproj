@@ -122,11 +122,12 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /D /Y "$(ProjectDir)\..\References\firefoxdriver.xpi" .
-xcopy /D /Y "$(ProjectDir)\..\References\chromedriver.exe" .
-xcopy /D /Y "$(ProjectDir)\..\References\operadriver.exe" .
-xcopy /D /Y "$(ProjectDir)\..\References\iedriver.exe" .
-xcopy /D /Y "$(ProjectDir)\..\References\phantomjs.exe" .</PostBuildEvent>
+    <PostBuildEvent>if exist "$(ProjectDir)\..\References\firefoxdriver.xpi" xcopy /D /Y "$(ProjectDir)\..\References\firefoxdriver.xpi" .
+if exist "$(ProjectDir)\..\References\chromedriver.exe" xcopy /D /Y "$(ProjectDir)\..\References\chromedriver.exe" .
+if exist "$(ProjectDir)\..\References\msedgedriver.exe" xcopy /D /Y "$(ProjectDir)\..\References\msedgedriver.exe" .
+if exist "$(ProjectDir)\..\References\operadriver.exe" xcopy /D /Y "$(ProjectDir)\..\References\operadriver.exe" .
+if exist "$(ProjectDir)\..\References\iedriver.exe" xcopy /D /Y "$(ProjectDir)\..\References\iedriver.exe" .
+if exist "$(ProjectDir)\..\References\phantomjs.exe" xcopy /D /Y "$(ProjectDir)\..\References\phantomjs.exe" .</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

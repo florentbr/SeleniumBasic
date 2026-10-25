@@ -58,7 +58,7 @@ namespace Selenium {
             var svc = new DriverService();
             svc.AddArgument("--port=" + svc.IPEndPoint.Port.ToString());
             svc.AddArgument("--silent");
-            svc.Start("chromedriver.exe");
+            svc.Start("chromedriver.exe", true, wd.Binary);
             return svc;
         }
 
