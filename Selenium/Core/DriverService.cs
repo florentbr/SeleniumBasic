@@ -77,12 +77,13 @@ namespace Selenium.Core {
             _arguments.Add(argument);
         }
 
-        public void Start(string filename, bool hide = true) {
+        public void Start(string filename, bool hide = true, string browserBinary = null) {
             Hashtable env = ProcessExt.GetStdEnvironmentVariables();
             env["TEMP"] = _temp_folder;
             env["TMP"] = _temp_folder;
 
-            string servicePath = Path.Combine(_library_dir, filename);
+            //updates the Chrome and Edge drivers to the major version of the browser
+            string servicePath = DriverUpdater.Resolve(_library_dir, filename, browserBinary);
             if (!File.Exists(servicePath))
                 throw new Errors.FileNotFoundError(servicePath);
 

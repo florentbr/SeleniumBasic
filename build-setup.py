@@ -12,7 +12,7 @@ import os, re, time, sys, traceback, shutil, datetime, subprocess, zipfile, glob
 __dir__ = os.path.dirname(os.path.realpath(__file__))
 
 APP_MSBUILD_PATH = r'c:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe'
-APP_TLBEXP_PATH = r'c:\Progra~2\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\TlbExp.exe'
+APP_TLBEXP_PATH = r'c:\Progra~2\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\TlbExp.exe'
 APP_INNOSETUP_PATH = r'c:\Progra~2\Inno Setup 5\ISCC.exe'
 APP_PYTHON_PATH = r'c:\Progra~2\Python27\python.exe'
 APP_IRONPYTHON_PATH = r'c:\Progra~2\IronPython 2.7\ipy.exe'
@@ -60,7 +60,7 @@ def main():
     
     print 'Build .Net library ...'
     execute(APP_MSBUILD_PATH, '/t:build', '/nologo', '/v:quiet',
-        r'/p:Configuration=Release;TargetFrameworkVersion=v3.5',
+        r'/p:Configuration=Release;TargetFrameworkVersion=v4.8',
         r'/p:RegisterForComInterop=False',
         r'/p:SignAssembly=true;AssemblyOriginatorKeyFile=key.snk', 
         r'.\Selenium\Selenium.csproj' )
@@ -76,7 +76,7 @@ def main():
     
     print 'Build console runner ...'
     execute(APP_MSBUILD_PATH, '/v:quiet', '/t:build', '/nologo', 
-        r'/p:Configuration=Release;TargetFrameworkVersion=v3.5', 
+        r'/p:Configuration=Release;TargetFrameworkVersion=v4.8', 
         r'.\VbsConsole\VbsConsole.csproj' )
     
     print 'Build documentation ...'
