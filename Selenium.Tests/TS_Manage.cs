@@ -27,7 +27,9 @@ namespace Selenium.Tests {
             var manage = driver.Manage;
             A.AreEqual(0, manage.Cookies.Count);
 
-            manage.AddCookie("ck_name", "ck_value", null, "/", "2017-06-15T12:08:03");
+            //the expiry must be in the future and within the 400 days accepted by Chrome
+            string expiry = System.DateTime.Now.AddDays(30).ToString("yyyy-MM-ddTHH:mm:ss");
+            manage.AddCookie("ck_name", "ck_value", null, "/", expiry);
             var cookies = manage.Cookies;
             A.AreEqual(1, manage.Cookies.Count);
 
@@ -36,7 +38,7 @@ namespace Selenium.Tests {
             A.AreEqual("ck_value", cookie.Value);
             A.AreEqual("localhost", cookie.Domain);
             A.AreEqual("/", cookie.Path);
-            A.AreEqual("2017-06-15T12:08:03", cookie.Expiry);
+            A.AreEqual(expiry, cookie.Expiry);
 
             driver.Manage.DeleteAllCookies();
             A.AreEqual(0, manage.Cookies.Count);

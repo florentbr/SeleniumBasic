@@ -42,7 +42,7 @@ ArchitecturesInstallIn64BitMode=x64
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [CustomMessages]
-MsgNETFrameworkNotInstalled=Microsoft .NET Framework 3.5 installation was Not detected. 
+MsgNETFrameworkNotInstalled=Microsoft .NET Framework 4.8 installation was Not detected.
 MsgRegistryWriteFailure=Failed to register the library due to insufficient privileges. 
 MsgFileNotFound=File Not found: %1. 
 MsgCOMInvokeFailed=Installation failed. The installer was unable to call the registered library. 
@@ -75,11 +75,11 @@ Source: "VbsConsole\bin\Release\vbsc.exe"; DestDir: "{app}"; Flags: ignoreversio
 ;drivers
 Source: "References\firefoxdriver.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ff;
 Source: "References\chromedriver.exe";  DestDir: "{app}"; Flags: ignoreversion; Components: pkg_cr;
-Source: "References\operadriver.exe";   DestDir: "{app}"; Flags: ignoreversion; Components: pkg_op;
+Source: "References\operadriver.exe";   DestDir: "{app}"; Flags: skipifsourcedoesntexist ignoreversion; Components: pkg_op;
 Source: "References\phantomjs.exe";     DestDir: "{app}"; Flags: ignoreversion; Components: pkg_pjs;
-Source: "References\iedriver.exe";      DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;
+Source: "References\iedriver.exe";      DestDir: "{app}"; Flags: skipifsourcedoesntexist ignoreversion; Components: pkg_ie;
 ;Source: "References\iedriver64.exe";    DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ie;  Check: IsWin64;
-Source: "References\edgedriver.exe";    DestDir: "{app}"; Flags: ignoreversion; Components: pkg_edg;
+Source: "References\msedgedriver.exe";  DestDir: "{app}"; Flags: ignoreversion; Components: pkg_edg;
 
 ;Firefox extensions
 Source: "FirefoxAddons\bin\extensions.xpi"; DestDir: "{app}"; Flags: ignoreversion; Components: pkg_ide;
@@ -87,24 +87,24 @@ Source: "FirefoxAddons\bin\extensions.xpi"; DestDir: "{app}"; Flags: ignoreversi
 ;examples                                                                                                                                                     
 Source: "Scripts\*.*" ;               DestDir: "{app}\Scripts";             Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_core;
 Source: "Templates\*.vbs" ;           DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Templates\Xlbin\*.xlt";      DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
+Source: "Templates\Xlbin\*.xlt";      DestDir: "{app}\Templates";           Flags: skipifsourcedoesntexist ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
 Source: "Templates\*.xltm" ;          DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasNewExcel
 Source: "Templates\*.au3" ;           DestDir: "{app}\Templates";           Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasAutoIt
 Source: "Examples\VBScript\*.vbs";    DestDir: "{app}\Examples\VBScript";   Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; 
 Source: "Examples\JavaScript\*.js";   DestDir: "{app}\Examples\JavaScript"; Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc;
-Source: "Examples\Excel\Xlbin\*.xls"; DestDir: "{app}\Examples\Excel";      Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
+Source: "Examples\Excel\Xlbin\*.xls"; DestDir: "{app}\Examples\Excel";      Flags: skipifsourcedoesntexist ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasOldExcel
 Source: "Examples\Excel\*.xlsm";      DestDir: "{app}\Examples\Excel";      Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasNewExcel
 Source: "Examples\AutoIt\*.au3";      DestDir: "{app}\Examples\AutoIt";     Flags: ignoreversion overwritereadonly; Attribs:readonly; Components: pkg_doc; Check: HasAutoIt
 
 ;copy config file
-Source: "References\exe.config" ; DestDir: "{sys}";      DestName: "wscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
-Source: "References\exe.config" ; DestDir: "{sys}";      DestName: "cscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges;
-Source: "References\exe.config" ; DestDir: "{syswow64}"; DestName: "wscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: IsWin64 And HasPrivileges;
-Source: "References\exe.config" ; DestDir: "{syswow64}"; DestName: "cscript.exe.config"; Flags: ignoreversion uninsneveruninstall; Check: IsWin64 And HasPrivileges;
-Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|excel.exe}";    DestName: "EXCEL.EXE.CONFIG";    Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('excel.exe');
-Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|winword.exe}";  DestName: "WINWORD.EXE.CONFIG";  Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('winword.exe');
-Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|msaccess.exe}"; DestName: "MSACCESS.EXE.CONFIG"; Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('msaccess.exe');
-Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|outlook.exe}";  DestName: "OUTLOOK.EXE.CONFIG";  Flags: ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('outlook.exe');
+Source: "References\exe.config" ; DestDir: "{sys}";      DestName: "wscript.exe.config"; Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges;
+Source: "References\exe.config" ; DestDir: "{sys}";      DestName: "cscript.exe.config"; Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges;
+Source: "References\exe.config" ; DestDir: "{syswow64}"; DestName: "wscript.exe.config"; Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: IsWin64 And HasPrivileges;
+Source: "References\exe.config" ; DestDir: "{syswow64}"; DestName: "cscript.exe.config"; Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: IsWin64 And HasPrivileges;
+Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|excel.exe}";    DestName: "EXCEL.EXE.CONFIG";    Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('excel.exe');
+Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|winword.exe}";  DestName: "WINWORD.EXE.CONFIG";  Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('winword.exe');
+Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|msaccess.exe}"; DestName: "MSACCESS.EXE.CONFIG"; Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('msaccess.exe');
+Source: "References\exe.config" ; DestDir: "{code:GetAppFolder|outlook.exe}";  DestName: "OUTLOOK.EXE.CONFIG";  Flags: skipifsourcedoesntexist ignoreversion uninsneveruninstall; Check: HasPrivileges And HasApp('outlook.exe');
 
 [Icons]
 Name: "{group}\Project Home Page";  Filename: {#AppURL};                      WorkingDir: "{app}";
@@ -348,9 +348,13 @@ Procedure PatchOfficeFileVersion();
     _PatchOfficeFileVersion('SOFTWARE\Microsoft\.NETFramework\Policy\AppPatch\v2.0.50727.00000\winword.exe\{2CCAA9FE-6884-4AF2-99DD-5217B94115DF}'); 
   End;
 
-Procedure AssertFrameworkPresent(Const version: String);
+// .NET Framework 4.5 and later share the v4\Full key, the version is given by the Release value
+// (528040 = 4.8, https://learn.microsoft.com/dotnet/framework/migration-guide/how-to-determine-which-versions-are-installed)
+Procedure AssertFrameworkPresent(Const minRelease: Cardinal);
+  Var release: Cardinal;
   Begin
-    If Not RegKeyExists(HKLM,'SOFTWARE\Microsoft\NET Framework Setup\NDP\v' + version) Then
+    If Not RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', release)
+      Or (release < minRelease) Then
         RaiseException(ExpandConstant('{cm:MsgNETFrameworkNotInstalled}'));
   End;
 
@@ -440,7 +444,7 @@ Procedure RegInterface(Const lib : TNetLib; Const guid, name, proxystub: String)
 //   ""="mscoree.dll"
 //   "Class"="Selenium.Structures.Point"
 //   "Assembly"="Selenium, Version=2.0.1.2, Culture=neutral, PublicKeyToken=null"
-//   "RuntimeVersion"="v2.0.50727"
+//   "RuntimeVersion"="v4.0.30319"
 //   "CodeBase"="C:\...\SeleniumBasic\Selenium.dll"
 //
 Procedure RegRecord(Const lib : TNetLib; Const guid, typename: String);
@@ -464,7 +468,7 @@ Procedure RegRecord(Const lib : TNetLib; Const guid, typename: String);
 //     ""="C:\Windows\System32\mscoree.dll"
 //     "Class"="Selenium.WebDriver"
 //     "Assembly"="Selenium, Version=2.0.1.2, Culture=neutral, PublicKeyToken=null"
-//     "RuntimeVersion"="v2.0.50727"
+//     "RuntimeVersion"="v4.0.30319"
 //     "CodeBase"="C:\...\SeleniumBasic\Selenium.dll"
 //     "ThreadingModel"="Both"
 //   \Implemented Categories\{62C8FE65-4EBB-45e7-B440-6E39B2CDBF29}
@@ -516,7 +520,7 @@ Procedure RegClass(Const lib : TNetLib; Const guid, progid, typename: String);
     If Not IsUninstaller Then Begin
       RegString(HK, key, '', progid);
       RegString(HK, key + '\CLSID', '', guid);
-    End
+    End;
 
     RegClsid(lib, HK, guid, progid, typename, '{sys}');
     If IsWin64 Then
@@ -568,7 +572,7 @@ Function InitializeSetup() : Boolean;
   Begin
     ALL_USERS := HasPrivileges();
     InitRootKeys();
-    //AssertFrameworkPresent('3.5');
+    AssertFrameworkPresent(528040);
     Result := True;
   End;
       

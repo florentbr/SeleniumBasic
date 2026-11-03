@@ -70,7 +70,7 @@ namespace SScript {
             script = script.ReplaceAll(@"\[With\((.*)\)\](\s+(Private |Public )?Sub )([\w_]+)", "Dim $4_dataset_ As Object() = {$1}$2$4");
             var mth_params_names = script.FindAll(@"([\w_]+)_dataset_", 1);
 
-            var csc = new Microsoft.VisualBasic.VBCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v3.5" } });
+            var csc = new Microsoft.VisualBasic.VBCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
 
             var parameters = new CompilerParameters(references.ToArray());
             parameters.GenerateExecutable = false;

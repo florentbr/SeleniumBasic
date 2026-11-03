@@ -11,3 +11,5 @@ Xlbin
 *.user
 *.xlt
 *.xls
+.vs/
+.claude/

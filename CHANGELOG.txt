@@ -16,6 +16,25 @@ Third party softwares:
  http://phantomjs.org/
 
 
+v2.0.10.0  (2026/10/24)
+===============================================================================
+ * Migrated to the .NET Framework 4.8 (the .NET Framework 3.5 is no longer
+   required)
+ * Added a check of the .NET Framework 4.8 in the installer
+
+v2.0.9.2  (2026/10/24)
+===============================================================================
+ * Added the automatic update of the Chrome and Edge drivers to the major
+   version of the browser (disabled with SELENIUMBASIC_DRIVER_UPDATE=0)
+
+v2.0.9.1  (2026/10/24)
+===============================================================================
+ * Renamed the Edge driver to msedgedriver.exe
+ * Released the COM objects provided by the caller in WaitUntil
+ * Updated Chrome driver to version 155.0.8059.84
+ * Updated Edge driver to version 155
+ * Fixed the build of the tests
+
 v2.0.9.0  (2016/03/02)
 ===============================================================================
  * Updated examples
