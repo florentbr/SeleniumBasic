@@ -103,28 +103,59 @@ namespace Selenium.Internal {
         public bool WaitForListening(int timeout, int delay) {
             _socket.Close();
 
-            //A connection attempt is used since the states returned by GetTcpTable are
-            //not reliable on recent Windows builds (the listening state is not always 2).
             DateTime endtime = DateTime.UtcNow.AddMilliseconds(timeout);
-            IPAddress address = _ipEndPoint.Address.Equals(IPAddress.Any) ?
-                IPAddress.Loopback : _ipEndPoint.Address;
-            var endpoint = new IPEndPoint(address, _ipEndPoint.Port);
-            while (true) {
-                using (var probe = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
-                    try {
-                        IAsyncResult ar = probe.BeginConnect(endpoint, null, null);
-                        if (ar.AsyncWaitHandle.WaitOne(500, false)) {
-                            probe.EndConnect(ar);
-                            probe.Shutdown(SocketShutdown.Both);
-                            return true;
+            int portLE = _ipEndPoint.Port;
+            int portBE = (portLE & 0xFF) << 8 | (portLE & 0xFF00) >> 8;  //Convert port to big endian
+
+            int bufferSize = 1024;
+            IntPtr buffer = Marshal.AllocHGlobal(bufferSize);
+            int[] tcpTable = new int[bufferSize / sizeof(int)];
+            try {
+                while (true) {
+                    int result = 0;
+                    while (122 == (result = Native.GetTcpTable(buffer, ref bufferSize, false))) {
+                        Marshal.FreeHGlobal(buffer);
+                        buffer = Marshal.AllocHGlobal(bufferSize);
+                        tcpTable = new int[bufferSize / sizeof(int)];
+                    }
+                    if (result != 0)
+                        throw new NetworkInformationException(result);
+
+                    // Buffer MIB_TCPTABLE :
+                    // int dwNumEntries 
+                    // int dwState      //MIB_TCPROW entry 1
+                    // int dwLocalAddr
+                    // int dwLocalPort
+                    // int dwRemoteAddr
+                    // int dwRemotePort
+                    // int dwState      //MIB_TCPROW entry 2
+                    // ...
+
+                    Marshal.Copy(buffer, tcpTable, 0, bufferSize / sizeof(int));
+                    int dwNumEntries = tcpTable[0];
+                    int tcpTableLength = 1 + dwNumEntries * 5;
+
+                    //loop over each entry to find the port (1 entry is 5 integers)
+                    for (int i = 3; i < tcpTableLength; i += 5) {
+                        int dwLocalPort = tcpTable[i];
+                        if (dwLocalPort == portBE) {
+                            int dwLocalAddr = tcpTable[i - 1];
+                            if (dwLocalAddr == 0 || dwLocalAddr == 0x0100007f) { //Any or Loopback
+                                int dwState = tcpTable[i - 2];
+                                if (dwState == 2) // 2=listening
+                                    return true;
+                                break;
+                            }
                         }
-                    } catch (SocketException) { }
+                    }
+
+                    if (DateTime.UtcNow > endtime)
+                        return false;
+
+                    SysWaiter.Wait(delay);
                 }
-
-                if (DateTime.UtcNow > endtime)
-                    return false;
-
-                SysWaiter.Wait(delay);
+            } finally {
+                Marshal.FreeHGlobal(buffer);
             }
         }
 
